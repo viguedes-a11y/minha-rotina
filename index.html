@@ -143,8 +143,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--verde);min-height:100vh;o
 .chart-card{background:white;border-radius:16px;padding:16px 18px;border:1px solid var(--creme-e);margin-bottom:10px;}
 .chart-title{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--verde);margin-bottom:4px;}
 .chart-sub{font-size:11px;color:var(--texto-s);margin-bottom:14px;}
-.wc-wrap{position:relative;height:160px;}
-canvas{width:100%!important;}
+.wc-wrap{position:relative;height:180px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
+.wc-wrap canvas{width:auto!important;display:block;}
 
 /* STREAK */
 .streak-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
@@ -377,6 +377,13 @@ canvas{width:100%!important;}
       <div class="sec-hdr"><div class="sec-ico g">🥗</div><div class="sec-title">Alimentação</div><div class="sec-prog" id="sp-alim"></div></div>
       <div class="items" id="it-alim"></div>
       <div class="inline-input-row">
+        <div><div class="inline-input-lbl">⏰ Horas de jejum</div><div class="inline-input-val" id="jejumDisplay">— h</div></div>
+        <div class="inline-input-right">
+          <input type="number" class="peso-inp" id="jejumInp" placeholder="h" style="width:60px" min="0" max="24" step="0.5">
+          <button class="peso-btn" onclick="salvarJejum()">OK</button>
+        </div>
+      </div>
+      <div class="inline-input-row" style="margin-top:7px">
         <div><div class="inline-input-lbl">🔥 Calorias do dia</div><div class="inline-input-val" id="calDisplay">— kcal</div></div>
         <div class="inline-input-right">
           <input type="number" class="peso-inp" id="calInp" placeholder="kcal" style="width:78px" min="0" max="9999">
@@ -468,13 +475,6 @@ canvas{width:100%!important;}
       </div>
     </div>
 
-    <div class="chart-card">
-      <div class="chart-title">Evolução do Peso</div>
-      <div class="wc-wrap">
-        <canvas id="pesoChart"></canvas>
-      </div>
-    </div>
-
     <!-- BACKUP -->
     <div class="backup-card">
       <div class="backup-title">🔒 Backup dos dados</div>
@@ -491,6 +491,12 @@ canvas{width:100%!important;}
 
   <!-- PAGE PESO -->
   <div class="page" id="page-peso">
+    <div class="chart-card" style="margin-bottom:14px">
+      <div class="chart-title">Evolução do Peso · Cardio · Jejum</div>
+      <div class="wc-wrap">
+        <canvas id="pesoChart"></canvas>
+      </div>
+    </div>
     <div class="section-lbl">Registro de peso</div>
     <div id="pesoHistList">
       <p style="color:var(--texto-s);font-size:13px;text-align:center;padding:40px 0;">Nenhum peso registrado ainda.</p>
@@ -518,7 +524,6 @@ const SECS={
     {id:'vitC',name:'Vitamina C',sub:'Com a refeição',emo:'🍊'},
   ]},
   noite:{cc:'cv',items:[
-    {id:'magnesio',name:'Trimagnesio Glicinato',sub:'Antes de dormir',emo:'🌙'},
     {id:'astaxantina',name:'Astaxantina',sub:'Antioxidante potente',emo:'🦐'},
     {id:'omega3',name:'Ômega-3 EPA/DHA',sub:'Anti-inflamatório',emo:'🐟'},
     {id:'chaga',name:'Chaga',sub:'Antioxidante dos cogumelos',emo:'🍄'},
@@ -532,7 +537,6 @@ const SECS={
   ]},
   skn:{cc:'cv',items:[
     {id:'sk5',name:'Limpeza / Demaquilante',sub:'Pele limpa antes de tudo',emo:'🫧'},
-    {id:'sk6',name:'Lescolton Ponteira Vermelha',sub:'3x/sem — sem olhos, cuidado rosácea',emo:'🔴',opt:true},
     {id:'sk7',name:'Sérum Niacinamida Principia',sub:'Uniformiza e fortalece a barreira',emo:'💧'},
     {id:'sk8',name:'Balm Chronos Olhos',sub:'Dedo anelar, batidinhas suaves',emo:'👁️'},
     {id:'sk9',name:'Cicaplast',sub:'Sela tudo por cima',emo:'✅'},
@@ -542,11 +546,7 @@ const SECS={
     {id:'bepantol',name:'Bepantol Derma',sub:'Fios úmidos após lavar',emo:'💧',opt:true},
   ]},
   alim:{cc:'cv',items:[
-    {id:'jejum',name:'Jejum até 12h',sub:'Janela alimentar 12h–20h',emo:'⏰'},
     {id:'agua',name:'3L de água com limão',sub:'Tomar até as 18h',emo:'💧'},
-    {id:'almoco2',name:'Almoço (12h)',sub:'Proteína + salada',emo:'🥩'},
-    {id:'lanche',name:'Lanche (16h)',sub:'Chia, iogurte, queijo ou castanhas',emo:'🥜'},
-    {id:'jantar',name:'Jantar (19h)',sub:'Leve — proteína + legumes',emo:'🥗'},
   ]},
   ex:{cc:'cd',items:[
     {id:'musculacao',name:'Musculação',sub:'Todos os dias',emo:'🏋️'},
@@ -832,6 +832,7 @@ function toggleItem(id,key,cid,pid){
 function renderAll(){
   SEC_MAP.forEach(([k,c,p])=>renderSec(k,c,p));
   renderCardio();
+  renderJejum();
   renderCalorias();
 }
 
@@ -855,6 +856,25 @@ function renderCardio(){
   const v=getDayData(currentDate).cardioMin;
   const el=document.getElementById('cardioDisplay');
   if(el) el.textContent=v!=null?v+' min':'— min';
+}
+
+function salvarJejum(){
+  const v=parseFloat(document.getElementById('jejumInp').value);
+  if(isNaN(v)||v<0||v>24){showToast('Digite horas válidas (0–24)');return;}
+  const dd=getDayData(currentDate);
+  dd.jejumH=v;
+  setDayData(currentDate,dd);
+  save();
+  saveDaySnapshot();
+  document.getElementById('jejumInp').value='';
+  renderJejum();
+  showToast('⏰ Jejum salvo: '+v+'h');
+}
+
+function renderJejum(){
+  const v=getDayData(currentDate).jejumH;
+  const el=document.getElementById('jejumDisplay');
+  if(el) el.textContent=v!=null?v+'h':'— h';
 }
 
 function salvarCalorias(){
@@ -996,27 +1016,40 @@ function renderPesoChart(){
   const canvas=document.getElementById('pesoChart');
   if(!canvas) return;
   const ctx=canvas.getContext('2d');
-  const W=canvas.offsetWidth||300,H=160;
-  canvas.width=W*2;canvas.height=H*2;
-  canvas.style.width=W+'px';canvas.style.height=H+'px';
-  ctx.scale(2,2);
+  const H=180;
 
-  // últimos 14 dias por data
+  // Coleta todas as datas com qualquer dado
+  const allDates=new Set();
+  (S.pesoHistory||[]).forEach(p=>allDates.add(p.date));
+  Object.keys(S.dayHistory||{}).forEach(d=>{
+    const dd=S.dayHistory[d];
+    if(dd&&(dd.cardioMin||dd.jejumH)) allDates.add(d);
+  });
+  // garante pelo menos os últimos 14 dias
   const today=new Date();
-  const dates=[];
-  for(let i=13;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);dates.push(d.toISOString().split('T')[0]);}
+  for(let i=13;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);allDates.add(d.toISOString().split('T')[0]);}
+  const dates=[...allDates].sort();
 
   const pesoByDate={};
   (S.pesoHistory||[]).forEach(p=>pesoByDate[p.date]=p.peso);
   const pesoVals=dates.map(d=>pesoByDate[d]!=null?pesoByDate[d]:null);
   const cardioVals=dates.map(d=>{const v=getDayData(d).cardioMin;return(v!=null&&v>0)?v:null;});
+  const jejumVals=dates.map(d=>{const v=getDayData(d).jejumH;return(v!=null&&v>0)?v:null;});
 
   const hasPeso=pesoVals.some(v=>v!=null);
   const hasCardio=cardioVals.some(v=>v!=null);
+  const hasJejum=jejumVals.some(v=>v!=null);
 
-  if(!hasPeso&&!hasCardio){
-    ctx.fillStyle='#6a7a70';ctx.font='12px DM Sans';ctx.textAlign='center';
-    ctx.fillText('Registre pesagens e cardio para ver o gráfico',W/2,H/2);return;
+  // Largura dinâmica: mínimo 32px por ponto, mínimo a largura do container
+  const containerW=canvas.parentElement.offsetWidth||300;
+  const W=Math.max(containerW, dates.length*32);
+  canvas.width=W*2;canvas.height=H*2;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.scale(2,2);
+
+  if(!hasPeso&&!hasCardio&&!hasJejum){
+    ctx.fillStyle='#6a7a70';ctx.font='13px DM Sans';ctx.textAlign='center';
+    ctx.fillText('Registre peso, cardio e jejum para ver o gráfico',W/2,H/2);return;
   }
 
   const meta=70;
@@ -1026,53 +1059,55 @@ function renderPesoChart(){
   const cardioNonNull=cardioVals.filter(v=>v!=null);
   const maxC=cardioNonNull.length?Math.max(...cardioNonNull,30):60;
 
-  const pad={t:10,r:hasCardio?32:10,b:30,l:38};
+  const pad={t:12,r:(hasCardio||hasJejum)?38:12,b:34,l:44};
   const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
-  const toX=i=>(i/(dates.length-1))*cw+pad.l;
+  const n=dates.length;
+  const toX=i=>n>1?(i/(n-1))*cw+pad.l:pad.l+cw/2;
   const toY=v=>ch-(v-minV)/(maxV-minV)*ch+pad.t;
   const toYC=v=>ch-(v/maxC)*ch+pad.t;
+  const toYJ=v=>ch-(v/24)*ch+pad.t;
 
-  // grid lines peso
+  // grid
   ctx.strokeStyle='rgba(224,216,200,.5)';ctx.lineWidth=1;
   [minV,meta,maxV].forEach(v=>{
     const y=toY(v);
     ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
-    ctx.fillStyle='#6a7a70';ctx.font='9px DM Sans';ctx.textAlign='right';
-    ctx.fillText(v.toFixed(1),pad.l-3,y+3);
+    ctx.fillStyle='#6a7a70';ctx.font='11px DM Sans';ctx.textAlign='right';
+    ctx.fillText(v.toFixed(1),pad.l-4,y+4);
   });
 
-  // meta peso
+  // meta linha
   const my=toY(meta);
   ctx.strokeStyle='rgba(201,168,76,.5)';ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(pad.l,my);ctx.lineTo(W-pad.r,my);ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='rgba(201,168,76,.8)';ctx.font='9px DM Sans';ctx.textAlign='left';
-  ctx.fillText('meta 70kg',pad.l+4,my-3);
+  ctx.fillStyle='rgba(201,168,76,.8)';ctx.font='11px DM Sans';ctx.textAlign='left';
+  ctx.fillText('meta 70kg',pad.l+5,my-4);
 
-  // eixo direito cardio
+  // eixo direito
   if(hasCardio){
-    ctx.fillStyle='#5a8ab0';ctx.font='9px DM Sans';ctx.textAlign='left';
-    [0,Math.round(maxC/2),maxC].forEach(v=>{
-      ctx.fillText(v+'m',W-pad.r+3,toYC(v)+3);
-    });
+    ctx.fillStyle='#5a8ab0';ctx.font='11px DM Sans';ctx.textAlign='left';
+    [0,Math.round(maxC/2),maxC].forEach(v=>{ctx.fillText(v+'m',W-pad.r+4,toYC(v)+4);});
+  }
+  if(hasJejum&&!hasCardio){
+    ctx.fillStyle='#c9a84c';ctx.font='11px DM Sans';ctx.textAlign='left';
+    [0,12,24].forEach(v=>{ctx.fillText(v+'h',W-pad.r+4,toYJ(v)+4);});
   }
 
   // área + linha peso
   if(hasPeso){
     const firstIdx=pesoVals.findIndex(v=>v!=null);
+    const lastIdx=pesoVals.reduce((a,v,i)=>v!=null?i:a,-1);
     const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
     grad.addColorStop(0,'rgba(74,124,95,.3)');grad.addColorStop(1,'rgba(74,124,95,.02)');
     ctx.beginPath();
     let started=false;
     pesoVals.forEach((v,i)=>{if(v==null)return;if(!started){ctx.moveTo(toX(i),toY(v));started=true;}else ctx.lineTo(toX(i),toY(v));});
-    const lastIdx=pesoVals.reduce((a,v,i)=>v!=null?i:a,-1);
     ctx.lineTo(toX(lastIdx),H-pad.b+pad.t);ctx.lineTo(toX(firstIdx),H-pad.b+pad.t);
     ctx.closePath();ctx.fillStyle=grad;ctx.fill();
-
     ctx.beginPath();started=false;
     pesoVals.forEach((v,i)=>{if(v==null)return;if(!started){ctx.moveTo(toX(i),toY(v));started=true;}else ctx.lineTo(toX(i),toY(v));});
     ctx.strokeStyle='#2d5a3d';ctx.lineWidth=2;ctx.stroke();
-
     pesoVals.forEach((v,i)=>{
       if(v==null)return;
       ctx.beginPath();ctx.arc(toX(i),toY(v),4,0,Math.PI*2);
@@ -1085,25 +1120,31 @@ function renderPesoChart(){
     ctx.beginPath();let started=false;ctx.setLineDash([3,3]);
     cardioVals.forEach((v,i)=>{if(v==null)return;if(!started){ctx.moveTo(toX(i),toYC(v));started=true;}else ctx.lineTo(toX(i),toYC(v));});
     ctx.strokeStyle='#5a8ab0';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
-    cardioVals.forEach((v,i)=>{
-      if(v==null)return;
-      ctx.beginPath();ctx.arc(toX(i),toYC(v),3,0,Math.PI*2);
-      ctx.fillStyle='#5a8ab0';ctx.fill();
-    });
+    cardioVals.forEach((v,i)=>{if(v==null)return;ctx.beginPath();ctx.arc(toX(i),toYC(v),3,0,Math.PI*2);ctx.fillStyle='#5a8ab0';ctx.fill();});
   }
 
-  // labels datas
+  // linha jejum
+  if(hasJejum){
+    ctx.beginPath();let startedJ=false;ctx.setLineDash([2,4]);
+    jejumVals.forEach((v,i)=>{if(v==null)return;if(!startedJ){ctx.moveTo(toX(i),toYJ(v));startedJ=true;}else ctx.lineTo(toX(i),toYJ(v));});
+    ctx.strokeStyle='#c9a84c';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
+    jejumVals.forEach((v,i)=>{if(v==null)return;ctx.beginPath();ctx.arc(toX(i),toYJ(v),3,0,Math.PI*2);ctx.fillStyle='#c9a84c';ctx.fill();});
+  }
+
+  // labels datas — mostra todas
   dates.forEach((d,i)=>{
-    if(i%3!==0&&i!==dates.length-1)return;
+    if(i%2!==0&&i!==dates.length-1)return;
     const dt=new Date(d+'T12:00:00');
-    ctx.fillStyle='#6a7a70';ctx.font='9px DM Sans';ctx.textAlign='center';
-    ctx.fillText(dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),toX(i),H-pad.b+pad.t+12);
+    ctx.fillStyle='#6a7a70';ctx.font='11px DM Sans';ctx.textAlign='center';
+    ctx.fillText(dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),toX(i),H-6);
   });
 
   // legenda
   let lx=pad.l;
-  if(hasPeso){ctx.fillStyle='#2d5a3d';ctx.fillRect(lx,H-pad.b+pad.t+18,10,3);ctx.fillStyle='#6a7a70';ctx.font='8px DM Sans';ctx.textAlign='left';ctx.fillText('Peso',lx+13,H-pad.b+pad.t+21);lx+=42;}
-  if(hasCardio){ctx.fillStyle='#5a8ab0';ctx.fillRect(lx,H-pad.b+pad.t+18,10,3);ctx.fillStyle='#6a7a70';ctx.font='8px DM Sans';ctx.textAlign='left';ctx.fillText('Cardio (min)',lx+13,H-pad.b+pad.t+21);}
+  const ly=H-pad.b+pad.t+22;
+  if(hasPeso){ctx.fillStyle='#2d5a3d';ctx.fillRect(lx,ly,10,3);ctx.fillStyle='#6a7a70';ctx.font='10px DM Sans';ctx.textAlign='left';ctx.fillText('Peso',lx+13,ly+4);lx+=44;}
+  if(hasCardio){ctx.fillStyle='#5a8ab0';ctx.fillRect(lx,ly,10,3);ctx.fillStyle='#6a7a70';ctx.font='10px DM Sans';ctx.textAlign='left';ctx.fillText('Cardio (min)',lx+13,ly+4);lx+=66;}
+  if(hasJejum){ctx.fillStyle='#c9a84c';ctx.fillRect(lx,ly,10,3);ctx.fillStyle='#6a7a70';ctx.font='10px DM Sans';ctx.textAlign='left';ctx.fillText('Jejum (h)',lx+13,ly+4);}
 }
 
 function renderMoodChart(){
@@ -1259,13 +1300,13 @@ function goPage(page,btn){
   document.getElementById('page-'+page).classList.add('active');
   btn.classList.add('active');
   saveDaySnapshot();
-  if(page==='visao'){renderStreak();renderConsist();renderPesoChart();renderMoodChart();}
-  if(page==='peso') renderPeso();
+  if(page==='visao'){renderStreak();renderConsist();renderMoodChart();}
+  if(page==='peso'){renderPeso();renderPesoChart();}
 }
 
 function resetDay(){
   if(!confirm('Resetar todos os checks de '+currentDate+'?')) return;
-  setDayData(currentDate,{checks:{},prod:null,humor:null,energia:null,cardioMin:null,calorias:null});
+  setDayData(currentDate,{checks:{},prod:null,humor:null,energia:null,cardioMin:null,jejumH:null,calorias:null});
   save();
   renderAll();
   renderThermos();
@@ -1297,6 +1338,7 @@ renderAll();
 renderThermos();
 renderPeso();
 renderCardio();
+renderJejum();
 renderCalorias();
 saveDaySnapshot();
 
