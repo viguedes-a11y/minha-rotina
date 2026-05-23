@@ -217,6 +217,12 @@ canvas{width:100%!important;}
 .backup-textarea{width:100%;height:80px;border:1.5px solid var(--creme-e);border-radius:10px;padding:10px;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--texto);background:white;resize:none;outline:none;margin-top:10px;display:none;}
 .backup-textarea:focus{border-color:var(--verde-c);}
 .backup-restore-btn{width:100%;padding:10px;background:var(--verde-c);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;margin-top:8px;display:none;}
+
+/* INLINE INPUT ROWS */
+.inline-input-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 14px;background:var(--creme);border-radius:12px;border:1px solid var(--creme-e);}
+.inline-input-lbl{font-size:11px;font-weight:500;color:var(--texto-s);letter-spacing:.3px;margin-bottom:2px;}
+.inline-input-val{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--verde);}
+.inline-input-right{display:flex;align-items:center;gap:7px;}
 </style>
 </head>
 <body>
@@ -358,11 +364,25 @@ canvas{width:100%!important;}
     <div class="sec">
       <div class="sec-hdr"><div class="sec-ico b">🏋️</div><div class="sec-title">Exercícios</div><div class="sec-prog" id="sp-ex"></div></div>
       <div class="items" id="it-ex"></div>
+      <div class="inline-input-row">
+        <div><div class="inline-input-lbl">⏱️ Cardio hoje</div><div class="inline-input-val" id="cardioDisplay">— min</div></div>
+        <div class="inline-input-right">
+          <input type="number" class="peso-inp" id="cardioInp" placeholder="min" style="width:68px" min="0" max="360">
+          <button class="peso-btn" onclick="salvarCardio()">OK</button>
+        </div>
+      </div>
     </div><div class="divider"></div>
 
     <div class="sec">
       <div class="sec-hdr"><div class="sec-ico g">🥗</div><div class="sec-title">Alimentação</div><div class="sec-prog" id="sp-alim"></div></div>
       <div class="items" id="it-alim"></div>
+      <div class="inline-input-row">
+        <div><div class="inline-input-lbl">🔥 Calorias do dia</div><div class="inline-input-val" id="calDisplay">— kcal</div></div>
+        <div class="inline-input-right">
+          <input type="number" class="peso-inp" id="calInp" placeholder="kcal" style="width:78px" min="0" max="9999">
+          <button class="peso-btn" onclick="salvarCalorias()">OK</button>
+        </div>
+      </div>
     </div><div class="divider"></div>
 
     <div class="sec">
@@ -530,8 +550,6 @@ const SECS={
   ]},
   ex:{cc:'cd',items:[
     {id:'musculacao',name:'Musculação',sub:'Todos os dias',emo:'🏋️'},
-    {id:'esteira',name:'Esteira 30min',sub:'Inclinação 2-3% — todos os dias',emo:'🚶'},
-    {id:'eliptico',name:'Elíptico 30min',sub:'Todos os dias',emo:'🔄'},
     {id:'abdominal',name:'Abdominal 3x20',sub:'Todos os dias',emo:'🔥'},
   ]}
 };
@@ -813,6 +831,49 @@ function toggleItem(id,key,cid,pid){
 
 function renderAll(){
   SEC_MAP.forEach(([k,c,p])=>renderSec(k,c,p));
+  renderCardio();
+  renderCalorias();
+}
+
+// ══════════════════════════════════
+// CARDIO & CALORIAS
+// ══════════════════════════════════
+function salvarCardio(){
+  const v=parseInt(document.getElementById('cardioInp').value);
+  if(!v||v<0||v>360){showToast('Digite um tempo válido');return;}
+  const dd=getDayData(currentDate);
+  dd.cardioMin=v;
+  setDayData(currentDate,dd);
+  save();
+  saveDaySnapshot();
+  document.getElementById('cardioInp').value='';
+  renderCardio();
+  showToast('⏱️ Cardio salvo: '+v+' min');
+}
+
+function renderCardio(){
+  const v=getDayData(currentDate).cardioMin;
+  const el=document.getElementById('cardioDisplay');
+  if(el) el.textContent=v!=null?v+' min':'— min';
+}
+
+function salvarCalorias(){
+  const v=parseInt(document.getElementById('calInp').value);
+  if(!v||v<0||v>9999){showToast('Digite um valor válido');return;}
+  const dd=getDayData(currentDate);
+  dd.calorias=v;
+  setDayData(currentDate,dd);
+  save();
+  saveDaySnapshot();
+  document.getElementById('calInp').value='';
+  renderCalorias();
+  showToast('🔥 Calorias salvas: '+v+' kcal');
+}
+
+function renderCalorias(){
+  const v=getDayData(currentDate).calorias;
+  const el=document.getElementById('calDisplay');
+  if(el) el.textContent=v!=null?v+' kcal':'— kcal';
 }
 
 function updateProg(){
@@ -940,21 +1001,38 @@ function renderPesoChart(){
   canvas.style.width=W+'px';canvas.style.height=H+'px';
   ctx.scale(2,2);
 
-  const data=[...(S.pesoHistory||[])].reverse().slice(-14);
-  if(data.length<2){
+  // últimos 14 dias por data
+  const today=new Date();
+  const dates=[];
+  for(let i=13;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);dates.push(d.toISOString().split('T')[0]);}
+
+  const pesoByDate={};
+  (S.pesoHistory||[]).forEach(p=>pesoByDate[p.date]=p.peso);
+  const pesoVals=dates.map(d=>pesoByDate[d]!=null?pesoByDate[d]:null);
+  const cardioVals=dates.map(d=>{const v=getDayData(d).cardioMin;return(v!=null&&v>0)?v:null;});
+
+  const hasPeso=pesoVals.some(v=>v!=null);
+  const hasCardio=cardioVals.some(v=>v!=null);
+
+  if(!hasPeso&&!hasCardio){
     ctx.fillStyle='#6a7a70';ctx.font='12px DM Sans';ctx.textAlign='center';
-    ctx.fillText('Registre pelo menos 2 pesagens para ver o gráfico',W/2,H/2);return;
+    ctx.fillText('Registre pesagens e cardio para ver o gráfico',W/2,H/2);return;
   }
 
-  const vals=data.map(d=>d.peso);
   const meta=70;
-  const minV=Math.min(...vals,meta)-1;
-  const maxV=Math.max(...vals)+1;
-  const pad={t:10,r:10,b:30,l:38};
-  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
-  const toX=i=>(i/(data.length-1))*cw+pad.l;
-  const toY=v=>ch-(v-minV)/(maxV-minV)*ch+pad.t;
+  const pesoNonNull=pesoVals.filter(v=>v!=null);
+  const minV=pesoNonNull.length?Math.min(...pesoNonNull,meta)-1:65;
+  const maxV=pesoNonNull.length?Math.max(...pesoNonNull)+1:90;
+  const cardioNonNull=cardioVals.filter(v=>v!=null);
+  const maxC=cardioNonNull.length?Math.max(...cardioNonNull,30):60;
 
+  const pad={t:10,r:hasCardio?32:10,b:30,l:38};
+  const cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  const toX=i=>(i/(dates.length-1))*cw+pad.l;
+  const toY=v=>ch-(v-minV)/(maxV-minV)*ch+pad.t;
+  const toYC=v=>ch-(v/maxC)*ch+pad.t;
+
+  // grid lines peso
   ctx.strokeStyle='rgba(224,216,200,.5)';ctx.lineWidth=1;
   [minV,meta,maxV].forEach(v=>{
     const y=toY(v);
@@ -963,6 +1041,7 @@ function renderPesoChart(){
     ctx.fillText(v.toFixed(1),pad.l-3,y+3);
   });
 
+  // meta peso
   const my=toY(meta);
   ctx.strokeStyle='rgba(201,168,76,.5)';ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(pad.l,my);ctx.lineTo(W-pad.r,my);ctx.stroke();
@@ -970,28 +1049,61 @@ function renderPesoChart(){
   ctx.fillStyle='rgba(201,168,76,.8)';ctx.font='9px DM Sans';ctx.textAlign='left';
   ctx.fillText('meta 70kg',pad.l+4,my-3);
 
-  const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
-  grad.addColorStop(0,'rgba(74,124,95,.3)');grad.addColorStop(1,'rgba(74,124,95,.02)');
-  ctx.beginPath();ctx.moveTo(toX(0),toY(vals[0]));
-  vals.forEach((v,i)=>ctx.lineTo(toX(i),toY(v)));
-  ctx.lineTo(toX(vals.length-1),H-pad.b+pad.t);ctx.lineTo(toX(0),H-pad.b+pad.t);
-  ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  // eixo direito cardio
+  if(hasCardio){
+    ctx.fillStyle='#5a8ab0';ctx.font='9px DM Sans';ctx.textAlign='left';
+    [0,Math.round(maxC/2),maxC].forEach(v=>{
+      ctx.fillText(v+'m',W-pad.r+3,toYC(v)+3);
+    });
+  }
 
-  ctx.beginPath();ctx.moveTo(toX(0),toY(vals[0]));
-  vals.forEach((v,i)=>ctx.lineTo(toX(i),toY(v)));
-  ctx.strokeStyle='#2d5a3d';ctx.lineWidth=2;ctx.stroke();
+  // área + linha peso
+  if(hasPeso){
+    const firstIdx=pesoVals.findIndex(v=>v!=null);
+    const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);
+    grad.addColorStop(0,'rgba(74,124,95,.3)');grad.addColorStop(1,'rgba(74,124,95,.02)');
+    ctx.beginPath();
+    let started=false;
+    pesoVals.forEach((v,i)=>{if(v==null)return;if(!started){ctx.moveTo(toX(i),toY(v));started=true;}else ctx.lineTo(toX(i),toY(v));});
+    const lastIdx=pesoVals.reduce((a,v,i)=>v!=null?i:a,-1);
+    ctx.lineTo(toX(lastIdx),H-pad.b+pad.t);ctx.lineTo(toX(firstIdx),H-pad.b+pad.t);
+    ctx.closePath();ctx.fillStyle=grad;ctx.fill();
 
-  data.forEach((d,i)=>{
-    const x=toX(i),y=toY(d.peso);
-    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
-    ctx.fillStyle='white';ctx.fill();
+    ctx.beginPath();started=false;
+    pesoVals.forEach((v,i)=>{if(v==null)return;if(!started){ctx.moveTo(toX(i),toY(v));started=true;}else ctx.lineTo(toX(i),toY(v));});
     ctx.strokeStyle='#2d5a3d';ctx.lineWidth=2;ctx.stroke();
-    if(i===0||i===data.length-1||i%3===0){
-      const dt=new Date(d.date+'T12:00:00');
-      ctx.fillStyle='#6a7a70';ctx.font='9px DM Sans';ctx.textAlign='center';
-      ctx.fillText(dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),x,H-pad.b+pad.t+12);
-    }
+
+    pesoVals.forEach((v,i)=>{
+      if(v==null)return;
+      ctx.beginPath();ctx.arc(toX(i),toY(v),4,0,Math.PI*2);
+      ctx.fillStyle='white';ctx.fill();ctx.strokeStyle='#2d5a3d';ctx.lineWidth=2;ctx.stroke();
+    });
+  }
+
+  // linha cardio
+  if(hasCardio){
+    ctx.beginPath();let started=false;ctx.setLineDash([3,3]);
+    cardioVals.forEach((v,i)=>{if(v==null)return;if(!started){ctx.moveTo(toX(i),toYC(v));started=true;}else ctx.lineTo(toX(i),toYC(v));});
+    ctx.strokeStyle='#5a8ab0';ctx.lineWidth=1.5;ctx.stroke();ctx.setLineDash([]);
+    cardioVals.forEach((v,i)=>{
+      if(v==null)return;
+      ctx.beginPath();ctx.arc(toX(i),toYC(v),3,0,Math.PI*2);
+      ctx.fillStyle='#5a8ab0';ctx.fill();
+    });
+  }
+
+  // labels datas
+  dates.forEach((d,i)=>{
+    if(i%3!==0&&i!==dates.length-1)return;
+    const dt=new Date(d+'T12:00:00');
+    ctx.fillStyle='#6a7a70';ctx.font='9px DM Sans';ctx.textAlign='center';
+    ctx.fillText(dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),toX(i),H-pad.b+pad.t+12);
   });
+
+  // legenda
+  let lx=pad.l;
+  if(hasPeso){ctx.fillStyle='#2d5a3d';ctx.fillRect(lx,H-pad.b+pad.t+18,10,3);ctx.fillStyle='#6a7a70';ctx.font='8px DM Sans';ctx.textAlign='left';ctx.fillText('Peso',lx+13,H-pad.b+pad.t+21);lx+=42;}
+  if(hasCardio){ctx.fillStyle='#5a8ab0';ctx.fillRect(lx,H-pad.b+pad.t+18,10,3);ctx.fillStyle='#6a7a70';ctx.font='8px DM Sans';ctx.textAlign='left';ctx.fillText('Cardio (min)',lx+13,H-pad.b+pad.t+21);}
 }
 
 function renderMoodChart(){
@@ -1153,7 +1265,7 @@ function goPage(page,btn){
 
 function resetDay(){
   if(!confirm('Resetar todos os checks de '+currentDate+'?')) return;
-  setDayData(currentDate,{checks:{},prod:null,humor:null,energia:null});
+  setDayData(currentDate,{checks:{},prod:null,humor:null,energia:null,cardioMin:null,calorias:null});
   save();
   renderAll();
   renderThermos();
@@ -1184,6 +1296,8 @@ renderFad();
 renderAll();
 renderThermos();
 renderPeso();
+renderCardio();
+renderCalorias();
 saveDaySnapshot();
 
 setInterval(saveDaySnapshot,5*60*1000);
