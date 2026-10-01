@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
+  color-scheme:light;
   --verde:#1a3a2a; --verde-m:#2d5a3d; --verde-c:#4a7c5f;
   --dourado:#c9a84c; --dourado-c:#e8c97a;
   --creme:#f5f0e8; --creme-e:#e0d8c8; --branco:#fdfaf5;
@@ -30,7 +31,7 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;col
 
 /* CONTENT / TABS */
 .content{max-width:720px;margin:0 auto;padding:6px 16px 100px;}
-.tabs{display:flex;gap:7px;margin-bottom:18px;overflow-x:auto;padding:2px 0;scrollbar-width:none;position:sticky;top:0;background:var(--branco);z-index:5;padding-top:10px;padding-bottom:8px;}
+.tabs{display:flex;gap:7px;margin-bottom:18px;overflow-x:auto;padding:2px 0;scrollbar-width:none;position:sticky;top:env(safe-area-inset-top,0px);background:var(--branco);z-index:5;padding-top:10px;padding-bottom:8px;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{padding:8px 16px;border-radius:20px;border:1.5px solid var(--creme-e);background:white;font-size:13px;color:var(--texto-s);cursor:pointer;white-space:nowrap;font-weight:500;}
 .tab.active{background:var(--verde);border-color:var(--verde);color:var(--dourado);}
@@ -127,6 +128,11 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 .ed-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
 .ed-row .inp{padding:7px 8px;}
 
+.modal-bg{position:fixed;inset:0;background:rgba(15,34,25,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:900;}
+.modal{background:var(--branco);border-radius:18px;padding:20px;width:100%;max-width:420px;box-shadow:0 10px 40px rgba(0,0,0,.25);}
+.modal p{font-size:14px;line-height:1.5;margin-bottom:14px;}
+.modal textarea{min-height:160px;font-size:12px;}
+.modal .row{justify-content:flex-end;margin-top:12px;}
 .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--verde);color:var(--dourado);padding:10px 22px;border-radius:28px;font-size:13px;z-index:1000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
@@ -144,6 +150,7 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 <body>
 
 <div class="toast" id="toast"></div>
+<div id="modal"></div>
 
 <div class="hdr">
   <div class="hdr-orb"></div>
@@ -351,6 +358,20 @@ function combosDe(p){
    ============================================================ */
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function num(v){ return Number(v).toLocaleString('pt-BR',{maximumFractionDigits:2}); }
+function fecharModal(){ document.getElementById('modal').innerHTML=''; }
+let _modalOk=null;
+function pedir(msg,ok,txtOk){
+  _modalOk=ok;
+  document.getElementById('modal').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)fecharModal()"><div class="modal"><p>${esc(msg)}</p>
+    <div class="row"><button class="btn sec" onclick="fecharModal()">Cancelar</button><button class="btn" onclick="const f=_modalOk;fecharModal();f()">${esc(txtOk||'Confirmar')}</button></div></div></div>`;
+}
+function caixaTexto(titulo,texto,ok,txtOk){
+  _modalOk=ok;
+  document.getElementById('modal').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)fecharModal()"><div class="modal"><p>${esc(titulo)}</p>
+    <textarea class="inp" id="modalTxt">${esc(texto||'')}</textarea>
+    <div class="row"><button class="btn sec" onclick="fecharModal()">Fechar</button>${ok?`<button class="btn" onclick="const v=document.getElementById('modalTxt').value;const f=_modalOk;fecharModal();f(v)">${esc(txtOk||'OK')}</button>`:''}</div></div></div>`;
+  const ta=document.getElementById('modalTxt'); if(!ok){ ta.focus(); ta.select(); }
+}
 function toast(msg){
   const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
   clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200);
@@ -605,9 +626,10 @@ function setJItem(i,k,v){ D.semana.jantar.itens[i][k]=v; save(); render(); }
 function addJItem(){ D.semana.jantar.itens.push({rid:'',g:150}); save(); render(); }
 function rmJItem(i){ D.semana.jantar.itens.splice(i,1); save(); render(); }
 function novaSemana(){
-  if(!confirm('Começar nova semana? As receitas escolhidas ficam; só os checklists e itens comprados são zerados.')) return;
-  D.semana.checks={}; D.semana.compradas={}; D.semana.extras=[];
-  save(); render(); toast('Nova semana pronta ✨');
+  pedir('Começar nova semana? As receitas escolhidas ficam; só os checklists e itens comprados são zerados.',()=>{
+    D.semana.checks={}; D.semana.compradas={}; D.semana.extras=[];
+    save(); render(); toast('Nova semana pronta ✨');
+  },'Começar');
 }
 
 /* ============================================================
@@ -635,8 +657,7 @@ function pgCompras(c){
   let h=`<div class="sec-t">Lista de compras</div>
     <div class="sec-s">Toque para marcar o que já tem em casa ou já comprou. Faltam <b>${falta}</b> de ${itens.length} itens.</div>
     <div class="row wrap no-print" style="margin-bottom:14px">
-      <button class="btn" onclick="compartilharCompras()">📤 Enviar / copiar lista</button>
-      <button class="btn sec" onclick="window.print()">🖨️ Imprimir</button>
+      <button class="btn" onclick="compartilharCompras()">📋 Copiar lista (para WhatsApp)</button>
     </div>`;
   if(!itens.length) return h+`<div class="empty">Escolha receitas na aba Semana para gerar a lista.</div>`;
   SECOES.forEach(s=>{
@@ -669,17 +690,14 @@ function compartilharCompras(){
     if(!doS.length) return;
     t+=`\n*${s}*\n`+doS.map(i=>'• '+(i.un?fmtQ(i.qtd,i.un,true)+' ':'')+i.nome).join('\n')+'\n';
   });
-  if(navigator.share){ navigator.share({title:'Lista de compras',text:t}).catch(()=>{}); return; }
   copiar(t,'Lista copiada 📋');
 }
 function copiar(t,msg){
-  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>toast(msg),()=>fallbackCopy(t,msg)); }
-  else fallbackCopy(t,msg);
-}
-function fallbackCopy(t,msg){
-  const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); toast(msg); }catch(e){ prompt('Copie:',t); }
-  ta.remove();
+  const manual=()=>caixaTexto('Selecione e copie o texto abaixo:',t);
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(()=>toast(msg),manual);
+    else manual();
+  }catch(e){ manual(); }
 }
 
 /* ============================================================
@@ -889,12 +907,13 @@ function salvarReceita(){
 }
 function duplicarReceita(){ ED=JSON.parse(JSON.stringify(ED)); ED.id=''; ED.nome+=' (cópia)'; render(); toast('Cópia criada — edite e salve'); }
 function apagarReceita(){
-  if(!confirm(`Apagar “${ED.nome}”?`)) return;
-  const id=ED.id;
-  D.receitas=D.receitas.filter(r=>r.id!==id);
-  for(const pid in D.semana.combos) D.semana.combos[pid].forEach(c=>COMP.forEach(k=>{ if(c[k]===id) c[k]=''; }));
-  D.semana.jantar.itens=D.semana.jantar.itens.filter(i=>i.rid!==id);
-  ED=null; save(); render(); toast('Receita apagada');
+  pedir(`Apagar “${ED.nome}”?`,()=>{
+    const id=ED.id;
+    D.receitas=D.receitas.filter(r=>r.id!==id);
+    for(const pid in D.semana.combos) D.semana.combos[pid].forEach(c=>COMP.forEach(k=>{ if(c[k]===id) c[k]=''; }));
+    D.semana.jantar.itens=D.semana.jantar.itens.filter(i=>i.rid!==id);
+    ED=null; save(); render(); toast('Receita apagada');
+  },'Apagar');
 }
 
 /* ============================================================
@@ -954,14 +973,14 @@ function setP(id,k,v){
 function addPessoa(){ const p={id:uid(),nome:'Nova pessoa',emoji:'🙂',qtd:5,proteina:120,carbo:120,legume:100}; D.pessoas.push(p); save(); render(); }
 function rmPessoa(id){
   const p=pessoa(id);
-  if(!confirm(`Remover ${p.nome}?`)) return;
-  D.pessoas=D.pessoas.filter(x=>x.id!==id); delete D.semana.combos[id]; save(); render();
+  pedir(`Remover ${p.nome}?`,()=>{ D.pessoas=D.pessoas.filter(x=>x.id!==id); delete D.semana.combos[id]; save(); render(); },'Remover');
 }
 function setC(k,v){ if(typeof v==='number') v=Math.max(0,v||0); D.config[k]=v; save(); render(); }
 function importar(){
-  const t=prompt('Cole aqui o backup:'); if(!t) return;
-  try{ const d=JSON.parse(t); if(!d.receitas||!d.pessoas) throw 0; D=d; save(); load(); render(); toast('Backup restaurado ✓'); }
-  catch(e){ toast('Backup inválido'); }
+  caixaTexto('Cole aqui o backup copiado antes:','',t=>{
+    try{ const d=JSON.parse(t); if(!d.receitas||!d.pessoas) throw 0; D=d; save(); load(); render(); toast('Backup restaurado ✓'); }
+    catch(e){ toast('Backup inválido: cole o texto completo'); }
+  },'Restaurar');
 }
 function restaurarPadrao(){
   const faltando=receitasPadrao().filter(r=>!rec(r.id));
