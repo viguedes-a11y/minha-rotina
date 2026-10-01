@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marmitas da Semana</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme:light;
+  --verde:#1a3a2a; --verde-m:#2d5a3d; --verde-c:#4a7c5f;
+  --dourado:#c9a84c; --dourado-c:#e8c97a;
+  --creme:#f5f0e8; --creme-e:#e0d8c8; --branco:#fdfaf5;
+  --texto:#1a2420; --texto-s:#6a7a70;
+  --rosa:#d4756a; --azul:#5a8ab0;
+  --c-proteina:#d4756a; --c-carbo:#c9a84c; --c-legume:#4a7c5f; --c-jantar:#5a8ab0;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'DM Sans',sans-serif;background:var(--branco);color:var(--texto);min-height:100vh;overflow-x:hidden;}
+button,input,select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--texto);}
+
+/* HEADER */
+.hdr{background:linear-gradient(165deg,#0f2219 0%,var(--verde-m) 100%);padding:40px 20px 30px;text-align:center;position:relative;overflow:hidden;}
+.hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:24px;background:var(--branco);border-radius:24px 24px 0 0;}
+.hdr-orb{position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1) 0%,transparent 70%);top:-60px;left:50%;transform:translateX(-50%);pointer-events:none;}
+.hdr-back{position:absolute;top:14px;left:14px;font-size:12px;color:var(--dourado);text-decoration:none;opacity:.85;}
+.hdr-date{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dourado);margin-bottom:4px;opacity:.8;}
+.hdr-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--creme);}
+.hdr-title em{font-style:italic;color:var(--dourado-c);}
+.hdr-sum{font-size:12px;color:rgba(245,240,232,.65);margin-top:6px;}
+
+/* CONTENT / TABS */
+.content{max-width:720px;margin:0 auto;padding:6px 16px 100px;}
+.tabs{display:flex;gap:7px;margin-bottom:18px;overflow-x:auto;padding:2px 0;scrollbar-width:none;position:sticky;top:env(safe-area-inset-top,0px);background:var(--branco);z-index:5;padding-top:10px;padding-bottom:8px;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:8px 16px;border-radius:20px;border:1.5px solid var(--creme-e);background:white;font-size:13px;color:var(--texto-s);cursor:pointer;white-space:nowrap;font-weight:500;}
+.tab.active{background:var(--verde);border-color:var(--verde);color:var(--dourado);}
+
+/* CARDS */
+.card{background:var(--creme);border-radius:16px;padding:16px;margin-bottom:12px;}
+.card.white{background:white;border:1px solid var(--creme-e);}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.card-t{font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--verde);line-height:1.1;}
+.card-s{font-size:12px;color:var(--texto-s);}
+.sec-t{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--verde);margin:6px 2px 4px;}
+.sec-s{font-size:12px;color:var(--texto-s);margin:0 2px 14px;line-height:1.5;}
+.ml-auto{margin-left:auto;}
+.muted{color:var(--texto-s);font-size:12px;}
+.warn{background:rgba(212,117,106,.1);border:1px solid rgba(212,117,106,.3);color:#9a4a40;border-radius:10px;padding:8px 12px;font-size:12px;margin:8px 0;}
+.ok{background:rgba(74,124,95,.1);border:1px solid rgba(74,124,95,.25);color:var(--verde-m);border-radius:10px;padding:8px 12px;font-size:12px;margin:8px 0;}
+.empty{text-align:center;padding:30px 10px;color:var(--texto-s);font-size:13px;}
+
+/* FORM */
+.inp,select.inp,textarea.inp{width:100%;padding:9px 11px;border:1.5px solid var(--creme-e);border-radius:10px;background:white;outline:none;min-width:0;}
+.inp:focus{border-color:var(--verde-c);}
+.inp.sm{width:72px;text-align:center;padding:7px 6px;}
+.inp.xs{width:58px;text-align:center;padding:6px 4px;}
+textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
+.lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-s);margin:10px 0 5px;display:block;}
+.row{display:flex;gap:8px;align-items:center;}
+.row.wrap{flex-wrap:wrap;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.btn{padding:9px 16px;background:var(--verde);color:var(--dourado);border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:500;white-space:nowrap;}
+.btn.sec{background:white;color:var(--verde);border:1.5px solid var(--creme-e);}
+.btn.ghost{background:transparent;color:var(--verde-c);border:1.5px dashed var(--creme-e);width:100%;}
+.btn.danger{background:white;color:var(--rosa);border:1.5px solid rgba(212,117,106,.4);}
+.btn.sm{padding:6px 11px;font-size:12px;}
+.x{width:30px;height:30px;border-radius:50%;border:1px solid var(--creme-e);background:white;color:var(--texto-s);cursor:pointer;flex-shrink:0;font-size:14px;line-height:1;}
+.switch{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;user-select:none;}
+.switch input{width:18px;height:18px;accent-color:var(--verde);}
+
+/* PEOPLE / COMBOS */
+.avatar{width:40px;height:40px;border-radius:12px;background:white;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.chips{display:flex;gap:6px;flex-wrap:wrap;}
+.chip{font-size:11px;padding:3px 9px;border-radius:12px;background:white;border:1px solid var(--creme-e);color:var(--texto-s);white-space:nowrap;}
+.chip b{color:var(--texto);font-weight:600;}
+.combo{background:white;border-radius:12px;padding:10px;margin-bottom:8px;border:1px solid var(--creme-e);}
+.combo-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--creme-e);border-radius:10px;overflow:hidden;}
+.stepper button{width:32px;height:32px;border:none;background:var(--creme);cursor:pointer;font-size:16px;color:var(--verde);}
+.stepper span{min-width:34px;text-align:center;font-weight:600;font-size:14px;}
+.sel-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.dot.proteina{background:var(--c-proteina);} .dot.carbo{background:var(--c-carbo);} .dot.legume{background:var(--c-legume);} .dot.jantar{background:var(--c-jantar);}
+.sel-row .k{font-size:11px;color:var(--texto-s);width:62px;flex-shrink:0;}
+.sum-line{font-size:12px;margin-top:4px;}
+
+/* CHECKLIST */
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 2px;border-bottom:1px solid var(--creme-e);cursor:pointer;}
+.chk:last-child{border-bottom:none;}
+.chk .box{width:22px;height:22px;border-radius:7px;border:2px solid var(--creme-e);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:white;margin-top:1px;}
+.chk.done .box{background:var(--verde-c);border-color:var(--verde-c);}
+.chk.done .box::after{content:'✓';color:white;font-size:13px;font-weight:700;}
+.chk .txt{flex:1;font-size:14px;line-height:1.4;}
+.chk.done .txt{color:var(--texto-s);text-decoration:line-through;}
+.chk .q{font-weight:600;color:var(--verde);white-space:nowrap;}
+.chk .sub{font-size:11px;color:var(--texto-s);margin-top:2px;text-decoration:none;}
+.ing-list{font-size:13px;line-height:1.7;columns:2;column-gap:16px;margin:6px 0 4px;}
+.ing-list div{break-inside:avoid;}
+.ing-list b{color:var(--verde);font-weight:600;}
+
+/* TIMELINE */
+.gantt{background:white;border:1px solid var(--creme-e);border-radius:14px;padding:12px 10px 8px;margin-bottom:12px;}
+.g-lane{display:flex;align-items:center;height:30px;}
+.g-name{width:74px;font-size:11px;color:var(--texto-s);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.g-track{position:relative;flex:1;height:22px;background:var(--creme);border-radius:6px;}
+.g-bar{position:absolute;top:0;bottom:0;border-radius:6px;color:white;font-size:10px;padding:0 5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:22px;border:1px solid rgba(255,255,255,.6);}
+.g-bar.proteina{background:var(--c-proteina);} .g-bar.carbo{background:var(--c-carbo);} .g-bar.legume{background:var(--c-legume);} .g-bar.jantar{background:var(--c-jantar);} .g-bar.montagem{background:var(--verde);}
+.g-axis{display:flex;margin-left:74px;position:relative;height:16px;margin-top:4px;}
+.g-tick{position:absolute;font-size:10px;color:var(--texto-s);transform:translateX(-50%);}
+.tl-time{font-size:12px;font-weight:600;color:var(--verde);white-space:nowrap;min-width:92px;}
+.tl-eq{font-size:11px;color:var(--texto-s);}
+
+/* MONTAGEM */
+.mt{width:100%;border-collapse:collapse;font-size:13px;}
+.mt td,.mt th{padding:7px 4px;border-bottom:1px solid var(--creme-e);text-align:left;vertical-align:top;}
+.mt th{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-s);font-weight:500;}
+.mt td.n{text-align:right;white-space:nowrap;font-weight:600;color:var(--verde);}
+
+/* RECIPES */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.fchip{padding:6px 12px;border-radius:16px;border:1.5px solid var(--creme-e);background:white;font-size:12px;cursor:pointer;color:var(--texto-s);}
+.fchip.active{background:var(--verde);border-color:var(--verde);color:var(--dourado);}
+.rcard{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--creme-e);border-radius:12px;padding:11px 12px;margin-bottom:8px;cursor:pointer;}
+.rcard .nm{font-size:14px;font-weight:500;}
+.rcard .meta{font-size:11px;color:var(--texto-s);margin-top:2px;}
+.ed-row{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
+.ed-row .inp{padding:7px 8px;}
+
+.modal-bg{position:fixed;inset:0;background:rgba(15,34,25,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:900;}
+.modal{background:var(--branco);border-radius:18px;padding:20px;width:100%;max-width:420px;box-shadow:0 10px 40px rgba(0,0,0,.25);}
+.modal p{font-size:14px;line-height:1.5;margin-bottom:14px;}
+.modal textarea{min-height:160px;font-size:12px;}
+.modal .row{justify-content:flex-end;margin-top:12px;}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--verde);color:var(--dourado);padding:10px 22px;border-radius:28px;font-size:13px;z-index:1000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@media (max-width:480px){
+  .ing-list{columns:1;}
+  .grid3{grid-template-columns:1fr 1fr;}
+  .tl-time{min-width:80px;}
+}
+@media print{
+  .tabs,.hdr,.btn,.no-print{display:none!important;}
+  .card{break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div id="modal"></div>
+
+<div class="hdr">
+  <div class="hdr-orb"></div>
+  <a class="hdr-back" href="index.html">‹ Minha Rotina</a>
+  <div class="hdr-date">planejamento semanal</div>
+  <div class="hdr-title">Marmitas <em>da Semana</em></div>
+  <div class="hdr-sum" id="hdrSum"></div>
+</div>
+
+<div class="content">
+  <div class="tabs" id="tabs"></div>
+  <div id="page"></div>
+</div>
+
+<script>
+/* ============================================================
+   CONSTANTES
+   ============================================================ */
+const KEY = 'marmitas_v1';
+const COMP = ['proteina','carbo','legume'];
+const TIPOS = {proteina:'Proteína', carbo:'Carboidrato', legume:'Legumes', jantar:'Jantar'};
+const EQUIP = {
+  fogao:{nome:'Fogão', icon:'🔥'},
+  airfryer:{nome:'Airfryer', icon:'💨'},
+  forno:{nome:'Forno', icon:'♨️'},
+  bancada:{nome:'Bancada', icon:'🔪'}
+};
+const UNIDADES = ['g','ml','un','dente','maço','colher (sopa)','colher (chá)','xícara','lata','caixa','pacote','a gosto'];
+const SECOES = ['Açougue e peixaria','Hortifrúti','Frios, laticínios e ovos','Mercearia','Outros'];
+const PAGES = [
+  ['semana','Semana'],['compras','Compras'],['vespera','Véspera'],
+  ['preparo','Dia do preparo'],['receitas','Receitas'],['ajustes','Ajustes']
+];
+
+/* ============================================================
+   RECEITAS PADRÃO
+   ingredientes: [quantidade, unidade, nome]
+   rende: gramas PRONTAS (proteína/carbo/legume) ou PORÇÕES (jantar)
+   lote: capacidade da airfryer em g prontos por leva (opcional)
+   ============================================================ */
+function R(id,nome,tipo,rende,ing,pre,etapas,lote){
+  return {id,nome,tipo,rende,lote:lote||0,
+    ingredientes:ing.map(([qtd,un,nome])=>({qtd,un,nome,secao:''})),
+    pre,etapas:etapas.map(([eq,min,txt])=>({eq,min,txt}))};
+}
+function receitasPadrao(){ return [
+  // PROTEÍNAS
+  R('frango_cubos','Frango em cubos grelhado','proteina',700,
+    [[1000,'g','peito de frango'],[3,'dente','alho'],[1,'un','limão'],[10,'g','sal'],[20,'ml','azeite'],[5,'g','páprica defumada']],
+    ['Cortar o frango em cubos médios','Temperar com alho amassado, limão, sal e páprica e deixar marinando na geladeira'],
+    [['fogao',25,'Grelhar em frigideira grande com azeite, em levas, sem amontoar']]),
+  R('frango_af','Frango na airfryer','proteina',700,
+    [[1000,'g','peito de frango'],[3,'dente','alho'],[1,'un','limão'],[10,'g','sal'],[10,'ml','azeite'],[5,'g','páprica defumada']],
+    ['Cortar o frango em cubos ou tiras','Temperar e deixar marinando na geladeira'],
+    [['airfryer',18,'Airfryer a 200 °C, sacudindo o cesto na metade']],500),
+  R('carne_moida','Carne moída refogada (patinho)','proteina',750,
+    [[1000,'g','patinho moído'],[1,'un','cebola'],[3,'dente','alho'],[2,'un','tomate'],[10,'g','sal'],[15,'ml','azeite'],[1,'maço','cheiro-verde']],
+    ['Picar cebola, alho e tomate e guardar em pote fechado','Passar a carne do congelador para a geladeira'],
+    [['fogao',25,'Dourar a carne em panela grande, juntar cebola, alho e tomate e refogar até secar']]),
+  R('sobrecoxa_forno','Sobrecoxa assada sem osso','proteina',700,
+    [[1000,'g','sobrecoxa sem osso'],[4,'dente','alho'],[1,'un','limão'],[10,'g','sal'],[5,'g','páprica doce'],[20,'ml','azeite']],
+    ['Temperar e deixar marinando na geladeira de um dia para o outro'],
+    [['forno',45,'Assar a 200 °C coberta com papel-alumínio por 25 min, depois descobrir e dourar']]),
+  R('tilapia_af','Tilápia na airfryer','proteina',750,
+    [[1000,'g','filé de tilápia'],[1,'un','limão'],[2,'dente','alho'],[8,'g','sal'],[10,'ml','azeite']],
+    ['Passar os filés do congelador para a geladeira','Temperar com limão, alho e sal'],
+    [['airfryer',15,'Airfryer a 200 °C (por leva)']],400),
+  R('iscas_patinho','Iscas de patinho aceboladas','proteina',700,
+    [[1000,'g','patinho em iscas'],[2,'un','cebola'],[3,'dente','alho'],[10,'g','sal'],[20,'ml','azeite']],
+    ['Cortar a carne em tiras finas (ou pedir no açougue)','Fatiar as cebolas em meia-lua'],
+    [['fogao',20,'Selar a carne em fogo alto, em levas, e finalizar com a cebola']]),
+  R('frango_desfiado','Frango desfiado','proteina',750,
+    [[1000,'g','peito de frango'],[1,'un','cebola'],[2,'dente','alho'],[2,'un','tomate'],[10,'g','sal'],[15,'ml','azeite']],
+    ['Picar cebola, alho e tomate'],
+    [['fogao',25,'Cozinhar o frango na panela de pressão com água e sal (15 min após pegar pressão)'],['bancada',10,'Desfiar o frango'],['fogao',10,'Refogar com cebola, alho e tomate']]),
+  // CARBOIDRATOS
+  R('arroz_branco','Arroz branco','carbo',1500,
+    [[500,'g','arroz branco'],[1000,'ml','água'],[2,'dente','alho'],[15,'ml','óleo'],[8,'g','sal']],
+    [],
+    [['fogao',25,'Refogar o alho no óleo, juntar o arroz e a água fervente com sal; cozinhar tampado em fogo baixo']]),
+  R('arroz_integral','Arroz integral','carbo',1400,
+    [[500,'g','arroz integral'],[1250,'ml','água'],[2,'dente','alho'],[15,'ml','óleo'],[8,'g','sal']],
+    ['Deixar o arroz de molho em água (opcional, acelera o cozimento)'],
+    [['fogao',40,'Refogar o alho, juntar arroz e água fervente com sal; cozinhar tampado em fogo baixo']]),
+  R('batata_doce_forno','Batata-doce assada','carbo',1000,
+    [[1250,'g','batata-doce'],[20,'ml','azeite'],[6,'g','sal'],[2,'g','alecrim']],
+    ['Lavar, descascar e cortar em cubos; guardar na geladeira coberta com água'],
+    [['forno',40,'Assar a 200 °C em assadeira untada, virando na metade']]),
+  R('batata_doce_af','Batata-doce na airfryer','carbo',1000,
+    [[1250,'g','batata-doce'],[15,'ml','azeite'],[6,'g','sal'],[2,'g','alecrim']],
+    ['Lavar, descascar e cortar em cubos; guardar na geladeira coberta com água'],
+    [['airfryer',25,'Airfryer a 200 °C, sacudindo na metade']],500),
+  R('mandioca','Mandioca cozida','carbo',1000,
+    [[1000,'g','mandioca descascada'],[8,'g','sal']],
+    ['Descascar e cortar em pedaços (se comprar congelada, pular)'],
+    [['fogao',30,'Cozinhar na panela de pressão com água e sal (20 min após pegar pressão)']]),
+  R('macarrao_integral','Macarrão integral','carbo',1200,
+    [[500,'g','macarrão integral'],[8,'g','sal'],[10,'ml','azeite']],
+    [],
+    [['fogao',20,'Cozinhar em água fervente com sal, 1 min a menos que a embalagem (vai reaquecer)']]),
+  R('pure_batata','Purê de batata','carbo',1000,
+    [[1000,'g','batata'],[150,'ml','leite'],[30,'g','manteiga'],[6,'g','sal']],
+    ['Descascar e cortar as batatas; guardar cobertas de água na geladeira'],
+    [['fogao',25,'Cozinhar as batatas até ficarem macias'],['bancada',10,'Espremer e misturar com leite quente e manteiga']]),
+  R('feijao','Feijão carioca','carbo',1500,
+    [[500,'g','feijão carioca'],[1,'un','cebola'],[3,'dente','alho'],[8,'g','sal'],[15,'ml','óleo'],[2,'un','folha de louro']],
+    ['Deixar o feijão de molho em água por 12 h (descartar a água antes de cozinhar)'],
+    [['fogao',40,'Cozinhar na pressão com louro (25–30 min após pegar pressão)'],['fogao',10,'Temperar com refogado de cebola e alho']]),
+  // LEGUMES
+  R('brocolis','Brócolis no vapor','legume',900,
+    [[1000,'g','brócolis'],[5,'g','sal']],
+    ['Lavar, higienizar e separar em floretes'],
+    [['fogao',10,'Cozinhar no vapor por 6–8 min e passar em água gelada (fica verdinho na marmita)']]),
+  R('legumes_assados','Legumes assados','legume',900,
+    [[500,'g','abobrinha'],[400,'g','cenoura'],[300,'g','berinjela'],[30,'ml','azeite'],[6,'g','sal'],[2,'g','orégano']],
+    ['Lavar e cortar todos os legumes em cubos do mesmo tamanho'],
+    [['forno',35,'Assar a 220 °C bem espalhados (2 assadeiras)']]),
+  R('vagem','Vagem refogada','legume',900,
+    [[1000,'g','vagem'],[2,'dente','alho'],[15,'ml','azeite'],[5,'g','sal']],
+    ['Lavar e cortar as pontas'],
+    [['fogao',12,'Branquear por 3 min e refogar com alho']]),
+  R('abobrinha','Abobrinha refogada','legume',700,
+    [[1000,'g','abobrinha'],[1,'un','cebola'],[15,'ml','azeite'],[5,'g','sal']],
+    ['Cortar a abobrinha em meia-lua e fatiar a cebola'],
+    [['fogao',12,'Refogar em fogo alto, sem tampar']]),
+  R('cenoura_chuchu','Cenoura e chuchu no vapor','legume',950,
+    [[500,'g','cenoura'],[500,'g','chuchu'],[5,'g','sal']],
+    ['Descascar e cortar em cubos'],
+    [['fogao',15,'Cozinhar no vapor até ficar al dente']]),
+  R('legumes_af','Legumes na airfryer','legume',800,
+    [[500,'g','abobrinha'],[500,'g','cenoura'],[20,'ml','azeite'],[5,'g','sal']],
+    ['Lavar e cortar em cubos'],
+    [['airfryer',20,'Airfryer a 200 °C, sacudindo na metade']],400),
+  // JANTAR
+  R('lasanha','Lasanha à bolonhesa','jantar',6,
+    [[500,'g','massa de lasanha pré-cozida'],[600,'g','carne moída'],[680,'g','molho de tomate'],[400,'g','muçarela'],[300,'g','presunto'],[1,'un','cebola'],[3,'dente','alho'],[50,'g','parmesão ralado'],[8,'g','sal']],
+    ['Fazer o molho à bolonhesa (pode ser na véspera e guardar na geladeira)','Fatiar ou ralar os queijos se necessário'],
+    [['fogao',30,'Molho à bolonhesa (se não fez na véspera)'],['bancada',15,'Montar as camadas: molho, massa, presunto e muçarela'],['forno',40,'Assar a 200 °C coberta por 25 min, depois descobrir e gratinar']]),
+  R('strogonoff','Strogonoff de frango','jantar',6,
+    [[900,'g','peito de frango'],[400,'g','creme de leite'],[200,'g','champignon'],[1,'un','cebola'],[2,'dente','alho'],[200,'g','molho de tomate'],[30,'g','mostarda'],[30,'g','ketchup'],[8,'g','sal'],[150,'g','batata palha']],
+    ['Cortar o frango em cubos e temperar'],
+    [['fogao',30,'Dourar o frango, juntar cebola, alho, molhos e champignon; finalizar com o creme de leite em fogo baixo']]),
+  R('escondidinho','Escondidinho de carne moída','jantar',6,
+    [[1200,'g','mandioca descascada'],[700,'g','carne moída'],[200,'g','requeijão'],[200,'g','muçarela'],[200,'ml','leite'],[30,'g','manteiga'],[1,'un','cebola'],[2,'dente','alho'],[10,'g','sal']],
+    ['Descascar e cortar a mandioca','Picar cebola e alho'],
+    [['fogao',30,'Cozinhar a mandioca na pressão'],['fogao',20,'Refogar a carne moída'],['bancada',10,'Amassar a mandioca com leite e manteiga e montar as camadas com a carne e o requeijão'],['forno',25,'Gratinar com muçarela a 200 °C']]),
+  R('frango_batatas','Frango assado com batatas','jantar',6,
+    [[1500,'g','coxa e sobrecoxa'],[1000,'g','batata'],[2,'un','cebola'],[4,'dente','alho'],[1,'un','limão'],[30,'ml','azeite'],[12,'g','sal'],[2,'g','alecrim']],
+    ['Temperar o frango e deixar marinando de um dia para o outro'],
+    [['bancada',10,'Cortar batatas e cebolas e montar tudo na assadeira'],['forno',60,'Assar a 200 °C coberto por 30 min e descoberto até dourar']]),
+];}
+
+function dadosPadrao(){
+  return {
+    versao:1,
+    pessoas:[
+      {id:'marido', nome:'Marido', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
+      {id:'filha',  nome:'Filha',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:0},
+      {id:'eu',     nome:'Eu',     emoji:'👩', qtd:5,  proteina:150, carbo:150, legume:0},
+    ],
+    receitas:receitasPadrao(),
+    semana:{
+      combos:{
+        marido:[{id:uid(), proteina:'frango_cubos', carbo:'arroz_branco', legume:'brocolis', qtd:6}],
+        filha:[{id:uid(), proteina:'carne_moida', carbo:'batata_doce_forno', legume:'', qtd:10}],
+        eu:[{id:uid(), proteina:'frango_cubos', carbo:'arroz_integral', legume:'', qtd:5}],
+      },
+      jantar:{ativo:true, pessoas:6, junto:true, itens:[{rid:'lasanha', g:150}]},
+      checks:{}, compradas:{}, extras:[]
+    },
+    config:{bocas:4, airfryer:1, forno:1, inicio:'08:00', margem:5, diaPre:'Quinta-feira', diaPrep:'Sexta-feira'}
+  };
+}
+
+/* ============================================================
+   ESTADO
+   ============================================================ */
+let D, page='semana', filtroTipo='todos', ED=null;
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY));
+    D = (s && s.receitas && s.pessoas) ? s : dadosPadrao();
+  }catch(e){ D = dadosPadrao(); }
+  const p = dadosPadrao();
+  D.config = Object.assign(p.config, D.config||{});
+  D.semana = Object.assign(p.semana, D.semana||{});
+  D.semana.jantar = Object.assign(p.semana.jantar, D.semana.jantar||{});
+  try{ const pg = localStorage.getItem(KEY+'_page'); if(pg && PAGES.some(x=>x[0]===pg)) page = pg; }catch(e){}
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){ toast('Não consegui salvar no navegador'); }
+}
+function rec(id){ return D.receitas.find(r=>r.id===id); }
+function pessoa(id){ return D.pessoas.find(p=>p.id===id); }
+function combosDe(p){
+  if(!D.semana.combos[p.id] || !D.semana.combos[p.id].length)
+    D.semana.combos[p.id] = [{id:uid(), proteina:'', carbo:'', legume:'', qtd:p.qtd}];
+  return D.semana.combos[p.id];
+}
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function num(v){ return Number(v).toLocaleString('pt-BR',{maximumFractionDigits:2}); }
+function fecharModal(){ document.getElementById('modal').innerHTML=''; }
+let _modalOk=null;
+function pedir(msg,ok,txtOk){
+  _modalOk=ok;
+  document.getElementById('modal').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)fecharModal()"><div class="modal"><p>${esc(msg)}</p>
+    <div class="row"><button class="btn sec" onclick="fecharModal()">Cancelar</button><button class="btn" onclick="const f=_modalOk;fecharModal();f()">${esc(txtOk||'Confirmar')}</button></div></div></div>`;
+}
+function caixaTexto(titulo,texto,ok,txtOk){
+  _modalOk=ok;
+  document.getElementById('modal').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)fecharModal()"><div class="modal"><p>${esc(titulo)}</p>
+    <textarea class="inp" id="modalTxt">${esc(texto||'')}</textarea>
+    <div class="row"><button class="btn sec" onclick="fecharModal()">Fechar</button>${ok?`<button class="btn" onclick="const v=document.getElementById('modalTxt').value;const f=_modalOk;fecharModal();f(v)">${esc(txtOk||'OK')}</button>`:''}</div></div></div>`;
+  const ta=document.getElementById('modalTxt'); if(!ok){ ta.focus(); ta.select(); }
+}
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200);
+}
+const PLURAL = {'dente':'dentes','maço':'maços','colher (sopa)':'colheres (sopa)','colher (chá)':'colheres (chá)','xícara':'xícaras','lata':'latas','caixa':'caixas','pacote':'pacotes'};
+function arred(q,un,compra){
+  if(un==='g'||un==='ml'){ if(q<20) return Math.ceil(q); if(q<100) return Math.ceil(q/5)*5; return Math.ceil(q/10)*10; }
+  return compra ? Math.ceil(q-0.001) : Math.ceil(q*2-0.001)/2;
+}
+function fmtQ(q,un,compra){
+  if(un==='a gosto') return 'a gosto';
+  const v = arred(q,un,compra);
+  if(un==='g' && v>=1000) return num(v/1000)+' kg';
+  if(un==='ml' && v>=1000) return num(v/1000)+' L';
+  if(un==='g'||un==='ml') return num(v)+' '+un;
+  return num(v)+' '+(v>1 ? (PLURAL[un]||un) : un);
+}
+function fmtG(g){ return g>=1000 ? num(Math.round(g/10)/100)+' kg' : Math.round(g)+' g'; }
+function hora(min){
+  const [h,m] = (D.config.inicio||'08:00').split(':').map(Number);
+  const t = (h*60+m+Math.round(min)) % (24*60);
+  return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+}
+function dur(min){ min=Math.round(min); return min>=60 ? Math.floor(min/60)+'h'+(min%60?String(min%60).padStart(2,'0'):'') : min+' min'; }
+function secaoDe(ing){
+  if(ing.secao) return ing.secao;
+  const n = ing.nome.toLowerCase();
+  if(/palha|molho|massa|macarr|arroz|feij|champignon|ketchup|mostarda/.test(n)) return 'Mercearia';
+  if(/frango|carne|patinho|sobrecoxa|coxa|til[áa]pia|peixe|salm[ãa]o|alcatra|m[úu]sculo|lombo|porco|lingui|fil[ée]|mo[íi]da|peito|cox[ãa]o|ac[ée]m|maminha|fraldinha|atum|camar/.test(n)) return 'Açougue e peixaria';
+  if(/queijo|mu[çcs]+arela|presunto|creme de leite|leite|manteiga|requeij|parmes|iogurte|\bovos?\b|ricota/.test(n)) return 'Frios, laticínios e ovos';
+  if(/cebola|alho|tomate|lim[ãa]o|batata|mandioca|aipim|br[óo]colis|abobrinha|cenoura|berinjela|vagem|chuchu|cheiro|salsinha|cebolinha|couve|espinafre|piment[ãa]o|ab[óo]bora|inhame|mandioquinha|beterraba|alface|repolho|quiabo|couve-flor|gengibre|coentro/.test(n)) return 'Hortifrúti';
+  return 'Mercearia';
+}
+function ehAgua(nome){ return /^água\b/i.test(nome.trim()); }
+
+/* ============================================================
+   CÁLCULOS
+   ============================================================ */
+function calcular(){
+  const mar={}, jan={}, montagem=[];
+  const add=(map,rid,qtd,quem)=>{ if(!rec(rid)) return; map[rid]=map[rid]||{qtd:0,quem:[]}; map[rid].qtd+=qtd; map[rid].quem.push(quem); };
+  let total=0;
+  D.pessoas.forEach(p=>{
+    combosDe(p).forEach(c=>{
+      if(!(c.qtd>0)) return;
+      total += c.qtd;
+      const partes=[];
+      COMP.forEach(k=>{
+        if(p[k]>0 && c[k] && rec(c[k])){
+          add(mar,c[k],p[k]*c.qtd,{nome:p.nome,n:c.qtd,g:p[k]});
+          partes.push({k,r:rec(c[k]),g:p[k]});
+        }
+      });
+      montagem.push({p,c,partes});
+    });
+  });
+  const J=D.semana.jantar;
+  if(J.ativo) J.itens.forEach(it=>{
+    const r=rec(it.rid); if(!r) return;
+    if(r.tipo==='jantar') add(jan,r.id,J.pessoas,{nome:'Jantar',n:J.pessoas,porcoes:true});
+    else add(jan,r.id,(it.g||150)*J.pessoas,{nome:'Jantar',n:J.pessoas,g:it.g||150});
+  });
+  return {mar,jan,montagem,total};
+}
+function fator(r,qtd){
+  if(!(r.rende>0)) return 0;
+  return r.tipo==='jantar' ? qtd/r.rende : qtd*(1+(D.config.margem||0)/100)/r.rende;
+}
+function escala(r,qtd){ const f=fator(r,qtd); return r.ingredientes.map(i=>Object.assign({},i,{qtd:i.qtd*f})); }
+function juntar(a,b){
+  const o={};
+  [a,b].forEach(m=>{ for(const k in m){ o[k]=o[k]||{qtd:0,quem:[]}; o[k].qtd+=m[k].qtd; o[k].quem.push(...m[k].quem); } });
+  return o;
+}
+function quantoTxt(r,n){
+  if(r.tipo==='jantar') return num(n.qtd)+' porç'+(n.qtd>1?'ões':'ão');
+  return fmtG(n.qtd)+' pronto';
+}
+
+/* Agenda as etapas nos equipamentos (fogão com N bocas, airfryer, forno, bancada) */
+function agendar(need, comMontagem, nMarmitas){
+  const C=D.config;
+  const unidades={
+    fogao:Array.from({length:Math.max(0,C.bocas|0)},(_,i)=>'Boca '+(i+1)),
+    airfryer:Array.from({length:Math.max(0,C.airfryer|0)},(_,i)=>C.airfryer>1?'Airfryer '+(i+1):'Airfryer'),
+    forno:Array.from({length:Math.max(0,C.forno|0)},(_,i)=>C.forno>1?'Forno '+(i+1):'Forno'),
+    bancada:['Bancada']
+  };
+  // cada unidade guarda os intervalos ocupados; a etapa entra no primeiro espaço livre
+  const ocup={}; for(const e in unidades) ocup[e]=unidades[e].map(()=>[]);
+  const encaixe=(iv,t,d)=>{ let s=t; for(const [a,b] of iv){ if(s+d<=a) break; if(b>s) s=b; } return s; };
+  const avisos=[];
+  const cadeias=Object.keys(need).map(rid=>{
+    const r=rec(rid), n=need[rid];
+    const gProntos = r.tipo==='jantar' ? 0 : n.qtd*(1+(C.margem||0)/100);
+    const passos=(r.etapas||[]).map((e,i)=>{
+      let lotes=1;
+      if(e.eq==='airfryer' && r.lote>0 && gProntos>0) lotes=Math.max(1,Math.ceil(gProntos/r.lote));
+      return {r,i,eq:e.eq,txt:e.txt,lotes,dur:(+e.min||0)*lotes};
+    }).filter(s=>s.dur>0);
+    return {r,passos,total:passos.reduce((a,s)=>a+s.dur,0)};
+  }).sort((a,b)=>b.total-a.total);
+
+  const out=[];
+  cadeias.forEach(ch=>{
+    let t=0;
+    ch.passos.forEach(s=>{
+      let eq=s.eq;
+      if(!ocup[eq] || !ocup[eq].length){ avisos.push(`“${ch.r.nome}” usa ${EQUIP[eq]?EQUIP[eq].nome:eq}, mas não há esse equipamento nos Ajustes — coloquei na bancada.`); eq='bancada'; }
+      const arr=ocup[eq];
+      let bi=0, start=encaixe(arr[0],t,s.dur);
+      for(let i=1;i<arr.length;i++){ const st=encaixe(arr[i],t,s.dur); if(st<start){ start=st; bi=i; } }
+      const end=start+s.dur;
+      arr[bi].push([start,end]); arr[bi].sort((a,b)=>a[0]-b[0]); t=end;
+      out.push(Object.assign({},s,{eq,start,end,lane:unidades[eq][bi],key:ch.r.id+'|'+s.i}));
+    });
+  });
+  let fim=out.reduce((a,s)=>Math.max(a,s.end),0);
+  if(comMontagem && nMarmitas>0){
+    const d=Math.max(15,Math.ceil(nMarmitas*1.5));
+    const fimMarm=out.filter(s=>s.r.tipo!=='jantar').reduce((a,s)=>Math.max(a,s.end),0);
+    const ini=encaixe(ocup.bancada[0],fimMarm,d);
+    out.push({montagem:true,eq:'bancada',lane:'Bancada',start:ini,end:ini+d,dur:d,key:'montagem',
+      txt:`Deixar amornar (no máx. 2 h fora da geladeira), porcionar ${nMarmitas} marmitas na balança, tampar, etiquetar e levar para geladeira/freezer`});
+    fim=Math.max(fim,ini+d);
+  }
+  out.sort((a,b)=>a.start-b.start||a.lane.localeCompare(b.lane));
+  const lanes=[...unidades.fogao,...unidades.airfryer,...unidades.forno,'Bancada'];
+  return {passos:out,fim,lanes,avisos:[...new Set(avisos)]};
+}
+
+/* ============================================================
+   RENDER — NAVEGAÇÃO
+   ============================================================ */
+function go(p){ page=p; ED=null; try{localStorage.setItem(KEY+'_page',p);}catch(e){} render(); window.scrollTo({top:0}); }
+function render(){
+  document.getElementById('tabs').innerHTML = PAGES.map(([id,nm])=>`<button class="tab ${page===id?'active':''}" onclick="go('${id}')">${nm}</button>`).join('');
+  const c=calcular();
+  const J=D.semana.jantar;
+  document.getElementById('hdrSum').textContent = `${c.total} marmitas` + (J.ativo?` · jantar para ${J.pessoas}`:'');
+  const el=document.getElementById('page');
+  const fn={semana:pgSemana,compras:pgCompras,vespera:pgVespera,preparo:pgPreparo,receitas:pgReceitas,ajustes:pgAjustes}[page];
+  el.innerHTML=fn(c);
+}
+
+function opcoesReceita(tipo, sel, vazio){
+  const lista=D.receitas.filter(r=>r.tipo===tipo).sort((a,b)=>a.nome.localeCompare(b.nome));
+  return `<option value="">${vazio||'— escolher —'}</option>`+lista.map(r=>`<option value="${r.id}" ${r.id===sel?'selected':''}>${esc(r.nome)}</option>`).join('');
+}
+
+/* ============================================================
+   PÁGINA: SEMANA
+   ============================================================ */
+function pgSemana(c){
+  let h=`<div class="sec-t">Cardápio da semana</div>
+  <div class="sec-s">Escolha as receitas de cada pessoa. Quer variar? Use <b>“dividir marmitas”</b> para fazer, por exemplo, 3 com frango e 3 com carne.</div>`;
+  D.pessoas.forEach(p=>{
+    const cs=combosDe(p);
+    const soma=cs.reduce((a,x)=>a+(+x.qtd||0),0);
+    h+=`<div class="card">
+      <div class="card-h">
+        <div class="avatar">${esc(p.emoji||'🍱')}</div>
+        <div><div class="card-t">${esc(p.nome)}</div>
+          <div class="chips" style="margin-top:4px">
+            <span class="chip"><b>${p.qtd}</b> marmitas</span>
+            ${COMP.filter(k=>p[k]>0).map(k=>`<span class="chip">${TIPOS[k].slice(0,5).replace('Carbo','Carb')}. <b>${p[k]}g</b></span>`).join('')}
+          </div>
+        </div>
+        <button class="btn sec sm ml-auto" onclick="go('ajustes')">editar</button>
+      </div>`;
+    cs.forEach(cb=>{
+      h+=`<div class="combo"><div class="combo-top">
+          <div class="stepper"><button onclick="stepCombo('${p.id}','${cb.id}',-1)">−</button><span>${cb.qtd}</span><button onclick="stepCombo('${p.id}','${cb.id}',1)">+</button></div>
+          <span class="muted">marmita${cb.qtd==1?'':'s'}</span>
+          ${cs.length>1?`<button class="x ml-auto" title="remover" onclick="rmCombo('${p.id}','${cb.id}')">×</button>`:''}
+        </div>`;
+      COMP.filter(k=>p[k]>0).forEach(k=>{
+        h+=`<div class="sel-row"><span class="dot ${k}"></span><span class="k">${TIPOS[k]}</span>
+          <select class="inp" onchange="setCombo('${p.id}','${cb.id}','${k}',this.value)">${opcoesReceita(k,cb[k])}</select></div>`;
+      });
+      h+=`</div>`;
+    });
+    h+=`<button class="btn ghost sm" onclick="addCombo('${p.id}')">+ dividir marmitas (outra combinação)</button>`;
+    if(soma!==p.qtd) h+=`<div class="warn">As combinações somam ${soma} marmitas, mas ${esc(p.nome)} tem ${p.qtd} configuradas. Ajuste os números acima ou em Ajustes.</div>`;
+    h+=`</div>`;
+  });
+
+  // JANTAR
+  const J=D.semana.jantar;
+  h+=`<div class="card" style="background:rgba(90,138,176,.08)">
+    <div class="card-h"><div class="avatar">🍽️</div>
+      <div><div class="card-t">Jantar especial de família</div><div class="card-s">receitas são calculadas para o nº de pessoas</div></div>
+      <label class="switch ml-auto"><input type="checkbox" ${J.ativo?'checked':''} onchange="setJ('ativo',this.checked)">incluir</label>
+    </div>`;
+  if(J.ativo){
+    h+=`<div class="row wrap" style="margin-bottom:10px">
+        <span class="muted">Pessoas</span>
+        <div class="stepper"><button onclick="setJ('pessoas',Math.max(1,${J.pessoas}-1))">−</button><span>${J.pessoas}</span><button onclick="setJ('pessoas',${J.pessoas}+1)">+</button></div>
+        <label class="switch" style="margin-left:8px"><input type="checkbox" ${J.junto?'checked':''} onchange="setJ('junto',this.checked)">preparar junto com as marmitas</label>
+      </div>`;
+    J.itens.forEach((it,i)=>{
+      const r=rec(it.rid);
+      const porGramas = r && r.tipo!=='jantar';
+      h+=`<div class="combo"><div class="row">
+        <select class="inp" onchange="setJItem(${i},'rid',this.value)">
+          <option value="">— escolher prato —</option>
+          ${['jantar','proteina','carbo','legume'].map(t=>`<optgroup label="${TIPOS[t]}">${D.receitas.filter(x=>x.tipo===t).sort((a,b)=>a.nome.localeCompare(b.nome)).map(x=>`<option value="${x.id}" ${x.id===it.rid?'selected':''}>${esc(x.nome)}</option>`).join('')}</optgroup>`).join('')}
+        </select>
+        <button class="x" onclick="rmJItem(${i})">×</button></div>
+        ${porGramas?`<div class="row" style="margin-top:8px"><span class="muted">Porção por pessoa</span><input class="inp sm" type="number" inputmode="numeric" value="${it.g||150}" onchange="setJItem(${i},'g',+this.value)"><span class="muted">g</span></div>`:''}
+      </div>`;
+    });
+    h+=`<button class="btn ghost sm" onclick="addJItem()">+ acompanhamento / outro prato</button>`;
+  }
+  h+=`</div>`;
+
+  // RESUMO
+  const need=juntar(c.mar,c.jan);
+  const ids=Object.keys(need);
+  if(ids.length){
+    h+=`<div class="card white"><div class="card-t" style="margin-bottom:8px">Quanto preparar</div>`;
+    ['proteina','carbo','legume','jantar'].forEach(t=>{
+      ids.filter(id=>rec(id).tipo===t).forEach(id=>{
+        const r=rec(id), n=need[id];
+        h+=`<div class="row" style="padding:6px 0;border-bottom:1px solid var(--creme-e)"><span class="dot ${t}"></span>
+          <span style="flex:1;font-size:14px">${esc(r.nome)}<div class="muted">${n.quem.map(q=>q.porcoes?`${q.nome}: ${q.n} porções`:`${esc(q.nome)}: ${q.n}×${q.g}g`).join(' · ')}</div></span>
+          <b style="color:var(--verde);white-space:nowrap">${quantoTxt(r,n)}</b></div>`;
+      });
+    });
+    h+=`<div class="muted" style="margin-top:8px">Quantidades de ingredientes incluem ${D.config.margem}% de margem (ajustável em Ajustes).</div>
+      <div class="row wrap" style="margin-top:12px"><button class="btn" onclick="go('compras')">🛒 Ver lista de compras</button><button class="btn sec" onclick="novaSemana()">↺ Nova semana</button></div></div>`;
+  }
+  return h;
+}
+function stepCombo(pid,cid,d){ const cb=combosDe(pessoa(pid)).find(x=>x.id===cid); cb.qtd=Math.max(0,(+cb.qtd||0)+d); save(); render(); }
+function setCombo(pid,cid,k,v){ const cb=combosDe(pessoa(pid)).find(x=>x.id===cid); cb[k]=v; save(); render(); }
+function addCombo(pid){
+  const p=pessoa(pid), cs=combosDe(p);
+  const base=cs[cs.length-1];
+  const metade=Math.floor((+base.qtd||0)/2);
+  base.qtd-=metade;
+  cs.push({id:uid(),proteina:'',carbo:base.carbo||'',legume:base.legume||'',qtd:metade});
+  save(); render();
+}
+function rmCombo(pid,cid){
+  const cs=combosDe(pessoa(pid)); const i=cs.findIndex(x=>x.id===cid);
+  const [rm]=cs.splice(i,1); cs[Math.max(0,i-1)].qtd+= (+rm.qtd||0);
+  save(); render();
+}
+function setJ(k,v){ D.semana.jantar[k]=v; save(); render(); }
+function setJItem(i,k,v){ D.semana.jantar.itens[i][k]=v; save(); render(); }
+function addJItem(){ D.semana.jantar.itens.push({rid:'',g:150}); save(); render(); }
+function rmJItem(i){ D.semana.jantar.itens.splice(i,1); save(); render(); }
+function novaSemana(){
+  pedir('Começar nova semana? As receitas escolhidas ficam; só os checklists e itens comprados são zerados.',()=>{
+    D.semana.checks={}; D.semana.compradas={}; D.semana.extras=[];
+    save(); render(); toast('Nova semana pronta ✨');
+  },'Começar');
+}
+
+/* ============================================================
+   PÁGINA: COMPRAS
+   ============================================================ */
+function listaCompras(c){
+  const need=juntar(c.mar,c.jan), itens={};
+  Object.keys(need).forEach(rid=>{
+    const r=rec(rid);
+    escala(r,need[rid].qtd).forEach(i=>{
+      if(ehAgua(i.nome)) return;
+      const k=i.nome.trim().toLowerCase()+'|'+i.un;
+      if(!itens[k]) itens[k]={k,nome:i.nome.trim(),un:i.un,qtd:0,secao:secaoDe(i),usos:[]};
+      itens[k].qtd+=i.qtd;
+      if(!itens[k].usos.includes(r.nome)) itens[k].usos.push(r.nome);
+    });
+  });
+  (D.semana.extras||[]).forEach((e,i)=>{ const k='extra|'+i; itens[k]={k,nome:e,un:'',qtd:0,secao:'Outros',usos:[],extra:i}; });
+  return Object.values(itens);
+}
+function pgCompras(c){
+  const itens=listaCompras(c);
+  const comp=D.semana.compradas||{};
+  const falta=itens.filter(i=>!comp[i.k]).length;
+  let h=`<div class="sec-t">Lista de compras</div>
+    <div class="sec-s">Toque para marcar o que já tem em casa ou já comprou. Faltam <b>${falta}</b> de ${itens.length} itens.</div>
+    <div class="row wrap no-print" style="margin-bottom:14px">
+      <button class="btn" onclick="compartilharCompras()">📋 Copiar lista (para WhatsApp)</button>
+    </div>`;
+  if(!itens.length) return h+`<div class="empty">Escolha receitas na aba Semana para gerar a lista.</div>`;
+  SECOES.forEach(s=>{
+    const doS=itens.filter(i=>i.secao===s).sort((a,b)=>a.nome.localeCompare(b.nome));
+    if(!doS.length) return;
+    h+=`<div class="card white"><div class="card-t" style="margin-bottom:4px">${s}</div>`;
+    doS.forEach(i=>{
+      h+=`<div class="chk ${comp[i.k]?'done':''}" onclick="togCompra('${encK(i.k)}')">
+        <div class="box"></div>
+        <div class="txt">${i.un?`<span class="q">${fmtQ(i.qtd,i.un,true)}</span> `:''}${esc(i.nome)}
+          ${i.usos.length?`<div class="sub">${i.usos.map(esc).join(', ')}</div>`:''}</div>
+        ${i.extra!=null?`<button class="x" onclick="event.stopPropagation();rmExtra(${i.extra})">×</button>`:''}
+      </div>`;
+    });
+    h+=`</div>`;
+  });
+  h+=`<div class="card no-print"><div class="lbl" style="margin-top:0">Adicionar item avulso</div>
+    <div class="row"><input class="inp" id="extraInp" placeholder="ex.: potes de vidro, frutas, ovos..." onkeydown="if(event.key==='Enter')addExtra()"><button class="btn" onclick="addExtra()">+</button></div></div>`;
+  return h;
+}
+function encK(k){ return encodeURIComponent(k).replace(/'/g,'%27'); }
+function togCompra(k){ k=decodeURIComponent(k); const c=D.semana.compradas; if(c[k]) delete c[k]; else c[k]=1; save(); render(); }
+function addExtra(){ const v=document.getElementById('extraInp').value.trim(); if(!v) return; D.semana.extras.push(v); save(); render(); }
+function rmExtra(i){ D.semana.extras.splice(i,1); const c=D.semana.compradas; delete c['extra|'+i]; save(); render(); }
+function compartilharCompras(){
+  const itens=listaCompras(calcular()).filter(i=>!D.semana.compradas[i.k]);
+  let t='🛒 *Lista de compras — marmitas*\n';
+  SECOES.forEach(s=>{
+    const doS=itens.filter(i=>i.secao===s).sort((a,b)=>a.nome.localeCompare(b.nome));
+    if(!doS.length) return;
+    t+=`\n*${s}*\n`+doS.map(i=>'• '+(i.un?fmtQ(i.qtd,i.un,true)+' ':'')+i.nome).join('\n')+'\n';
+  });
+  copiar(t,'Lista copiada 📋');
+}
+function copiar(t,msg){
+  const manual=()=>caixaTexto('Selecione e copie o texto abaixo:',t);
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(()=>toast(msg),manual);
+    else manual();
+  }catch(e){ manual(); }
+}
+
+/* ============================================================
+   PÁGINA: VÉSPERA (pré-preparo)
+   ============================================================ */
+function chkHtml(key,conteudo){
+  const done=D.semana.checks[key];
+  return `<div class="chk ${done?'done':''}" onclick="togChk('${key}')"><div class="box"></div><div class="txt">${conteudo}</div></div>`;
+}
+function togChk(k){ const c=D.semana.checks; if(c[k]) delete c[k]; else c[k]=1; save(); render(); }
+
+function pgVespera(c){
+  const need=juntar(c.mar,c.jan);
+  const ids=Object.keys(need);
+  const J=D.semana.jantar;
+  let h=`<div class="sec-t">${esc(D.config.diaPre)} · pré-preparo</div>
+    <div class="sec-s">Tudo o que dá para adiantar no dia anterior, para o dia do preparo render.</div>`;
+  if(!ids.length) return h+`<div class="empty">Escolha receitas na aba Semana.</div>`;
+
+  const temCongelado = ids.some(id=>{ const t=rec(id).tipo; return t==='proteina' || t==='jantar'; });
+  const potes = c.total;
+  h+=`<div class="card white"><div class="card-t" style="margin-bottom:4px">Geral</div>
+    ${chkHtml('pre|potes',`Separar e higienizar <span class="q">${potes} potes</span> de marmita${J.ativo&&!J.junto?'':''}`)}
+    ${temCongelado?chkHtml('pre|desc','Passar as proteínas congeladas do freezer para a geladeira'):''}
+    ${chkHtml('pre|etiq','Preparar etiquetas (nome + data de preparo)')}
+    ${chkHtml('pre|bal','Conferir balança de cozinha, assadeiras e cesto da airfryer limpos')}
+  </div>`;
+
+  const ordem=['proteina','carbo','legume','jantar'];
+  const sem=[];
+  ordem.forEach(t=>ids.filter(id=>rec(id).tipo===t).forEach(id=>{
+    const r=rec(id), n=need[id];
+    if(!(r.pre||[]).length){ sem.push(r.nome); return; }
+    const ings=escala(r,n.qtd).filter(i=>!ehAgua(i.nome));
+    h+=`<div class="card white">
+      <div class="card-h" style="margin-bottom:4px"><span class="dot ${r.tipo}"></span><div class="card-t">${esc(r.nome)}</div><span class="muted ml-auto">${quantoTxt(r,n)}</span></div>
+      <div class="ing-list">${ings.map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div>
+      ${r.pre.map((p,i)=>chkHtml('pre|'+r.id+'|'+i,esc(p))).join('')}
+    </div>`;
+  }));
+  if(sem.length) h+=`<div class="muted" style="padding:0 4px">Sem pré-preparo: ${sem.map(esc).join(', ')}.</div>`;
+  return h;
+}
+
+/* ============================================================
+   PÁGINA: DIA DO PREPARO
+   ============================================================ */
+function ganttHtml(ag){
+  if(!ag.passos.length) return '';
+  const total=Math.max(ag.fim,1);
+  const usadas=new Set(ag.passos.map(s=>s.lane));
+  const lanes=ag.lanes.filter(l=>usadas.has(l) || l.startsWith('Boca'));
+  let h=`<div class="gantt">`;
+  lanes.forEach(l=>{
+    h+=`<div class="g-lane"><div class="g-name">${esc(l)}</div><div class="g-track">`;
+    ag.passos.filter(s=>s.lane===l).forEach(s=>{
+      const cls=s.montagem?'montagem':s.r.tipo;
+      const nm=s.montagem?'Montagem':s.r.nome;
+      h+=`<div class="g-bar ${cls}" style="left:${s.start/total*100}%;width:${(s.end-s.start)/total*100}%" title="${esc(nm)} · ${hora(s.start)}–${hora(s.end)}">${esc(nm)}</div>`;
+    });
+    h+=`</div></div>`;
+  });
+  const passo = total>240?60:30;
+  h+=`<div class="g-axis">`;
+  for(let m=0;m<=total;m+=passo) h+=`<span class="g-tick" style="left:${m/total*100}%">${hora(m)}</span>`;
+  h+=`</div></div>`;
+  return h;
+}
+function timelineHtml(ag,pref){
+  return `<div class="card white">${ag.passos.map(s=>{
+    const nm=s.montagem?'Montagem das marmitas':s.r.nome;
+    const eq=EQUIP[s.eq];
+    const lotes=s.lotes>1?` · <b>${s.lotes} levas</b>`:'';
+    return chkHtml(pref+s.key,`<div class="row" style="align-items:flex-start;gap:10px">
+      <span class="tl-time">${hora(s.start)}–${hora(s.end)}</span>
+      <span style="flex:1"><b>${esc(nm)}</b> <span class="tl-eq">${eq.icon} ${esc(s.lane)} · ${dur(s.dur)}${lotes}</span>
+      <div class="sub" style="font-size:12px;color:var(--texto-s)">${esc(s.txt)}</div></span></div>`);
+  }).join('')}</div>`;
+}
+function pgPreparo(c){
+  const J=D.semana.jantar;
+  const juntos=J.ativo && J.junto;
+  const needDia = juntos ? juntar(c.mar,c.jan) : c.mar;
+  const ag=agendar(needDia,true,c.total);
+  let h=`<div class="sec-t">${esc(D.config.diaPrep)} · preparo</div>
+    <div class="sec-s">Cronograma montado para ${D.config.bocas} bocas, ${D.config.airfryer} airfryer e ${D.config.forno} forno, começando pelo que demora mais.</div>
+    <div class="row no-print" style="margin-bottom:12px"><span class="muted">Começo às</span>
+      <input class="inp sm" type="time" value="${esc(D.config.inicio)}" onchange="D.config.inicio=this.value;save();render()" style="width:110px">
+      ${ag.passos.length?`<span class="muted ml-auto">término ~<b style="color:var(--verde)">${hora(ag.fim)}</b> (${dur(ag.fim)})</span>`:''}</div>`;
+  if(!ag.passos.length) return h+`<div class="empty">Escolha receitas na aba Semana.</div>`;
+  ag.avisos.forEach(a=>h+=`<div class="warn">${esc(a)}</div>`);
+  h+=ganttHtml(ag)+timelineHtml(ag,'dia|');
+
+  // Quantidades por receita (para conferir durante o preparo)
+  h+=`<div class="sec-t" style="margin-top:20px">Ingredientes de cada receita</div>`;
+  Object.keys(needDia).forEach(id=>{
+    const r=rec(id), n=needDia[id];
+    h+=`<details class="card white"><summary class="row" style="cursor:pointer"><span class="dot ${r.tipo}"></span><b style="flex:1">${esc(r.nome)}</b><span class="muted">${quantoTxt(r,n)}</span></summary>
+      <div class="ing-list" style="margin-top:8px">${escala(r,n.qtd).map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div></details>`;
+  });
+
+  // Montagem
+  h+=`<div class="sec-t" style="margin-top:20px">Montagem das marmitas</div>
+    <div class="sec-s">Porcione com balança. Total: <b>${c.total} marmitas</b>.</div>
+    <div class="card white"><table class="mt"><tr><th>Quem</th><th>Conteúdo</th><th style="text-align:right">Qtd</th></tr>`;
+  c.montagem.forEach(m=>{
+    h+=`<tr><td>${esc(m.p.emoji||'')} ${esc(m.p.nome)}</td>
+      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.g}g ${esc(x.r.nome)}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
+      <td class="n">${m.c.qtd}×</td></tr>`;
+  });
+  h+=`</table></div>
+    <div class="card"><div class="card-t" style="font-size:18px;margin-bottom:6px">Dicas de conservação</div>
+      <div style="font-size:13px;line-height:1.6">• Geladeira: consumir em até 3–4 dias. Para o resto da semana, congele.<br>
+      • Legumes ficam melhores levemente al dente — terminam de cozinhar ao reaquecer.<br>
+      • Não deixe a comida mais de 2 h em temperatura ambiente antes de refrigerar.</div></div>`;
+
+  if(J.ativo && !J.junto){
+    const agJ=agendar(c.jan,false,0);
+    h+=`<div class="sec-t" style="margin-top:20px">🍽️ Jantar especial (${J.pessoas} pessoas)</div>
+      <div class="sec-s">Cronograma separado — horários contados a partir de ${esc(D.config.inicio)}; ajuste mentalmente para a hora do jantar.</div>`;
+    if(agJ.passos.length){ agJ.avisos.forEach(a=>h+=`<div class="warn">${esc(a)}</div>`); h+=ganttHtml(agJ)+timelineHtml(agJ,'jan|'); }
+    else h+=`<div class="empty">Escolha o prato do jantar na aba Semana.</div>`;
+  }
+  return h;
+}
+
+/* ============================================================
+   PÁGINA: RECEITAS
+   ============================================================ */
+function pgReceitas(){
+  if(ED) return editorHtml();
+  let h=`<div class="sec-t">Receitas</div>
+    <div class="sec-s">Cadastre suas receitas. Para proteína, carboidrato e legumes informe <b>quanto rende pronto (em g)</b> — o app escala os ingredientes para as gramas que você precisa. Para jantar, informe <b>quantas porções</b>.</div>
+    <div class="filters">${['todos','proteina','carbo','legume','jantar'].map(t=>`<button class="fchip ${filtroTipo===t?'active':''}" onclick="filtroTipo='${t}';render()">${t==='todos'?'Todas':TIPOS[t]}</button>`).join('')}</div>
+    <button class="btn" style="width:100%;margin-bottom:12px" onclick="novaReceita()">+ Nova receita</button>`;
+  const lista=D.receitas.filter(r=>filtroTipo==='todos'||r.tipo===filtroTipo).sort((a,b)=>a.tipo.localeCompare(b.tipo)||a.nome.localeCompare(b.nome));
+  if(!lista.length) h+=`<div class="empty">Nenhuma receita aqui ainda.</div>`;
+  lista.forEach(r=>{
+    const eqs=[...new Set((r.etapas||[]).map(e=>EQUIP[e.eq]?EQUIP[e.eq].icon:''))].join(' ');
+    const tempo=(r.etapas||[]).reduce((a,e)=>a+(+e.min||0),0);
+    h+=`<div class="rcard" onclick="editarReceita('${r.id}')"><span class="dot ${r.tipo}"></span>
+      <div style="flex:1"><div class="nm">${esc(r.nome)}</div>
+      <div class="meta">${TIPOS[r.tipo]} · rende ${r.tipo==='jantar'?r.rende+' porções':fmtG(r.rende)} · ${dur(tempo)} ${eqs}</div></div><span class="muted">›</span></div>`;
+  });
+  return h;
+}
+function novaReceita(){
+  ED={id:'',nome:'',tipo:filtroTipo==='todos'?'proteina':filtroTipo,rende:1000,lote:0,ingredientes:[{qtd:'',un:'g',nome:'',secao:''}],pre:[],etapas:[{eq:'fogao',min:20,txt:''}]};
+  render(); window.scrollTo({top:0});
+}
+function editarReceita(id){ ED=JSON.parse(JSON.stringify(rec(id))); render(); window.scrollTo({top:0}); }
+function editorHtml(){
+  const r=ED, j=r.tipo==='jantar';
+  const temAF=(r.etapas||[]).some(e=>e.eq==='airfryer');
+  let h=`<div class="row" style="margin-bottom:10px"><button class="btn sec sm" onclick="ED=null;render()">‹ Voltar</button>
+    <div class="sec-t" style="margin:0">${r.id?'Editar receita':'Nova receita'}</div></div>
+  <div class="card">
+    <label class="lbl" style="margin-top:0">Nome</label>
+    <input class="inp" value="${esc(r.nome)}" onchange="ED.nome=this.value" placeholder="ex.: Frango ao curry">
+    <div class="grid2">
+      <div><label class="lbl">Tipo</label><select class="inp" onchange="ED.tipo=this.value;render()">${Object.keys(TIPOS).map(t=>`<option value="${t}" ${r.tipo===t?'selected':''}>${TIPOS[t]}</option>`).join('')}</select></div>
+      <div><label class="lbl">${j?'Rende (porções)':'Rende pronto (g)'}</label><input class="inp" type="number" inputmode="numeric" value="${r.rende}" onchange="ED.rende=+this.value"></div>
+    </div>
+    <div class="muted" style="margin-top:6px">${j?'Quantas pessoas a receita abaixo serve.':'Peso total da receita depois de pronta, com as quantidades abaixo. Ex.: 1 kg de frango cru rende ~700 g grelhado.'}</div>
+    ${temAF&&!j?`<label class="lbl">Capacidade da airfryer por leva (g prontos)</label><input class="inp sm" style="width:110px" type="number" inputmode="numeric" value="${r.lote||''}" placeholder="ex.: 500" onchange="ED.lote=+this.value">
+      <div class="muted" style="margin-top:4px">Usado para calcular quantas levas serão necessárias.</div>`:''}
+  </div>
+  <div class="card"><div class="card-t" style="margin-bottom:8px">Ingredientes</div>`;
+  r.ingredientes.forEach((i,k)=>{
+    h+=`<div class="ed-row">
+      <input class="inp xs" type="number" inputmode="decimal" step="any" value="${i.qtd}" onchange="ED.ingredientes[${k}].qtd=+this.value" ${i.un==='a gosto'?'disabled':''}>
+      <select class="inp" style="width:96px;flex-shrink:0" onchange="ED.ingredientes[${k}].un=this.value;render()">${UNIDADES.map(u=>`<option ${u===i.un?'selected':''}>${u}</option>`).join('')}</select>
+      <input class="inp" value="${esc(i.nome)}" placeholder="ingrediente" onchange="ED.ingredientes[${k}].nome=this.value">
+      <button class="x" onclick="ED.ingredientes.splice(${k},1);render()">×</button></div>`;
+  });
+  h+=`<button class="btn ghost sm" onclick="ED.ingredientes.push({qtd:'',un:'g',nome:'',secao:''});render()">+ ingrediente</button></div>
+  <div class="card"><div class="card-t" style="margin-bottom:4px">Pré-preparo (véspera)</div>
+    <div class="muted" style="margin-bottom:8px">Uma tarefa por linha. Ex.: marinar, descongelar, picar, deixar de molho.</div>
+    <textarea class="inp" onchange="ED.pre=this.value.split('\\n').map(s=>s.trim()).filter(Boolean)">${esc((r.pre||[]).join('\n'))}</textarea></div>
+  <div class="card"><div class="card-t" style="margin-bottom:4px">Etapas do preparo</div>
+    <div class="muted" style="margin-bottom:8px">Em ordem. O equipamento e o tempo são usados para montar o cronograma do dia.</div>`;
+  (r.etapas||[]).forEach((e,k)=>{
+    h+=`<div class="combo"><div class="ed-row">
+      <select class="inp" onchange="ED.etapas[${k}].eq=this.value;render()">${Object.keys(EQUIP).map(q=>`<option value="${q}" ${q===e.eq?'selected':''}>${EQUIP[q].icon} ${EQUIP[q].nome}</option>`).join('')}</select>
+      <input class="inp xs" type="number" inputmode="numeric" value="${e.min}" onchange="ED.etapas[${k}].min=+this.value"><span class="muted">min</span>
+      <button class="x" onclick="ED.etapas.splice(${k},1);render()">×</button></div>
+      <input class="inp" value="${esc(e.txt)}" placeholder="o que fazer" onchange="ED.etapas[${k}].txt=this.value"></div>`;
+  });
+  h+=`<button class="btn ghost sm" onclick="ED.etapas.push({eq:'fogao',min:15,txt:''});render()">+ etapa</button></div>
+  <div class="row wrap" style="margin-top:6px">
+    <button class="btn" onclick="salvarReceita()">Salvar receita</button>
+    ${r.id?`<button class="btn sec" onclick="duplicarReceita()">Duplicar</button><button class="btn danger ml-auto" onclick="apagarReceita()">Apagar</button>`:''}
+  </div>`;
+  return h;
+}
+function salvarReceita(){
+  // garante que o campo em foco seja lido antes de salvar
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  const r=ED;
+  if(!r.nome.trim()){ toast('Dê um nome à receita'); return; }
+  if(!(r.rende>0)){ toast('Informe quanto a receita rende'); return; }
+  r.ingredientes=r.ingredientes.filter(i=>i.nome.trim()).map(i=>Object.assign(i,{nome:i.nome.trim(),qtd:+i.qtd||0}));
+  r.etapas=(r.etapas||[]).filter(e=>(+e.min>0)||e.txt.trim());
+  if(!r.id){ r.id=uid(); D.receitas.push(r); }
+  else{ const i=D.receitas.findIndex(x=>x.id===r.id); D.receitas[i]=r; }
+  ED=null; save(); render(); toast('Receita salva ✓');
+}
+function duplicarReceita(){ ED=JSON.parse(JSON.stringify(ED)); ED.id=''; ED.nome+=' (cópia)'; render(); toast('Cópia criada — edite e salve'); }
+function apagarReceita(){
+  pedir(`Apagar “${ED.nome}”?`,()=>{
+    const id=ED.id;
+    D.receitas=D.receitas.filter(r=>r.id!==id);
+    for(const pid in D.semana.combos) D.semana.combos[pid].forEach(c=>COMP.forEach(k=>{ if(c[k]===id) c[k]=''; }));
+    D.semana.jantar.itens=D.semana.jantar.itens.filter(i=>i.rid!==id);
+    ED=null; save(); render(); toast('Receita apagada');
+  },'Apagar');
+}
+
+/* ============================================================
+   PÁGINA: AJUSTES
+   ============================================================ */
+function pgAjustes(){
+  const C=D.config;
+  let h=`<div class="sec-t">Pessoas e porções</div>
+    <div class="sec-s">Gramas por marmita (pesadas prontas). Coloque 0 para não incluir aquele componente.</div>`;
+  D.pessoas.forEach(p=>{
+    h+=`<div class="card">
+      <div class="row" style="margin-bottom:8px">
+        <input class="inp" style="width:54px;text-align:center;font-size:20px;padding:5px" value="${esc(p.emoji||'')}" onchange="setP('${p.id}','emoji',this.value)">
+        <input class="inp" value="${esc(p.nome)}" onchange="setP('${p.id}','nome',this.value)">
+        <button class="x" onclick="rmPessoa('${p.id}')">×</button>
+      </div>
+      <div class="grid2" style="grid-template-columns:repeat(4,1fr)">
+        <div><label class="lbl">Marmitas</label><input class="inp" type="number" inputmode="numeric" value="${p.qtd}" onchange="setP('${p.id}','qtd',+this.value)"></div>
+        <div><label class="lbl">Proteína g</label><input class="inp" type="number" inputmode="numeric" value="${p.proteina}" onchange="setP('${p.id}','proteina',+this.value)"></div>
+        <div><label class="lbl">Carbo g</label><input class="inp" type="number" inputmode="numeric" value="${p.carbo}" onchange="setP('${p.id}','carbo',+this.value)"></div>
+        <div><label class="lbl">Legumes g</label><input class="inp" type="number" inputmode="numeric" value="${p.legume}" onchange="setP('${p.id}','legume',+this.value)"></div>
+      </div></div>`;
+  });
+  h+=`<button class="btn ghost" onclick="addPessoa()">+ adicionar pessoa</button>
+
+  <div class="sec-t" style="margin-top:22px">Cozinha</div>
+  <div class="card"><div class="grid3">
+    <div><label class="lbl" style="margin-top:0">🔥 Bocas</label><input class="inp" type="number" inputmode="numeric" value="${C.bocas}" onchange="setC('bocas',+this.value)"></div>
+    <div><label class="lbl" style="margin-top:0">💨 Airfryers</label><input class="inp" type="number" inputmode="numeric" value="${C.airfryer}" onchange="setC('airfryer',+this.value)"></div>
+    <div><label class="lbl" style="margin-top:0">♨️ Fornos</label><input class="inp" type="number" inputmode="numeric" value="${C.forno}" onchange="setC('forno',+this.value)"></div>
+  </div>
+  <div class="grid3">
+    <div><label class="lbl">Início do preparo</label><input class="inp" type="time" value="${esc(C.inicio)}" onchange="setC('inicio',this.value)"></div>
+    <div><label class="lbl">Margem %</label><input class="inp" type="number" inputmode="numeric" value="${C.margem}" onchange="setC('margem',+this.value)"></div>
+  </div>
+  <div class="grid2">
+    <div><label class="lbl">Dia do pré-preparo</label><input class="inp" value="${esc(C.diaPre)}" onchange="setC('diaPre',this.value)"></div>
+    <div><label class="lbl">Dia do preparo</label><input class="inp" value="${esc(C.diaPrep)}" onchange="setC('diaPrep',this.value)"></div>
+  </div>
+  <div class="muted" style="margin-top:8px">A margem compensa perdas e variação no rendimento (sobra um pouco a mais).</div></div>
+
+  <div class="sec-t" style="margin-top:22px">Backup</div>
+  <div class="card">
+    <div class="muted" style="margin-bottom:10px">Os dados ficam salvos neste navegador. Copie o backup para guardar ou levar para outro aparelho.</div>
+    <div class="row wrap"><button class="btn" onclick="copiar(JSON.stringify(D),'Backup copiado 📋')">Copiar backup</button>
+    <button class="btn sec" onclick="importar()">Restaurar backup</button>
+    <button class="btn sec" onclick="restaurarPadrao()">Repor receitas de exemplo</button></div>
+  </div>`;
+  return h;
+}
+function setP(id,k,v){
+  const p=pessoa(id);
+  if(k==='qtd'){ v=Math.max(0,v|0); const cs=combosDe(p); if(cs.length===1) cs[0].qtd=v; }
+  if(['proteina','carbo','legume'].includes(k)) v=Math.max(0,v||0);
+  p[k]=v; save(); render();
+}
+function addPessoa(){ const p={id:uid(),nome:'Nova pessoa',emoji:'🙂',qtd:5,proteina:120,carbo:120,legume:100}; D.pessoas.push(p); save(); render(); }
+function rmPessoa(id){
+  const p=pessoa(id);
+  pedir(`Remover ${p.nome}?`,()=>{ D.pessoas=D.pessoas.filter(x=>x.id!==id); delete D.semana.combos[id]; save(); render(); },'Remover');
+}
+function setC(k,v){ if(typeof v==='number') v=Math.max(0,v||0); D.config[k]=v; save(); render(); }
+function importar(){
+  caixaTexto('Cole aqui o backup copiado antes:','',t=>{
+    try{ const d=JSON.parse(t); if(!d.receitas||!d.pessoas) throw 0; D=d; save(); load(); render(); toast('Backup restaurado ✓'); }
+    catch(e){ toast('Backup inválido: cole o texto completo'); }
+  },'Restaurar');
+}
+function restaurarPadrao(){
+  const faltando=receitasPadrao().filter(r=>!rec(r.id));
+  if(!faltando.length){ toast('Todas as receitas de exemplo já estão aqui'); return; }
+  D.receitas.push(...faltando); save(); render(); toast(faltando.length+' receitas repostas');
+}
+
+load(); render();
+</script>
+</body>
+</html>
