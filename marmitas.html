@@ -13,7 +13,7 @@
   --creme:#f5f0e8; --creme-e:#e0d8c8; --branco:#fdfaf5;
   --texto:#1a2420; --texto-s:#6a7a70;
   --rosa:#d4756a; --azul:#5a8ab0;
-  --c-proteina:#d4756a; --c-carbo:#c9a84c; --c-legume:#4a7c5f; --c-jantar:#5a8ab0; --c-lanche:#9a7aa0;
+  --c-proteina:#d4756a; --c-carbo:#c9a84c; --c-legume:#4a7c5f; --c-jantar:#5a8ab0; --c-lanche:#9a7aa0; --c-cafe:#a9845a; --c-petisco:#c0705a;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'DM Sans',sans-serif;background:var(--branco);color:var(--texto);min-height:100vh;overflow-x:hidden;}
@@ -83,7 +83,7 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 .stepper span{min-width:34px;text-align:center;font-weight:600;font-size:14px;}
 .sel-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
 .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.dot.proteina{background:var(--c-proteina);} .dot.carbo{background:var(--c-carbo);} .dot.legume{background:var(--c-legume);} .dot.jantar{background:var(--c-jantar);} .dot.lanche{background:var(--c-lanche);}
+.dot.proteina{background:var(--c-proteina);} .dot.carbo{background:var(--c-carbo);} .dot.legume{background:var(--c-legume);} .dot.jantar{background:var(--c-jantar);} .dot.lanche{background:var(--c-lanche);} .dot.cafe{background:var(--c-cafe);} .dot.petisco{background:var(--c-petisco);}
 .sel-row .k{font-size:11px;color:var(--texto-s);width:62px;flex-shrink:0;}
 .sum-line{font-size:12px;margin-top:4px;}
 
@@ -107,7 +107,7 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 .g-name{width:74px;font-size:11px;color:var(--texto-s);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .g-track{position:relative;flex:1;height:22px;background:var(--creme);border-radius:6px;}
 .g-bar{position:absolute;top:0;bottom:0;border-radius:6px;color:white;font-size:10px;padding:0 5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:22px;border:1px solid rgba(255,255,255,.6);}
-.g-bar.proteina{background:var(--c-proteina);} .g-bar.carbo{background:var(--c-carbo);} .g-bar.legume{background:var(--c-legume);} .g-bar.jantar{background:var(--c-jantar);} .g-bar.lanche{background:var(--c-lanche);} .g-bar.montagem{background:var(--verde);}
+.g-bar.proteina{background:var(--c-proteina);} .g-bar.carbo{background:var(--c-carbo);} .g-bar.legume{background:var(--c-legume);} .g-bar.jantar{background:var(--c-jantar);} .g-bar.lanche{background:var(--c-lanche);} .g-bar.cafe{background:var(--c-cafe);} .g-bar.petisco{background:var(--c-petisco);} .g-bar.montagem{background:var(--verde);}
 .g-axis{display:flex;margin-left:74px;position:relative;height:16px;margin-top:4px;}
 .g-tick{position:absolute;font-size:10px;color:var(--texto-s);transform:translateX(-50%);}
 .tl-time{font-size:12px;font-weight:600;color:var(--verde);white-space:nowrap;min-width:92px;}
@@ -174,8 +174,16 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
    ============================================================ */
 const KEY = 'marmitas_v1';
 const COMP = ['proteina','carbo','legume'];
-const TIPOS = {proteina:'Proteína', carbo:'Carboidrato', legume:'Legumes', jantar:'Jantar', lanche:'Lanche'};
-const POR_UNIDADE = t => t==='jantar' || t==='lanche';
+const TIPOS = {proteina:'Proteína', jantar:'Proteína · prato completo', carbo:'Carboidrato', legume:'Legumes', lanche:'Lanche', cafe:'Café da manhã', petisco:'Petisco'};
+/* seções extras da semana: receitas que rendem unidades/porções */
+const EXTRAS = [
+  {tipo:'lanche',  chave:'lanches',  titulo:'Lanches da semana', plural:'Lanches',       emoji:'🥪', un:'un',      fundo:'rgba(154,122,160,.09)', add:'+ lanche'},
+  {tipo:'cafe',    chave:'cafe',     titulo:'Café da manhã',     plural:'Café da manhã', emoji:'☕', un:'porções', fundo:'rgba(169,132,90,.10)',  add:'+ item do café'},
+  {tipo:'petisco', chave:'petiscos', titulo:'Petiscos',          plural:'Petiscos',      emoji:'🧀', un:'porções', fundo:'rgba(192,112,90,.09)',  add:'+ petisco'},
+];
+const EXTRA = t => EXTRAS.find(x=>x.tipo===t);
+const POR_UNIDADE = t => t==='jantar' || !!EXTRA(t);
+const NOME_TIPO = t => EXTRA(t) ? EXTRA(t).plural : TIPOS[t];
 const EQUIP = {
   fogao:{nome:'Fogão', icon:'🔥'},
   airfryer:{nome:'Airfryer', icon:'💨'},
@@ -183,7 +191,7 @@ const EQUIP = {
   bancada:{nome:'Bancada', icon:'🔪'}
 };
 const UNIDADES = ['g','ml','un','dente','maço','colher (sopa)','colher (chá)','xícara','lata','caixa','pacote','a gosto'];
-const SECOES = ['Açougue e peixaria','Hortifrúti','Frios, laticínios e ovos','Mercearia','Outros'];
+const SECOES = ['Açougue e peixaria','Hortifrúti','Frios, laticínios e ovos','Padaria','Mercearia','Outros'];
 const PAGES = [
   ['semana','Semana'],['compras','Compras'],['vespera','Véspera'],
   ['preparo','Dia do preparo'],['receitas','Receitas'],['ajustes','Ajustes']
@@ -200,7 +208,7 @@ function R(id,nome,tipo,rende,ing,pre,etapas,lote){
     ingredientes:ing.map(([qtd,un,nome])=>({qtd,un,nome,secao:''})),
     pre,etapas:etapas.map(([eq,min,txt])=>({eq,min,txt}))};
 }
-function receitasPadrao(){ return receitasBase().map(r=>r.id==='arroz_branco'?ARROZ_BRANCO_VI():r.id==='legumes_assados'?LEGUMES_FORNO_VI():r).concat(receitasVi(),receitasLanches()); }
+function receitasPadrao(){ return receitasBase().map(r=>r.id==='arroz_branco'?ARROZ_BRANCO_VI():r.id==='legumes_assados'?LEGUMES_FORNO_VI():r).concat(receitasVi(),receitasLanches(),receitasCafe(),receitasPetiscos()); }
 function receitasBase(){ return [
   // PROTEÍNAS
   R('frango_cubos','Frango em cubos grelhado','proteina',700,
@@ -614,6 +622,70 @@ function receitasLanches(){ return [
 ];}
 
 /* ============================================================
+   CAFÉ DA MANHÃ e PETISCOS (rende = porções)
+   ============================================================ */
+function receitasCafe(){ return [
+  V('cafe_coado','Café coado','cafe',10,
+    [[60,'g','café em pó'],[1000,'ml','água']],[],
+    [['fogao',10,'Ferver a água e passar o café']],0,'Rende 10 xícaras.'),
+  V('iogurte_morango','Iogurte de morango','cafe',6,
+    [[1000,'g','iogurte natural'],[300,'g','morango'],[30,'g','mel']],
+    ['Lavar e cortar os morangos'],
+    [['bancada',5,'Bater tudo no liquidificador e guardar em garrafinhas']]),
+  V('suco_limao','Suco de limão','cafe',6,
+    [[4,'un','limão'],[1500,'ml','água'],[60,'g','açúcar']],[],
+    [['bancada',5,'Bater os limões com casca rapidamente com água e açúcar e coar']],0,'Bater pouco para não amargar.'),
+  V('cha_gelado','Chá gelado','cafe',8,
+    [[4,'un','sachê de chá'],[2000,'ml','água'],[1,'un','limão'],[40,'g','mel']],[],
+    [['fogao',10,'Fazer o chá, adoçar com mel e juntar o limão; deixar esfriar e levar à geladeira']]),
+  V('salada_frutas','Salada de frutas','cafe',8,
+    [[2,'un','maçã'],[1,'un','manga'],[1,'un','mamão'],[1,'un','abacaxi'],[3,'un','laranja']],[],
+    [['bancada',20,'Descascar e cortar as frutas; regar com o suco das laranjas']],0,'Maçã, manga, mamão, abacaxi e laranja.'),
+  V('uva','Uva','cafe',6,
+    [[500,'g','uva']],['Lavar, higienizar e separar em potinhos'],[]),
+  V('banana','Banana','cafe',6,
+    [[6,'un','banana-prata']],[],[]),
+  V('omelete','Omelete','cafe',4,
+    [[8,'un','ovo'],[100,'g','muçarela'],[150,'g','tomate-cereja'],[100,'g','presunto'],[3,'g','sal']],
+    ['Picar o recheio e guardar em pote'],
+    [['fogao',15,'Bater os ovos, juntar o recheio e cozinhar em fogo baixo, em levas']],0,'Recheio: muçarela, tomatinho, presunto etc.'),
+  V('tapioca','Tapioca','cafe',4,
+    [[400,'g','goma de tapioca'],[150,'g','muçarela'],[100,'g','presunto']],[],
+    [['fogao',15,'Espalhar a goma na frigideira, rechear e dobrar']]),
+  V('crepioca','Crepioca','cafe',4,
+    [[4,'un','ovo'],[60,'g','goma de tapioca'],[100,'g','muçarela'],[2,'g','sal']],[],
+    [['fogao',15,'Bater ovo com tapioca e sal e fazer na frigideira, rechear com queijo']]),
+  V('pao_ovo_cremoso','Pão com ovo mexido cremoso','cafe',4,
+    [[4,'un','pão francês'],[6,'un','ovo'],[20,'g','manteiga'],[50,'g','requeijão'],[2,'g','sal']],[],
+    [['fogao',8,'Mexer os ovos em fogo baixo com manteiga; finalizar com requeijão']]),
+  V('pao_cream_cheese','Pão com cream cheese e muçarela','cafe',4,
+    [[4,'un','pão francês'],[100,'g','cream cheese'],[120,'g','muçarela']],[],
+    [['airfryer',5,'Montar e aquecer até o queijo derreter']]),
+  V('cafe_pao_frango','Pão com frango desfiado','cafe',4,
+    [[4,'un','pão francês'],[250,'g','peito de frango'],[50,'g','requeijão'],[1,'un','cebola'],[1,'dente','alho']],
+    ['Cozinhar e desfiar o frango'],
+    [['fogao',10,'Refogar o frango com cebola e alho e misturar o requeijão'],['bancada',5,'Montar os pães']]),
+  V('pao_atum','Pão com atum','cafe',4,
+    [[4,'un','pão francês'],[1,'lata','atum'],[50,'g','requeijão'],[1,'un','tomate'],[1,'maço','cheiro-verde']],[],
+    [['bancada',10,'Misturar atum, requeijão, tomate e cheiro-verde e rechear os pães']]),
+  V('pudim_chia','Pudim de chia','cafe',4,
+    [[60,'g','chia'],[400,'ml','leite'],[30,'g','mel'],[150,'g','morango']],
+    ['Misturar chia, leite e mel em potinhos e deixar na geladeira de um dia para o outro'],
+    [['bancada',5,'Cobrir com morango picado']]),
+];}
+function receitasPetiscos(){ return [
+  V('bruschetta','Bruschetta','petisco',6,
+    [[1,'un','pão italiano'],[3,'un','tomate'],[2,'dente','alho'],[30,'ml','azeite'],[1,'maço','manjericão'],[4,'g','sal']],[],
+    [['bancada',10,'Picar tomate e manjericão e temperar com azeite e sal'],['forno',10,'Fatiar o pão, esfregar alho, regar com azeite e tostar']]),
+  V('tomates_confitados','Tomates confitados','petisco',6,
+    [[500,'g','tomate-cereja'],[100,'ml','azeite'],[4,'dente','alho'],[2,'g','tomilho'],[4,'g','sal'],[10,'g','açúcar']],[],
+    [['forno',60,'Assar a 150 °C cobertos de azeite com alho e tomilho até murcharem']],0,'Guarde na geladeira em pote coberto de azeite. Combina com burrata e bruschetta.'),
+  V('burrata','Burrata com tomates','petisco',6,
+    [[2,'un','burrata'],[250,'g','tomate-cereja'],[1,'maço','manjericão'],[30,'ml','azeite'],[1,'un','pão italiano'],[2,'g','sal']],[],
+    [['bancada',10,'Montar a burrata no centro com tomates, manjericão, azeite e sal; servir com o pão']],0,'Fica ótima com os tomates confitados.'),
+];}
+
+/* ============================================================
    GRUPOS: proteína principal e base (para agrupar as escolhas)
    ============================================================ */
 const GRUPOS = [
@@ -623,6 +695,8 @@ const GRUPOS = [
   ['linguica','🌭 Linguiça e outros',['Linguiça e miúdos']],
   ['carbo','',['Arroz','Batatas e raízes','Massas','Grãos e farofas']],
   ['legume','',['Legumes']],
+  ['cafe','',['Bebidas','Frutas','Principal','Outros']],
+  ['petisco','',['Petiscos']],
   ['outros','Outros',['Outros']],
 ];
 const CLASSE = {};
@@ -646,6 +720,11 @@ const CLASSE = {};
  ['frango','Frango desfiado','bolinha_frango_batata coxinha_frango torta_frango_tapioca rap10_frango pao_frango'],
  ['peixe','Empanado','isca_peixe_lanche'],
  ['outros','Outros','maionese_verde'],
+ ['cafe','Bebidas','cafe_coado iogurte_morango suco_limao cha_gelado'],
+ ['cafe','Frutas','salada_frutas uva banana'],
+ ['cafe','Principal','omelete tapioca crepioca pao_ovo_cremoso pao_cream_cheese cafe_pao_frango pao_atum'],
+ ['cafe','Outros','pudim_chia'],
+ ['petisco','Petiscos','bruschetta tomates_confitados burrata'],
 ].forEach(([g,b,ids])=>ids.split(' ').forEach(id=>CLASSE[id]=[g,b]));
 
 function classe(r){
@@ -653,7 +732,9 @@ function classe(r){
   if(prot && r.grupo) return [r.grupo, r.base||'Outros'];
   if(!prot && r.base) return [r.tipo, r.base];
   const cl=CLASSE[r.id];
-  if(cl && (['carbo','legume'].includes(cl[0]) !== prot)) return cl;
+  if(cl && (['carbo','legume','cafe','petisco'].includes(cl[0]) !== prot)) return cl;
+  if(r.tipo==='cafe') return ['cafe','Outros'];
+  if(r.tipo==='petisco') return ['petisco','Petiscos'];
   if(r.tipo==='carbo') return ['carbo', r.base||'Grãos e farofas'];
   if(r.tipo==='legume') return ['legume','Legumes'];
   // receitas novas: adivinha pela proteína dos ingredientes
@@ -689,13 +770,14 @@ function agrupar(lista){
     .map(x=>({label:rotuloGrupo(x.g,x.b), g:x.g, b:x.b, itens:x.itens.sort((a,c)=>a.nome.localeCompare(c.nome))}));
 }
 function optsAgrupadas(lista, sel){
-  return agrupar(lista).map(gr=>`<optgroup label="${esc(gr.label)}">${gr.itens.map(r=>`<option value="${r.id}" ${r.id===sel?'selected':''}>${esc(r.nome)}</option>`).join('')}</optgroup>`).join('');
+  const misto=lista.some(r=>r.tipo==='jantar') && lista.some(r=>r.tipo==='proteina');
+  return agrupar(lista).map(gr=>`<optgroup label="${esc(gr.label)}">${gr.itens.map(r=>`<option value="${r.id}" ${r.id===sel?'selected':''}>${esc(r.nome)}${misto&&r.tipo==='jantar'?' (prato completo)':''}</option>`).join('')}</optgroup>`).join('');
 }
 
 function dadosPadrao(){
   return {
     versao:1,
-    receitasVersao:3,
+    receitasVersao:4,
     pessoas:[
       {id:'marido', nome:'Baia', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
       {id:'filha',  nome:'Mel',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:0},
@@ -709,7 +791,7 @@ function dadosPadrao(){
         eu:[{id:uid(), proteina:'frango_cubos', carbo:'arroz_integral', legume:'', qtd:5}],
       },
       jantar:{ativo:true, pessoas:6, junto:true, itens:[{rid:'lasanha', g:150}]},
-      lanches:{ativo:true, itens:[]},
+      lanches:{ativo:true, itens:[]}, cafe:{ativo:true, itens:[]}, petiscos:{ativo:true, itens:[]},
       checks:{}, compradas:{}, extras:[]
     },
     config:{bocas:4, airfryer:1, forno:1, inicio:'08:00', margem:5, diaPre:'Quinta-feira', diaPrep:'Sexta-feira'}
@@ -737,7 +819,7 @@ function normalizar(){
   D.config = Object.assign(p.config, D.config||{});
   D.semana = Object.assign(p.semana, D.semana||{});
   D.semana.jantar = Object.assign(p.semana.jantar, D.semana.jantar||{});
-  D.semana.lanches = Object.assign(p.semana.lanches, D.semana.lanches||{});
+  EXTRAS.forEach(x=>{ D.semana[x.chave] = Object.assign(p.semana[x.chave], D.semana[x.chave]||{}); });
   let mudou=false;
   [['marido','Marido','Baia'],['filha','Filha','Mel'],['eu','Eu','Vi']].forEach(([id,de,para])=>{
     const x=D.pessoas.find(q=>q.id===id); if(x && x.nome===de){ x.nome=para; mudou=true; }
@@ -748,9 +830,10 @@ function normalizar(){
    só troca arroz branco / legumes assados se ainda estiverem como vieram. */
 function migrarReceitas(){
   const v=D.receitasVersao||1;
-  if(v >= 3) return false;
-  if(v < 3) receitasLanches().forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
-  D.receitasVersao=3;
+  if(v >= 4) return false;
+  const novas=[...(v<3?receitasLanches():[]), ...receitasCafe(), ...receitasPetiscos()];
+  novas.forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
+  D.receitasVersao=4;
   if(v >= 2) return true;
   const base=receitasBase();
   [['arroz_branco',ARROZ_BRANCO_VI],['legumes_assados',LEGUMES_FORNO_VI]].forEach(([id,nova])=>{
@@ -896,8 +979,9 @@ function secaoDe(ing){
   const n = ing.nome.toLowerCase();
   if(/palha|molho|massa|macarr|arroz|feij|champignon|ketchup|mostarda|atum|coco|pimenta-do-reino/.test(n)) return 'Mercearia';
   if(/frango|carne|patinho|sobrecoxa|coxa|til[áa]pia|peixe|salm[ãa]o|alcatra|m[úu]sculo|lombo|porco|lingui|fil[ée]|mo[íi]da|peito|cox[ãa]o|ac[ée]m|maminha|fraldinha|atum|camar/.test(n)) return 'Açougue e peixaria';
-  if(/queijo|mu[çcs]+arela|presunto|creme de leite|leite|manteiga|requeij|parmes|iogurte|\bovos?\b|ricota|cream cheese|catupiry|maionese/.test(n)) return 'Frios, laticínios e ovos';
-  if(/cebola|alho|tomate|lim[ãa]o|batata|mandioca|aipim|br[óo]colis|abobrinha|cenoura|berinjela|vagem|chuchu|cheiro|salsinha|cebolinha|couve|espinafre|piment[ãa]o|ab[óo]bora|inhame|mandioquinha|beterraba|alface|repolho|quiabo|couve-flor|gengibre|coentro|pepino|manga|abacate|banana|pimenta dedo/.test(n)) return 'Hortifrúti';
+  if(/p[ãa]o (franc|italiano|artesano|de forma)|^p[ãa]o$|rap10/.test(n)) return 'Padaria';
+  if(/burrata|queijo|mu[çcs]+arela|presunto|creme de leite|leite|manteiga|requeij|parmes|iogurte|\bovos?\b|ricota|cream cheese|catupiry|maionese/.test(n)) return 'Frios, laticínios e ovos';
+  if(/cebola|alho|tomate|lim[ãa]o|batata|mandioca|aipim|br[óo]colis|abobrinha|cenoura|berinjela|vagem|chuchu|cheiro|salsinha|cebolinha|couve|espinafre|piment[ãa]o|ab[óo]bora|inhame|mandioquinha|beterraba|alface|repolho|quiabo|couve-flor|gengibre|coentro|pepino|manga|abacate|banana|pimenta dedo|morango|ma[çc][ãa]|mam[ãa]o|abacaxi|laranja|\buva|manjeric|tomilho/.test(n)) return 'Hortifrúti';
   return 'Mercearia';
 }
 function linkify(t){ return esc(t).replace(/https?:\/\/[^\s<]+/g,u=>`<a href="${u}" target="_blank" rel="noopener" style="color:var(--verde-c)">${u}</a>`); }
@@ -917,9 +1001,14 @@ function calcular(){
       total += c.qtd;
       const partes=[];
       COMP.forEach(k=>{
-        if(p[k]>0 && c[k] && rec(c[k])){
-          add(mar,c[k],p[k]*c.qtd,{nome:p.nome,n:c.qtd,g:p[k]});
-          partes.push({k,r:rec(c[k]),g:p[k]});
+        const r=c[k] && rec(c[k]);
+        if(!(p[k]>0) || !r) return;
+        if(r.tipo==='jantar'){ // prato completo: 1 porção por marmita
+          add(mar,r.id,c.qtd,{nome:p.nome,n:c.qtd,porcoes:true});
+          partes.push({k:'jantar',r,porcao:true});
+        } else {
+          add(mar,r.id,p[k]*c.qtd,{nome:p.nome,n:c.qtd,g:p[k]});
+          partes.push({k,r,g:p[k]});
         }
       });
       montagem.push({p,c,partes});
@@ -932,8 +1021,10 @@ function calcular(){
     else add(jan,r.id,(it.g||150)*J.pessoas,{nome:'Jantar',n:J.pessoas,g:it.g||150});
   });
   const lan={};
-  const L=D.semana.lanches;
-  if(L.ativo) L.itens.forEach(it=>{ const r=rec(it.rid); if(!r||!(it.qtd>0)) return; add(lan,r.id,it.qtd,{nome:'Lanches',n:it.qtd,un:true}); });
+  EXTRAS.forEach(x=>{
+    const L=D.semana[x.chave];
+    if(L && L.ativo) L.itens.forEach(it=>{ const r=rec(it.rid); if(!r||!(it.qtd>0)) return; add(lan,r.id,it.qtd,{nome:x.plural,n:it.qtd,un:x.un}); });
+  });
   return {mar,jan,lan,montagem,total};
 }
 function fator(r,qtd){
@@ -949,7 +1040,7 @@ function juntar(...ms){
 }
 function quantoTxt(r,n){
   if(r.tipo==='jantar') return num(n.qtd)+' porç'+(n.qtd>1?'ões':'ão');
-  if(r.tipo==='lanche') return num(n.qtd)+' un';
+  if(EXTRA(r.tipo)) return num(n.qtd)+' '+EXTRA(r.tipo).un;
   return fmtG(n.qtd)+' pronto';
 }
 
@@ -968,7 +1059,7 @@ function agendar(need, comMontagem, nMarmitas){
   const avisos=[];
   const cadeias=Object.keys(need).map(rid=>{
     const r=rec(rid), n=need[rid];
-    const gProntos = r.tipo==='jantar' ? 0 : r.tipo==='lanche' ? n.qtd : n.qtd*(1+(C.margem||0)/100);
+    const gProntos = r.tipo==='jantar' ? 0 : EXTRA(r.tipo) ? n.qtd : n.qtd*(1+(C.margem||0)/100);
     const passos=(r.etapas||[]).map((e,i)=>{
       let lotes=1;
       if(e.eq==='airfryer' && r.lote>0 && gProntos>0) lotes=Math.max(1,Math.ceil(gProntos/r.lote));
@@ -1013,7 +1104,7 @@ function render(){
   document.getElementById('tabs').innerHTML = PAGES.map(([id,nm])=>`<button class="tab ${page===id?'active':''}" onclick="go('${id}')">${nm}</button>`).join('');
   const c=calcular();
   const J=D.semana.jantar;
-  const nLan=Object.values(c.lan).reduce((a,n)=>a+n.qtd,0);
+  const nLan=Object.keys(c.lan).filter(id=>rec(id).tipo==='lanche').reduce((a,id)=>a+c.lan[id].qtd,0);
   document.getElementById('hdrSum').textContent = `${c.total} marmitas` + (J.ativo?` · jantar para ${J.pessoas}`:'') + (nLan?` · ${nLan} lanches`:'');
   const el=document.getElementById('page');
   const fn={semana:pgSemana,compras:pgCompras,vespera:pgVespera,preparo:pgPreparo,receitas:pgReceitas,ajustes:pgAjustes}[page];
@@ -1021,7 +1112,9 @@ function render(){
 }
 
 function opcoesReceita(tipo, sel, vazio){
-  return `<option value="">${vazio||'— escolher —'}</option>`+optsAgrupadas(D.receitas.filter(r=>r.tipo===tipo), sel);
+  // na proteína entram também os pratos completos, no grupo da mesma base
+  const lista=D.receitas.filter(r=>r.tipo===tipo || (tipo==='proteina' && r.tipo==='jantar'));
+  return `<option value="">${vazio||'— escolher —'}</option>`+optsAgrupadas(lista, sel);
 }
 
 /* ============================================================
@@ -1053,6 +1146,8 @@ function pgSemana(c){
       COMP.filter(k=>p[k]>0).forEach(k=>{
         h+=`<div class="sel-row"><span class="dot ${k}"></span><span class="k">${TIPOS[k]}</span>
           <select class="inp" onchange="setCombo('${p.id}','${cb.id}','${k}',this.value)">${opcoesReceita(k,cb[k])}</select></div>`;
+        const rk=cb[k]&&rec(cb[k]);
+        if(rk && rk.tipo==='jantar') h+=`<div class="muted" style="margin:4px 0 0 70px">Prato completo: 1 porção por marmita (a receita rende ${rk.rende}).</div>`;
       });
       h+=`</div>`;
     });
@@ -1091,25 +1186,27 @@ function pgSemana(c){
   }
   h+=`</div>`;
 
-  // LANCHES
-  const L=D.semana.lanches;
-  h+=`<div class="card" style="background:rgba(154,122,160,.09)">
-    <div class="card-h"><div class="avatar">🥪</div>
-      <div><div class="card-t">Lanches da semana</div><div class="card-s">escolha quantas unidades fazer de cada</div></div>
-      <label class="switch ml-auto"><input type="checkbox" ${L.ativo?'checked':''} onchange="setL('ativo',this.checked)">incluir</label>
-    </div>`;
-  if(L.ativo){
-    L.itens.forEach((it,i)=>{
-      const r=rec(it.rid);
-      h+=`<div class="combo"><div class="row">
-        <select class="inp" onchange="setLItem(${i},'rid',this.value)"><option value="">— escolher lanche —</option>${optsAgrupadas(D.receitas.filter(x=>x.tipo==='lanche'), it.rid)}</select>
-        <button class="x" onclick="rmLItem(${i})">×</button></div>
-        ${r?`<div class="row" style="margin-top:8px"><span class="muted">Quantidade</span><input class="inp sm" type="number" inputmode="numeric" value="${it.qtd||''}" onchange="setLItem(${i},'qtd',+this.value)"><span class="muted">un · a receita rende ${r.rende}</span></div>`:''}
+  // LANCHES, CAFÉ DA MANHÃ, PETISCOS
+  EXTRAS.forEach(x=>{
+    const L=D.semana[x.chave];
+    h+=`<div class="card" style="background:${x.fundo}">
+      <div class="card-h"><div class="avatar">${x.emoji}</div>
+        <div><div class="card-t">${x.titulo}</div><div class="card-s">escolha quant${x.un==='un'?'as unidades':'as porções'} fazer de cada</div></div>
+        <label class="switch ml-auto"><input type="checkbox" ${L.ativo?'checked':''} onchange="setX('${x.chave}','ativo',this.checked)">incluir</label>
       </div>`;
-    });
-    h+=`<button class="btn ghost sm" onclick="addLItem()">+ lanche</button>`;
-  }
-  h+=`</div>`;
+    if(L.ativo){
+      L.itens.forEach((it,i)=>{
+        const r=rec(it.rid);
+        h+=`<div class="combo"><div class="row">
+          <select class="inp" onchange="setXItem('${x.chave}',${i},'rid',this.value)"><option value="">— escolher —</option>${optsAgrupadas(D.receitas.filter(q=>q.tipo===x.tipo), it.rid)}</select>
+          <button class="x" onclick="rmXItem('${x.chave}',${i})">×</button></div>
+          ${r?`<div class="row" style="margin-top:8px"><span class="muted">Quantidade</span><input class="inp sm" type="number" inputmode="numeric" value="${it.qtd||''}" onchange="setXItem('${x.chave}',${i},'qtd',+this.value)"><span class="muted">${x.un} · a receita rende ${r.rende}</span></div>`:''}
+        </div>`;
+      });
+      h+=`<button class="btn ghost sm" onclick="addXItem('${x.chave}')">${x.add}</button>`;
+    }
+    h+=`</div>`;
+  });
 
   // RESUMO
   const need=tudo(c);
@@ -1117,12 +1214,12 @@ function pgSemana(c){
   if(ids.length){
     h+=`<div class="card white"><div class="card-t" style="margin-bottom:8px">Quanto preparar</div>`;
     agrupar(ids.map(rec)).forEach(gr=>{
-      const comum = gr.itens.length>1 && !['carbo','legume','outros'].includes(gr.g);
+      const comum = gr.itens.length>1 && !['carbo','legume','outros','cafe','petisco'].includes(gr.g);
       h+=`<div class="grp-h">${esc(gr.label)}${comum?' · <span style="color:var(--verde-c)">base em comum</span>':''}</div>`;
       gr.itens.forEach(r=>{
         const n=need[r.id];
         h+=`<div class="row" style="padding:6px 0;border-bottom:1px solid var(--creme-e)"><span class="dot ${r.tipo}"></span>
-          <span style="flex:1;font-size:14px">${esc(r.nome)}<div class="muted">${n.quem.map(q=>q.porcoes?`${q.nome}: ${q.n} porções`:q.un?`${q.nome}: ${q.n} un`:`${esc(q.nome)}: ${q.n}×${q.g}g`).join(' · ')}</div></span>
+          <span style="flex:1;font-size:14px">${esc(r.nome)}<div class="muted">${n.quem.map(q=>q.porcoes?`${esc(q.nome)}: ${q.n} porç${q.n>1?'ões':'ão'}`:q.un?`${q.nome}: ${q.n} ${q.un}`:`${esc(q.nome)}: ${q.n}×${q.g}g`).join(' · ')}</div></span>
           <b style="color:var(--verde);white-space:nowrap">${quantoTxt(r,n)}</b></div>`;
       });
     });
@@ -1146,10 +1243,10 @@ function rmCombo(pid,cid){
   const [rm]=cs.splice(i,1); cs[Math.max(0,i-1)].qtd+= (+rm.qtd||0);
   save(); render();
 }
-function setL(k,v){ D.semana.lanches[k]=v; save(); render(); }
-function setLItem(i,k,v){ const it=D.semana.lanches.itens[i]; it[k]=v; if(k==='rid'){ const r=rec(v); if(r) it.qtd=r.rende; } save(); render(); }
-function addLItem(){ D.semana.lanches.itens.push({rid:'',qtd:0}); save(); render(); }
-function rmLItem(i){ D.semana.lanches.itens.splice(i,1); save(); render(); }
+function setX(ch,k,v){ D.semana[ch][k]=v; save(); render(); }
+function setXItem(ch,i,k,v){ const it=D.semana[ch].itens[i]; it[k]=v; if(k==='rid'){ const r=rec(v); if(r) it.qtd=r.rende; } save(); render(); }
+function addXItem(ch){ D.semana[ch].itens.push({rid:'',qtd:0}); save(); render(); }
+function rmXItem(ch,i){ D.semana[ch].itens.splice(i,1); save(); render(); }
 function setJ(k,v){ D.semana.jantar[k]=v; save(); render(); }
 function setJItem(i,k,v){ D.semana.jantar.itens[i][k]=v; save(); render(); }
 function addJItem(){ D.semana.jantar.itens.push({rid:'',g:150}); save(); render(); }
@@ -1256,7 +1353,7 @@ function pgVespera(c){
   </div>`;
 
   // bases em comum: preparar uma vez e dividir
-  const bases=agrupar(ids.map(rec)).filter(gr=>gr.itens.length>1 && !['carbo','legume','outros'].includes(gr.g));
+  const bases=agrupar(ids.map(rec)).filter(gr=>gr.itens.length>1 && !['carbo','legume','outros','cafe','petisco'].includes(gr.g));
   if(bases.length){
     h+=`<div class="card"><div class="card-t" style="margin-bottom:4px">Bases em comum</div>
       <div class="muted" style="margin-bottom:6px">Prepare a base de uma vez e depois divida entre as receitas.</div>`;
@@ -1274,7 +1371,7 @@ function pgVespera(c){
     h+=`</div>`;
   }
 
-  const ordem=['proteina','carbo','legume','jantar','lanche'];
+  const ordem=['proteina','carbo','legume','jantar','lanche','cafe','petisco'];
   const sem=[];
   ordem.forEach(t=>ids.filter(id=>rec(id).tipo===t).forEach(id=>{
     const r=rec(id), n=need[id];
@@ -1354,7 +1451,7 @@ function pgPreparo(c){
     <div class="card white"><table class="mt"><tr><th>Quem</th><th>Conteúdo</th><th style="text-align:right">Qtd</th></tr>`;
   c.montagem.forEach(m=>{
     h+=`<tr><td>${esc(m.p.emoji||'')} ${esc(m.p.nome)}</td>
-      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.g}g ${esc(x.r.nome)}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
+      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.porcao?'1 porção':x.g+'g'} ${esc(x.r.nome)}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
       <td class="n">${m.c.qtd}×</td></tr>`;
   });
   h+=`</table></div>
@@ -1379,17 +1476,17 @@ function pgPreparo(c){
 function pgReceitas(){
   if(ED) return editorHtml();
   let h=`<div class="sec-t">Receitas</div>
-    <div class="sec-s">Cadastre suas receitas. Para proteína, carboidrato e legumes informe <b>quanto rende pronto (em g)</b> — o app escala os ingredientes para as gramas que você precisa. Para jantar informe <b>quantas porções</b>, e para lanches <b>quantas unidades</b>.</div>
-    <div class="filters">${['todos','proteina','carbo','legume','jantar','lanche'].map(t=>`<button class="fchip ${filtroTipo===t?'active':''}" onclick="filtroTipo='${t}';render()">${t==='todos'?'Todas':t==='lanche'?'Lanches':TIPOS[t]}</button>`).join('')}</div>
+    <div class="sec-s">Cadastre suas receitas. Para proteína, carboidrato e legumes informe <b>quanto rende pronto (em g)</b> — o app escala os ingredientes para as gramas que você precisa. Para pratos completos (lasanha, panqueca...) escolha <b>Proteína · prato completo</b> e informe <b>quantas porções</b>; para lanches, café e petiscos <b>quantas unidades ou porções</b>.</div>
+    <div class="filters">${['todos','proteina','carbo','legume','lanche','cafe','petisco'].map(t=>`<button class="fchip ${filtroTipo===t?'active':''}" onclick="filtroTipo='${t}';render()">${t==='todos'?'Todas':NOME_TIPO(t)}</button>`).join('')}</div>
     <div class="row" style="margin-bottom:12px"><input class="inp" id="buscaRec" placeholder="buscar receita..." value="${esc(busca)}" oninput="busca=this.value;filtrarLista()">
     <button class="btn" onclick="novaReceita()">+ Nova</button></div><div id="listaRec">`;
   const q=busca.trim().toLowerCase();
-  const lista=D.receitas.filter(r=>(filtroTipo==='todos'||r.tipo===filtroTipo) && (!q || r.nome.toLowerCase().includes(q) || r.ingredientes.some(i=>i.nome.toLowerCase().includes(q))));
+  const lista=D.receitas.filter(r=>(filtroTipo==='todos'||r.tipo===filtroTipo||(filtroTipo==='proteina'&&r.tipo==='jantar')) && (!q || r.nome.toLowerCase().includes(q) || r.ingredientes.some(i=>i.nome.toLowerCase().includes(q))));
   if(!lista.length) h+=`<div class="empty">Nenhuma receita aqui ainda.</div>`;
-  const ordT=['proteina','jantar','carbo','legume','lanche'];
+  const ordT=['proteina','carbo','legume','lanche','cafe','petisco'];
   ordT.filter(t=>filtroTipo==='todos'||t===filtroTipo).forEach(t=>{
-   const doT=lista.filter(r=>r.tipo===t); if(!doT.length) return;
-   if(filtroTipo==='todos') h+=`<div class="sec-t" style="font-size:20px;margin-top:14px">${t==='lanche'?'Lanches':TIPOS[t]}</div>`;
+   const doT=lista.filter(r=>r.tipo===t||(t==='proteina'&&r.tipo==='jantar')); if(!doT.length) return;
+   if(filtroTipo==='todos') h+=`<div class="sec-t" style="font-size:20px;margin-top:14px">${NOME_TIPO(t)}</div>`;
    agrupar(doT).forEach(gr=>{
    h+=`<div class="grp-h">${esc(gr.label)}</div>`;
    gr.itens.forEach(r=>{
@@ -1397,7 +1494,7 @@ function pgReceitas(){
     const tempo=(r.etapas||[]).reduce((a,e)=>a+(+e.min||0),0);
     h+=`<div class="rcard" onclick="editarReceita('${r.id}')"><span class="dot ${r.tipo}"></span>
       <div style="flex:1"><div class="nm">${esc(r.nome)}</div>
-      <div class="meta">${r.obs?'📝 ':''}rende ${r.tipo==='jantar'?r.rende+' porções':r.tipo==='lanche'?r.rende+' un':fmtG(r.rende)} · ${dur(tempo)} ${eqs}</div></div><span class="muted">›</span></div>`;
+      <div class="meta">${r.obs?'📝 ':''}rende ${r.tipo==='jantar'?r.rende+' porções · prato completo':EXTRA(r.tipo)?r.rende+' '+EXTRA(r.tipo).un:fmtG(r.rende)} · ${dur(tempo)} ${eqs}</div></div><span class="muted">›</span></div>`;
    });
    });
   });
@@ -1408,12 +1505,12 @@ function filtrarLista(){
   const nova=tmp.querySelector('#listaRec'); if(nova) document.getElementById('listaRec').replaceWith(nova);
 }
 function novaReceita(){
-  ED={id:'',nome:'',obs:'',tipo:filtroTipo==='todos'?'proteina':filtroTipo,rende:1000,lote:0,ingredientes:[{qtd:'',un:'g',nome:'',secao:''}],pre:[],etapas:[{eq:'fogao',min:20,txt:''}]};
+  ED={id:'',nome:'',obs:'',tipo:filtroTipo==='todos'||filtroTipo==='jantar'?'proteina':filtroTipo,rende:1000,lote:0,ingredientes:[{qtd:'',un:'g',nome:'',secao:''}],pre:[],etapas:[{eq:'fogao',min:20,txt:''}]};
   render(); window.scrollTo({top:0});
 }
 function editarReceita(id){ ED=JSON.parse(JSON.stringify(rec(id))); render(); window.scrollTo({top:0}); }
 function editorHtml(){
-  const r=ED, j=r.tipo==='jantar', l=r.tipo==='lanche';
+  const r=ED, j=r.tipo==='jantar', l=!!EXTRA(r.tipo), unX=l?EXTRA(r.tipo).un:'';
   const temAF=(r.etapas||[]).some(e=>e.eq==='airfryer');
   const [cg,cb]=classe(r);
   const temProt=['proteina','jantar','lanche'].includes(r.tipo);
@@ -1425,14 +1522,14 @@ function editorHtml(){
     <input class="inp" value="${esc(r.nome)}" onchange="ED.nome=this.value" placeholder="ex.: Frango ao curry">
     <div class="grid2">
       <div><label class="lbl">Tipo</label><select class="inp" onchange="ED.tipo=this.value;render()">${Object.keys(TIPOS).map(t=>`<option value="${t}" ${r.tipo===t?'selected':''}>${TIPOS[t]}</option>`).join('')}</select></div>
-      <div><label class="lbl">${j?'Rende (porções)':l?'Rende (unidades)':'Rende pronto (g)'}</label><input class="inp" type="number" inputmode="numeric" value="${r.rende}" onchange="ED.rende=+this.value"></div>
+      <div><label class="lbl">${j||unX==='porções'?'Rende (porções)':l?'Rende (unidades)':'Rende pronto (g)'}</label><input class="inp" type="number" inputmode="numeric" value="${r.rende}" onchange="ED.rende=+this.value"></div>
     </div>
     <div class="grid2">
       ${temProt?`<div><label class="lbl">Proteína</label><select class="inp" onchange="ED.grupo=this.value;ED.base=ED.base||'';render()">${GRUPOS.filter(G=>G[1]&&G[0]!=='carbo').map(G=>`<option value="${G[0]}" ${G[0]===cg?'selected':''}>${G[1]}</option>`).join('')}</select></div>`:''}
       <div><label class="lbl">${temProt?'Base':'Categoria'}</label><input class="inp" list="basesSug" value="${esc(cb)}" onchange="ED.grupo=ED.grupo||'${cg}';ED.base=this.value.trim()"><datalist id="basesSug">${basesSug.map(b=>`<option value="${esc(b)}">`).join('')}</datalist></div>
     </div>
-    <div class="muted" style="margin-top:6px">${l?'Quantas unidades a receita abaixo rende.':j?'Quantas pessoas a receita abaixo serve.':'Peso total da receita depois de pronta, com as quantidades abaixo. Ex.: 1 kg de frango cru rende ~700 g grelhado.'}</div>
-    ${temAF&&!j?`<label class="lbl">Capacidade da airfryer por leva (${l?'unidades':'g prontos'})</label><input class="inp sm" style="width:110px" type="number" inputmode="numeric" value="${r.lote||''}" placeholder="ex.: 500" onchange="ED.lote=+this.value">
+    <div class="muted" style="margin-top:6px">${l?`Quant${unX==='un'?'as unidades':'as porções'} a receita abaixo rende.`:j?'Quantas pessoas a receita abaixo serve.':'Peso total da receita depois de pronta, com as quantidades abaixo. Ex.: 1 kg de frango cru rende ~700 g grelhado.'}</div>
+    ${temAF&&!j?`<label class="lbl">Capacidade da airfryer por leva (${l?unX:'g prontos'})</label><input class="inp sm" style="width:110px" type="number" inputmode="numeric" value="${r.lote||''}" placeholder="ex.: 500" onchange="ED.lote=+this.value">
       <div class="muted" style="margin-top:4px">Usado para calcular quantas levas serão necessárias.</div>`:''}
   </div>
   <div class="card"><div class="card-t" style="margin-bottom:8px">Ingredientes</div>`;
