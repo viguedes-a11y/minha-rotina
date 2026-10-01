@@ -27,6 +27,7 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;col
 .hdr-date{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dourado);margin-bottom:4px;opacity:.8;}
 .hdr-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--creme);}
 .hdr-title em{font-style:italic;color:var(--dourado-c);}
+.hdr-sync{font-size:11px;color:var(--dourado-c);margin-top:6px;min-height:14px;}
 .hdr-sum{font-size:12px;color:rgba(245,240,232,.65);margin-top:6px;}
 
 /* CONTENT / TABS */
@@ -158,6 +159,7 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
   <div class="hdr-date">planejamento semanal</div>
   <div class="hdr-title">Marmitas <em>da Semana</em></div>
   <div class="hdr-sum" id="hdrSum"></div>
+  <div class="hdr-sync" id="syncInfo"></div>
 </div>
 
 <div class="content">
@@ -336,14 +338,95 @@ function load(){
     const s = JSON.parse(localStorage.getItem(KEY));
     D = (s && s.receitas && s.pessoas) ? s : dadosPadrao();
   }catch(e){ D = dadosPadrao(); }
+  normalizar();
+  try{ const pg = localStorage.getItem(KEY+'_page'); if(pg && PAGES.some(x=>x[0]===pg)) page = pg; }catch(e){}
+}
+function normalizar(){
   const p = dadosPadrao();
+  if(!Array.isArray(D.receitas)) D.receitas = p.receitas;
+  if(!Array.isArray(D.pessoas)) D.pessoas = p.pessoas;
   D.config = Object.assign(p.config, D.config||{});
   D.semana = Object.assign(p.semana, D.semana||{});
   D.semana.jantar = Object.assign(p.semana.jantar, D.semana.jantar||{});
-  try{ const pg = localStorage.getItem(KEY+'_page'); if(pg && PAGES.some(x=>x[0]===pg)) page = pg; }catch(e){}
 }
-function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){ toast('Não consegui salvar no navegador'); }
+function salvarLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){} }
+function save(){ salvarLocal(); agendarEnvio(); }
+
+/* ============================================================
+   SINCRONIZAÇÃO — quando aberto no Claude, os dados ficam na conta
+   e aparecem iguais no celular e no computador
+   ============================================================ */
+const DOCS = {
+  receitas: ()=>({lista:D.receitas}),
+  ajustes:  ()=>({pessoas:D.pessoas, config:D.config}),
+  semana:   ()=>({semana:D.semana})
+};
+let nuvem=null;
+const ultimo={}, timers={}, cadeia={}, semeado={};
+function estavel(o){
+  if(Array.isArray(o)) return '['+o.map(estavel).join(',')+']';
+  if(o && typeof o==='object') return '{'+Object.keys(o).filter(k=>o[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+estavel(o[k])).join(',')+'}';
+  return JSON.stringify(o===undefined?null:o);
+}
+function setSync(st){
+  const el=document.getElementById('syncInfo'); if(!el) return;
+  el.textContent = {conectando:'☁️ conectando…', ok:'☁️ sincronizado entre seus aparelhos', salvando:'☁️ salvando…',
+    local:'📱 salvo só neste aparelho', erro:'⚠️ não consegui sincronizar agora; suas mudanças continuam neste aparelho'}[st]||'';
+}
+function agendarEnvio(){
+  if(!nuvem) return;
+  for(const n in DOCS){
+    if(estavel(DOCS[n]())===ultimo[n]) continue;
+    clearTimeout(timers[n]);
+    timers[n]=setTimeout(()=>{ timers[n]=null; enviar(n); },700);
+  }
+}
+function enviar(n){
+  cadeia[n]=(cadeia[n]||Promise.resolve()).then(async()=>{
+    const corpo=DOCS[n](), j=estavel(corpo);
+    if(j===ultimo[n]) return;
+    setSync('salvando');
+    const gravar=()=>nuvem.doc('marmitas/'+n).set(JSON.parse(JSON.stringify(corpo)));
+    try{ await gravar(); }
+    catch(e){
+      if(e && e.code==='unavailable'){
+        await new Promise(r=>setTimeout(r,800+Math.random()*800));
+        try{ await gravar(); }catch(e2){ setSync('erro'); return; }
+      } else { setSync('erro'); if(e && e.code==='quota_exceeded') toast('Espaço de armazenamento cheio'); return; }
+    }
+    ultimo[n]=j; setSync('ok');
+  });
+}
+function aplicar(n,data){
+  if(n==='receitas' && Array.isArray(data.lista)) D.receitas=data.lista;
+  if(n==='ajustes'){ if(Array.isArray(data.pessoas)) D.pessoas=data.pessoas; if(data.config) D.config=data.config; }
+  if(n==='semana' && data.semana) D.semana=data.semana;
+  normalizar();
+}
+async function conectar(){
+  if(!(window.claude && typeof window.claude.use==='function')) return;
+  setSync('conectando');
+  let db=null;
+  try{ db=await window.claude.use('db'); }catch(e){}
+  if(!db){ setSync('local'); return; }
+  nuvem=db;
+  for(const n in DOCS){
+    db.doc('marmitas/'+n).onSnapshot(snap=>{
+      if(snap.metadata.hasPendingWrites) return;
+      if(!snap.exists){
+        // primeira vez: leva para a conta o que já existe neste aparelho
+        if(!snap.metadata.fromCache && !semeado[n]){ semeado[n]=true; enviar(n); }
+        return;
+      }
+      const data=JSON.parse(JSON.stringify(snap.data()));
+      const j=estavel(data);
+      if(!snap.metadata.fromCache) setSync('ok');
+      if(j===ultimo[n] || timers[n]) return;
+      ultimo[n]=j;
+      if(j===estavel(DOCS[n]())) return;
+      aplicar(n,data); salvarLocal(); render();
+    }, ()=>setSync('erro'));
+  }
 }
 function rec(id){ return D.receitas.find(r=>r.id===id); }
 function pessoa(id){ return D.pessoas.find(p=>p.id===id); }
@@ -957,7 +1040,7 @@ function pgAjustes(){
 
   <div class="sec-t" style="margin-top:22px">Backup</div>
   <div class="card">
-    <div class="muted" style="margin-bottom:10px">Os dados ficam salvos neste navegador. Copie o backup para guardar ou levar para outro aparelho.</div>
+    <div class="muted" style="margin-bottom:10px">${nuvem?'Seus dados ficam salvos na sua conta e aparecem iguais em todos os aparelhos onde você abrir este link. O backup serve como cópia de segurança.':'Os dados ficam salvos neste navegador. Copie o backup para guardar ou levar para outro aparelho.'}</div>
     <div class="row wrap"><button class="btn" onclick="copiar(JSON.stringify(D),'Backup copiado 📋')">Copiar backup</button>
     <button class="btn sec" onclick="importar()">Restaurar backup</button>
     <button class="btn sec" onclick="restaurarPadrao()">Repor receitas de exemplo</button></div>
@@ -988,7 +1071,7 @@ function restaurarPadrao(){
   D.receitas.push(...faltando); save(); render(); toast(faltando.length+' receitas repostas');
 }
 
-load(); render();
+load(); render(); conectar();
 </script>
 </body>
 </html>
