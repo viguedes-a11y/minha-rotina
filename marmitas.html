@@ -909,7 +909,10 @@ async function conectar(){
       if(snap.metadata.hasPendingWrites) return;
       if(!snap.exists){
         // primeira vez: leva para a conta o que já existe neste aparelho
-        if(!snap.metadata.fromCache && !semeado[n]){ semeado[n]=true; enviar(n); }
+        if(semeado[n]) return;
+        if(!snap.metadata.fromCache){ semeado[n]=true; enviar(n); return; }
+        // resposta ainda do cache: confirma direto no servidor antes de enviar
+        db.doc('marmitas/'+n).get().then(s2=>{ if(!s2.exists && !semeado[n]){ semeado[n]=true; enviar(n); } }).catch(()=>{});
         return;
       }
       const data=JSON.parse(JSON.stringify(snap.data()));
