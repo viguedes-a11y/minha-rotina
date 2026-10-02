@@ -793,8 +793,8 @@ function dadosPadrao(){
     receitasVersao:5,
     pessoas:[
       {id:'marido', nome:'Baia', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
-      {id:'filha',  nome:'Mel',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:0},
-      {id:'eu',     nome:'Vi',     emoji:'👩', qtd:5,  proteina:150, carbo:150, legume:0},
+      {id:'filha',  nome:'Mel',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:100},
+      {id:'eu',     nome:'Vi',     emoji:'👩', qtd:5,  proteina:150, carbo:150, legume:100},
     ],
     receitas:receitasPadrao(),
     semana:{
@@ -837,6 +837,11 @@ function normalizar(){
   [['marido','Marido','Baia'],['filha','Filha','Mel'],['eu','Eu','Vi']].forEach(([id,de,para])=>{
     const x=D.pessoas.find(q=>q.id===id); if(x && x.nome===de){ x.nome=para; mudou=true; }
   });
+  // pedido da Vi: legumes também nas marmitas dela e da Mel (uma vez só)
+  if(!D.config.legumesViMel){
+    ['filha','eu'].forEach(id=>{ const x=D.pessoas.find(q=>q.id===id); if(x && !(x.legume>0)) x.legume=100; });
+    D.config.legumesViMel=1; mudou=true;
+  }
   return migrarReceitas() || mudou;
 }
 /* v2: receitas da página “Marmitas” do Notion. Só acrescenta o que falta e
