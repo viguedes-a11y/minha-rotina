@@ -854,7 +854,9 @@ function normalizar(){
     ['filha','eu'].forEach(id=>{ const x=D.pessoas.find(q=>q.id===id); if(x && !(x.legume>0)) x.legume=100; });
     D.config.legumesViMel=1; mudou=true;
   }
-  return migrarReceitas() || mudou;
+  const migrou=migrarReceitas();
+  let conv=false; D.receitas.forEach(r=>{ if(preParaEtapas(r)) conv=true; });
+  return migrou || mudou || conv;
 }
 /* v2: receitas da página “Marmitas” do Notion. Só acrescenta o que falta e
    só troca arroz branco / legumes assados se ainda estiverem como vieram. */
@@ -1094,6 +1096,13 @@ function quantoTxt(r,n){
 
 /* Agenda as etapas nos equipamentos (fogão com N bocas, airfryer, forno, bancada) */
 const naVespera = e => e.dia==='vespera';
+/* o antigo “pré-preparo” vira etapas da receita marcadas na véspera */
+function preParaEtapas(r){
+  if(!(r.pre && r.pre.length)) return false;
+  r.etapas=[...r.pre.map(t=>({eq:'bancada',min:10,txt:t,dia:'vespera'})), ...(r.etapas||[])];
+  r.pre=[];
+  return true;
+}
 function levas(r,qtd,e){
   if(e.eq!=='airfryer' || !(r.lote>0) || r.tipo==='jantar') return 1;
   const q = EXTRA(r.tipo) ? qtd : qtd*(1+(D.config.margem||0)/100);
@@ -1410,59 +1419,38 @@ function togChk(k){ const c=D.semana.checks; if(c[k]) delete c[k]; else c[k]=1; 
 function pgVespera(c){
   const need=tudo(c);
   const ids=Object.keys(need);
-  const J=D.semana.jantar;
-  let h=`<div class="sec-t">${esc(D.config.diaPre)} · pré-preparo</div>
-    <div class="sec-s">Tudo o que dá para adiantar no dia anterior, para o dia do preparo render.</div>`;
+  let h=`<div class="sec-t">${esc(D.config.diaPre)} · véspera</div>`;
   if(!ids.length) return h+`<div class="empty">Escolha receitas na aba Semana.</div>`;
 
-  const temCongelado = ids.some(id=>{ const t=rec(id).tipo; return t==='proteina' || t==='jantar' || t==='lanche'; });
-  const potes = c.total;
-  h+=`<div class="card white"><div class="card-t" style="margin-bottom:4px">Geral</div>
-    ${chkHtml('pre|potes',`Separar e higienizar <span class="q">${potes} potes</span> de marmita${J.ativo&&!J.junto?'':''}`)}
-    ${temCongelado?chkHtml('pre|desc','Passar as proteínas congeladas do freezer para a geladeira'):''}
-    ${chkHtml('pre|etiq','Preparar etiquetas (nome + data de preparo)')}
-    ${chkHtml('pre|bal','Conferir balança de cozinha, assadeiras e cesto da airfryer limpos')}
-  </div>`;
-
-  // bases em comum: preparar uma vez e dividir
-  const bases=agrupar(ids.map(rec)).filter(gr=>gr.itens.length>1 && !['carbo','legume','outros','cafe','petisco'].includes(gr.g));
-  if(bases.length){
-    h+=`<div class="card"><div class="card-t" style="margin-bottom:4px">Bases em comum</div>
-      <div class="muted" style="margin-bottom:6px">Prepare a base de uma vez e depois divida entre as receitas.</div>`;
-    bases.forEach(gr=>{
-      const princ={};
-      const RX={carne:/carne|patinho|alcatra|ac[ée]m|lagarto|cupim|costela|contrafil|maminha/i, frango:/frango|sobrecoxa|coxa/i, peixe:/til[áa]pia|peixe|salm|camar|atum/i, linguica:/lingui|cora[çc]/i}[gr.g];
-      gr.itens.forEach(r=>escala(r,need[r.id].qtd).forEach(i=>{
-        if(i.un!=='g' || !RX || !RX.test(i.nome)) return;
-        if(gr.b==='Carne moída' && !/mo[íi]d/i.test(i.nome)) return;
-        princ[i.nome]=(princ[i.nome]||0)+i.qtd;
-      }));
-      h+=chkHtml('pre|base|'+gr.g+'|'+gr.b, `<b>${esc(gr.label)}</b>: ${Object.entries(princ).map(([k,q])=>`<span class="q">${fmtQ(q,'g')}</span> ${esc(k)}`).join(' + ')}
-        <div class="sub">para ${gr.itens.map(r=>esc(r.nome)).join(', ')}</div>`);
-    });
-    h+=`</div>`;
-  }
-
-  const ordem=['proteina','carbo','legume','jantar','lanche','cafe','petisco'];
-  const sem=[];
+  // só as etapas marcadas “na véspera”
+  const ordem=['proteina','jantar','carbo','legume','lanche','cafe','petisco'];
+  const cards=[]; let total=0, nTarefas=0;
   ordem.forEach(t=>ids.filter(id=>rec(id).tipo===t).forEach(id=>{
     const r=rec(id), n=need[id];
     const vesp=(r.etapas||[]).map((e,i)=>({e,i})).filter(x=>naVespera(x.e));
-    if(!(r.pre||[]).length && !vesp.length){ sem.push(r.nome); return; }
+    if(!vesp.length) return;
+    const linhas=vesp.map(({e,i})=>{
+      const lv=levas(r,n.qtd,e), tm=(+e.min||0)*lv;
+      total+=tm; nTarefas++;
+      return chkHtml('vesp|'+r.id+'|'+i,`${esc(e.txt)}<div class="sub">${EQUIP[e.eq]?EQUIP[e.eq].icon:''} ${dur(tm)}${lv>1?` · ${lv} levas`:''}</div>`);
+    }).join('');
     const ings=escala(r,n.qtd).filter(i=>!ehAgua(i.nome));
-    h+=`<div class="card white">
-      <div class="card-h" style="margin-bottom:4px"><span class="dot ${r.tipo}"></span><div class="card-t">${esc(r.nome)}</div><span class="muted ml-auto">${quantoTxt(r,n)}</span></div>
-      ${naHora(r.id)?`<div class="muted" style="margin-bottom:4px">⏱ vai ser feita na hora; faça só o que adiantar.</div>`:''}
-      <div class="ing-list">${ings.map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div>
-      ${obsHtml(r)}
-      ${(r.pre||[]).map((p,i)=>chkHtml('pre|'+r.id+'|'+i,esc(p))).join('')}
-      ${vesp.length?`<div class="grp-h" style="margin-top:10px">Etapas do preparo feitas na véspera</div>`+vesp.map(({e,i})=>{
-        const lv=levas(r,n.qtd,e), t=(+e.min||0)*lv;
-        return chkHtml('vesp|'+r.id+'|'+i,`${EQUIP[e.eq]?EQUIP[e.eq].icon:''} <b>${dur(t)}</b>${lv>1?` (${lv} levas)`:''} ${esc(e.txt)}`);
-      }).join(''):''}
-    </div>`;
+    cards.push(`<div class="card white">
+      <div class="card-h" style="margin-bottom:2px"><span class="dot ${r.tipo}"></span><div class="card-t" style="font-size:19px">${esc(r.nome)}</div><span class="muted ml-auto">${quantoTxt(r,n)}</span></div>
+      ${naHora(r.id)?`<div class="muted">⏱ receita feita na hora</div>`:''}
+      ${linhas}
+      <details style="margin-top:6px"><summary class="muted" style="cursor:pointer">ver ingredientes</summary><div class="ing-list">${ings.map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div>${obsHtml(r)}</details>
+    </div>`);
   }));
-  if(sem.length) h+=`<div class="muted" style="padding:0 4px">Sem pré-preparo: ${sem.map(esc).join(', ')}.</div>`;
+
+  const temCongelado = ids.some(id=>['proteina','jantar','lanche'].includes(rec(id).tipo));
+  h+=`<div class="sec-s">${nTarefas?`${nTarefas} tarefa${nTarefas>1?'s':''} · cerca de ${dur(total)}`:'Nada marcado para a véspera.'}</div>
+    <div class="card white">
+      ${chkHtml('pre|potes',`Separar e higienizar <span class="q">${c.total} potes</span>`)}
+      ${temCongelado?chkHtml('pre|desc','Passar as proteínas congeladas do freezer para a geladeira'):''}
+    </div>`;
+  if(!cards.length) h+=`<div class="empty">Para adiantar algo, abra a receita em <b>Receitas</b> e, em <b>Etapas do preparo</b>, toque em <b>🌙 na véspera</b>.</div>`;
+  h+=cards.join('');
   return h;
 }
 
@@ -1640,11 +1628,8 @@ function editorHtml(){
   h+=`<button class="btn ghost sm" onclick="ED.ingredientes.push({qtd:'',un:'g',nome:'',secao:''});render()">+ ingrediente</button></div>
   <div class="card"><div class="card-t" style="margin-bottom:4px">Observações e links</div>
     <textarea class="inp" style="min-height:60px" placeholder="dicas, link do vídeo, de onde é a receita..." onchange="ED.obs=this.value">${esc(r.obs||'')}</textarea></div>
-  <div class="card"><div class="card-t" style="margin-bottom:4px">Pré-preparo (véspera)</div>
-    <div class="muted" style="margin-bottom:8px">Uma tarefa por linha. Ex.: marinar, descongelar, picar, deixar de molho.</div>
-    <textarea class="inp" onchange="ED.pre=this.value.split('\\n').map(s=>s.trim()).filter(Boolean)">${esc((r.pre||[]).join('\n'))}</textarea></div>
   <div class="card"><div class="card-t" style="margin-bottom:4px">Etapas do preparo</div>
-    <div class="muted" style="margin-bottom:8px">Em ordem. O equipamento e o tempo montam o cronograma. Escolha em cada etapa se ela é feita <b>no dia</b> ou <b>na véspera</b>; as da véspera aparecem na aba Véspera.</div>`;
+    <div class="muted" style="margin-bottom:8px">Em ordem. O equipamento e o tempo montam o cronograma. Escolha em cada etapa se ela é feita <b>no dia</b> ou <b>na véspera</b> (marinar, picar, deixar de molho...). A aba Véspera mostra só as etapas marcadas na véspera.</div>`;
   (r.etapas||[]).forEach((e,k)=>{
     h+=`<div class="combo"><div class="ed-row">
       <select class="inp" onchange="ED.etapas[${k}].eq=this.value;render()">${Object.keys(EQUIP).map(q=>`<option value="${q}" ${q===e.eq?'selected':''}>${EQUIP[q].icon} ${EQUIP[q].nome}</option>`).join('')}</select>
@@ -1656,7 +1641,8 @@ function editorHtml(){
         <button class="hora-btn ${naVespera(e)?'on':''}" onclick="ED.etapas[${k}].dia='vespera';render()">🌙 na véspera</button>
       </div></div>`;
   });
-  h+=`<button class="btn ghost sm" onclick="ED.etapas.push({eq:'fogao',min:15,txt:''});render()">+ etapa</button></div>
+  h+=`<div class="row" style="gap:6px"><button class="btn ghost sm" onclick="ED.etapas.push({eq:'fogao',min:15,txt:'',dia:'dia'});render()">+ etapa no dia</button>
+    <button class="btn ghost sm" onclick="ED.etapas.push({eq:'bancada',min:10,txt:'',dia:'vespera'});render()">+ etapa na véspera</button></div></div>
   <div class="row wrap" style="margin-top:6px">
     <button class="btn" onclick="salvarReceita()">Salvar receita</button>
     ${r.id?`<button class="btn sec" onclick="duplicarReceita()">Duplicar</button><button class="btn danger ml-auto" onclick="apagarReceita()">Apagar</button>`:''}
@@ -1670,6 +1656,7 @@ function salvarReceita(){
   if(!r.nome.trim()){ toast('Dê um nome à receita'); return; }
   if(!(r.rende>0)){ toast('Informe quanto a receita rende'); return; }
   r.ingredientes=r.ingredientes.filter(i=>i.nome.trim()).map(i=>Object.assign(i,{nome:i.nome.trim(),qtd:+i.qtd||0}));
+  preParaEtapas(r);
   r.etapas=(r.etapas||[]).filter(e=>(+e.min>0)||e.txt.trim());
   if(!r.id){ r.id=uid(); D.receitas.push(r); }
   else{ const i=D.receitas.findIndex(x=>x.id===r.id); D.receitas[i]=r; }
@@ -1755,7 +1742,7 @@ function importar(){
 function restaurarPadrao(){
   const faltando=receitasPadrao().filter(r=>!rec(r.id));
   if(!faltando.length){ toast('Todas as receitas de exemplo já estão aqui'); return; }
-  D.receitas.push(...faltando); save(); render(); toast(faltando.length+' receitas repostas');
+  faltando.forEach(preParaEtapas); D.receitas.push(...faltando); save(); render(); toast(faltando.length+' receitas repostas');
 }
 
 load(); render(); conectar();
