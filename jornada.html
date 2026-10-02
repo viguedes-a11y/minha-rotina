@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
+  color-scheme:light;
   --verde:#1a3a2a;--verde-m:#2d5a3d;--verde-c:#4a7c5f;
   --dourado:#c9a84c;--dourado-c:#e8c97a;
   --creme:#f5f0e8;--creme-e:#e0d8c8;--branco:#fdfaf5;
@@ -25,6 +26,13 @@ input,textarea,select{font:inherit;color:var(--texto);}
 .hdr-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dourado);opacity:.85;margin-bottom:4px;}
 .hdr-title{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:var(--creme);}
 .hdr-title em{font-style:italic;color:var(--dourado-c);}
+.sync{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:rgba(245,240,232,.7);letter-spacing:.3px;}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--dourado);display:inline-block;}
+.sync.ok i{background:#7fc49a;}
+.sync.erro i{background:var(--rosa);}
+.btn.perigo{border-style:solid;border-color:var(--rosa);color:var(--rosa);}
+.x.armado{width:auto;padding:0 10px;border-radius:16px;background:var(--rosa);color:#fff;font-size:12px;}
+.aviso{background:rgba(212,117,106,.1);border:1px solid rgba(212,117,106,.35);border-radius:12px;padding:12px;font-size:13px;margin-bottom:10px;}
 .hdr-bar{max-width:220px;height:3px;border-radius:2px;background:rgba(255,255,255,.12);margin:12px auto 0;overflow:hidden;}
 .hdr-bar i{display:block;height:100%;background:var(--dourado);}
 
@@ -236,9 +244,68 @@ try { const raw = localStorage.getItem(KEY); if (raw) S = merge(defaults(), JSON
 
 let saveT;
 function save(){
+  S.atualizado = Date.now();
   clearTimeout(saveT);
   saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }, 250);
+  agendarEnvio();
 }
+
+/* ============ SINCRONIZAÇÃO ============
+   Dentro do Claude, os dados ficam na conta da pessoa (área privada do db)
+   e sincronizam entre aparelhos. Fora dele, o app usa só o navegador. */
+const nuvem = {ref:null, estado:'local', pronto:false, msg:''};
+const atualizadoNoLoad = S.atualizado || 0;
+let envioT, fila = Promise.resolve(), pendenteRemoto = false;
+
+function setNuvem(estado, msg=''){
+  nuvem.estado = estado; nuvem.msg = msg;
+  const el = document.getElementById('sync');
+  if (el) el.outerHTML = vSync();
+}
+function agendarEnvio(){
+  if (!nuvem.ref || !nuvem.pronto) return;
+  clearTimeout(envioT);
+  setNuvem('salvando');
+  envioT = setTimeout(enviar, 1200);
+}
+function enviar(tentativa=0){
+  const body = {json: JSON.stringify(S), atualizado: S.atualizado || Date.now()};
+  fila = fila.then(() => nuvem.ref.set(body)).then(() => setNuvem('ok')).catch(e => {
+    if (e && e.code === 'unavailable' && tentativa === 0) setTimeout(() => enviar(1), 1500 + Math.random()*1500);
+    else if (e && e.code === 'quota_exceeded') setNuvem('erro', 'Espaço da nuvem cheio. Exporte um backup.');
+    else setNuvem('erro', 'Não consegui salvar na nuvem. Suas mudanças continuam neste aparelho.');
+  });
+}
+function aplicarRemoto(d){
+  try { S = merge(defaults(), JSON.parse(d.json)); } catch(e) { return; }
+  S.atualizado = d.atualizado;
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {}
+  const a = document.activeElement;
+  if (a && a.closest && a.closest('#app') && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) pendenteRemoto = true;
+  else render();
+}
+async function conectar(){
+  if (!window.claude || !window.claude.use) return;
+  setNuvem('conectando');
+  const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+  const id = db && user ? await user.id() : null;
+  if (!id) { setNuvem('local'); return; }
+  nuvem.ref = db.doc('data/users/' + id + '/jornada');
+  nuvem.ref.onSnapshot(snap => {
+    if (snap.metadata.hasPendingWrites) return;
+    const primeiro = !nuvem.pronto;
+    nuvem.pronto = true;
+    if (!snap.exists) { if (S.atualizado) enviar(); else setNuvem('ok'); return; }
+    const d = snap.data(), remoto = Number(d.atualizado) || 0;
+    if (primeiro) {
+      if (!atualizadoNoLoad || remoto >= atualizadoNoLoad) aplicarRemoto(d); else enviar();
+    } else if (remoto > (S.atualizado || 0)) aplicarRemoto(d);
+    setNuvem('ok');
+  }, () => setNuvem('erro', 'A sincronização parou. Recarregue a página.'));
+}
+document.addEventListener('focusout', () => setTimeout(() => {
+  if (pendenteRemoto && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) { pendenteRemoto = false; render(); }
+}, 0));
 window.addEventListener('pagehide', () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} });
 
 const get = p => p.split('.').reduce((o,key) => o == null ? undefined : o[key], S);
@@ -353,7 +420,12 @@ function vHeader(){
   const {dia, semana} = semanaJornada();
   const p = Math.min(1, Math.max(0, (dia-1)/91));
   return `<div class="hdr-sub">${dia >= 1 ? `Semana ${semana} de 13 · dia ${Math.min(dia,91)}` : 'Jornada de 13 semanas'}</div>
-    <div class="hdr-title">Minha <em>Jornada</em></div><div class="hdr-bar"><i style="width:${p*100}%"></i></div>`;
+    <div class="hdr-title">Minha <em>Jornada</em></div><div class="hdr-bar"><i style="width:${p*100}%"></i></div>${vSync()}`;
+}
+function vSync(){
+  const t = {local:'salvo só neste aparelho', conectando:'conectando…', salvando:'salvando…', ok:'sincronizado', erro:'erro ao sincronizar'}[nuvem.estado];
+  if (nuvem.estado === 'local' && !window.claude) return '<span id="sync"></span>';
+  return `<span id="sync" class="sync ${nuvem.estado}"><i></i>${t}</span>`;
 }
 
 function vHoje(){
@@ -436,7 +508,7 @@ function vMetas(){
     const ini = parseK(m.inicio || k(hoje0())), fim = addDays(ini, 89), dia = diffDays(hoje0(), ini) + 1;
     const status = dia < 1 ? `começa em ${fmt(ini)}` : dia > 90 ? `encerrada em ${fmt(fim)}` : `dia ${dia} de 90 · até ${fmt(fim)}`;
     h += `<div class="card"><div class="meta-h"><span class="tag">Meta ${i+1}</span><span class="days grow">${status}</span>
-      <button class="x" data-act="del-meta" data-i="${i}" aria-label="Apagar meta">×</button></div>
+      ${xBtn('del-meta', `data-i="${i}"`, 'meta:'+m.id, 'Apagar meta')}</div>
       <label class="fl"><span>Qual área da vida essa meta representa?</span><select data-k="${P}.area"><option value="">Escolha…</option>
         ${AREAS.map(([id,n]) => `<option value="${id}" ${m.area===id?'selected':''}>${n}</option>`).join('')}</select></label>
       ${ta(P+'.titulo', 'A meta — específica, com prazo de 90 dias', {ph:'Ex.: correr 5 km sem parar até 31 de dezembro'})}
@@ -445,7 +517,7 @@ function vMetas(){
       <h4>O sistema</h4><p class="hint">Quais atividades, com que frequência, em que dia e horário? Nenhum dia marcado = todos os dias.</p>
       ${m.habitos.map((x, j) => `<div class="hab"><div class="row"><input type="text" class="grow" data-k="${P}.habitos.${j}.nome" value="${esc(x.nome)}" placeholder="Atividade (ex.: caminhar 30 min)">
           <input type="time" data-k="${P}.habitos.${j}.hora" value="${esc(x.hora)}" style="width:96px;flex:none" aria-label="Horário">
-          <button class="x" data-act="del" data-p="${P}.habitos" data-i="${j}" aria-label="Remover hábito">×</button></div>
+          ${xBtn('del', `data-p="${P}.habitos" data-i="${j}"`, 'h:'+x.id, 'Remover hábito')}</div>
         <div class="row"><div class="chips grow">${DIAS.map((dd,n) => `<button class="chip ${x.dias.includes(n)?'on':''}" data-act="dia" data-p="${P}.habitos.${j}.dias" data-v="${n}" title="${DIAS_LONGO[n]}">${dd}</button>`).join('')}</div></div></div>`).join('')}
       <button class="btn" data-act="add" data-p="${P}.habitos" data-t="habito">+ atividade</button>
 
@@ -455,7 +527,7 @@ function vMetas(){
       <h4>Próximos passos</h4><p class="hint">O primeiro, tão pequeno que seria ridículo não fazer. Os seguintes viram o seu projeto.</p>
       ${m.passos.map((p, j) => `<div class="passo"><button class="box ${p.feito?'on':''}" data-act="passo" data-p="${P}.passos.${j}" aria-label="Concluir">${p.feito?'✓':''}</button>
         <input type="text" class="grow ${p.feito?'done':''}" data-k="${P}.passos.${j}.texto" value="${esc(p.texto)}" placeholder="Próximo passo">
-        <button class="x" data-act="del" data-p="${P}.passos" data-i="${j}" aria-label="Remover passo">×</button></div>`).join('')}
+        ${xBtn('del', `data-p="${P}.passos" data-i="${j}"`, 'p:'+p.id, 'Remover passo')}</div>`).join('')}
       <button class="btn" data-act="add" data-p="${P}.passos" data-t="passo">+ passo</button>
 
       <h4>O ambiente</h4>
@@ -467,6 +539,17 @@ function vMetas(){
   if (S.metas.length < 3) h += `<button class="btn full" data-act="add-meta">+ ${S.metas.length ? 'outra meta' : 'primeira meta'}</button>`;
   else h += `<p class="hint" style="text-align:center">Três metas é o limite do plano. Foco.</p>`;
   return h;
+}
+let armado = null, armadoT;
+function xBtn(act, attrs, id, label){
+  return armado === id ? `<button class="x armado" data-act="${act}" ${attrs} data-id="${id}">apagar?</button>`
+    : `<button class="x" data-act="${act}" ${attrs} data-id="${id}" aria-label="${label}">×</button>`;
+}
+function precisaConfirmar(id, temConteudo){
+  if (!temConteudo || armado === id) { armado = null; return false; }
+  armado = id; clearTimeout(armadoT);
+  armadoT = setTimeout(() => { armado = null; render(); }, 3500);
+  return true;
 }
 function regraDupla(base, a, b, rotB, rotA='Quando'){
   return `<div class="inline"><b>${rotA}</b><input type="text" data-k="${base}.${a}" value="${esc(get(base+'.'+a))}" placeholder="…"><b>${rotB}</b><input type="text" data-k="${base}.${b}" value="${esc(get(base+'.'+b))}" placeholder="…"></div>`;
@@ -634,7 +717,11 @@ function vProgresso(){
 
   h += `<div class="card"><div class="lbl">Configurações e dados</div>
     ${inp('inicio','Início da jornada de 13 semanas',{type:'date',rerender:true})}
-    <p class="hint">Os dados ficam salvos só neste navegador. Faça backup de vez em quando — e para passar para outro aparelho, exporte aqui e importe lá.</p>
+    <p class="hint">${nuvem.ref ? 'Seus dados ficam guardados na sua conta e sincronizam entre o computador e o celular. O backup é uma cópia extra.' : 'Os dados ficam salvos só neste navegador. Faça backup de vez em quando.'}</p>
+    ${nuvem.msg ? `<div class="aviso">${esc(nuvem.msg)}</div>` : ''}
+    ${avisoDados ? `<div class="aviso">${esc(avisoDados)}</div>` : ''}
+    ${importando ? `<div class="aviso"><b>Substituir todos os dados atuais por este backup?</b>${importando.atualizado ? ' Backup de ' + new Date(importando.atualizado).toLocaleString('pt-BR') + '.' : ''}
+      <div class="row" style="margin-top:10px"><button class="btn perigo grow" data-act="import-ok" style="justify-content:center">Substituir</button><button class="btn grow" data-act="import-cancel" style="justify-content:center">Cancelar</button></div></div>` : ''}
     <div class="row"><button class="btn solid grow" data-act="export" style="justify-content:center">Exportar backup</button><button class="btn grow" data-act="import" style="justify-content:center">Importar</button></div></div>`;
   return h;
 }
@@ -678,44 +765,54 @@ document.addEventListener('click', e => {
     case 'add-meta': S.metas.push(newMeta()); save(); break;
     case 'del-meta': {
       const m = S.metas[+b.dataset.i];
-      if ((m.titulo.trim() || m.habitos.length || m.passos.length) && !confirm('Apagar esta meta com as atividades e os passos dela?')) return;
+      if (precisaConfirmar(b.dataset.id, m.titulo.trim() || m.habitos.length || m.passos.length)) break;
       S.metas.splice(+b.dataset.i, 1); save(); break;
     }
     case 'add': get(p).push(b.dataset.t === 'habito' ? newHabito() : newPasso()); save(); break;
     case 'del': {
       const arr = get(p), it = arr[+b.dataset.i];
-      if ((it.nome || it.texto || '').trim() && !confirm('Remover “' + (it.nome || it.texto) + '”?')) return;
+      if (precisaConfirmar(b.dataset.id, (it.nome || it.texto || '').trim())) break;
       arr.splice(+b.dataset.i, 1); save(); break;
     }
     case 'passo': { const ps = get(p); ps.feito = !ps.feito; ps.feitoEm = ps.feito ? k(tab === 'hoje' ? curDate : hoje0()) : ''; save(); break; }
     case 'day': curDate = b.dataset.v === '0' ? hoje0() : addDays(curDate, Number(b.dataset.v)); break;
     case 'wk': { const n = Number(b.dataset.v); abertas.has(n) ? abertas.delete(n) : abertas.add(n); break; }
-    case 'export': {
-      const blob = new Blob([JSON.stringify(S, null, 2)], {type:'application/json'});
-      const a2 = document.createElement('a');
-      a2.href = URL.createObjectURL(blob); a2.download = `minha-jornada-${k(hoje0())}.json`; a2.click();
-      setTimeout(() => URL.revokeObjectURL(a2.href), 1000);
-      return;
-    }
+    case 'export': exportar(); return;
+    case 'import-ok': S = merge(defaults(), importando); importando = null; save(); if (nuvem.pronto) { clearTimeout(envioT); enviar(); } break;
+    case 'import-cancel': importando = null; break;
     case 'import': document.getElementById('importFile').click(); return;
   }
   render();
 });
 
+let importando = null, avisoDados = '';
+async function exportar(){
+  const nome = `minha-jornada-${k(hoje0())}.json`, json = JSON.stringify(S, null, 2);
+  const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+  if (dl) {
+    try { await dl.save({filename: nome, data: json}); avisoDados = ''; }
+    catch (e) { avisoDados = e && e.code === 'declined' ? '' : 'Não foi possível baixar o backup aqui.'; }
+    render(); return;
+  }
+  const a2 = document.createElement('a');
+  a2.href = URL.createObjectURL(new Blob([json], {type:'application/json'})); a2.download = nome; a2.click();
+  setTimeout(() => URL.revokeObjectURL(a2.href), 1000);
+}
 document.getElementById('importFile').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = '';
   if (!f) return;
   try {
     const data = JSON.parse(await f.text());
     if (!data || typeof data !== 'object' || !('carta' in data || 'metas' in data)) throw new Error('formato');
-    if (!confirm('Substituir os dados deste aparelho pelo backup?')) return;
-    S = merge(defaults(), data); save(); render();
-  } catch (err) { alert('Não consegui ler esse arquivo. Ele precisa ser um backup exportado por este app.'); }
+    importando = data; avisoDados = '';
+  } catch (err) { importando = null; avisoDados = 'Não consegui ler esse arquivo. Escolha um backup exportado por este app (.json).'; }
+  render();
 });
 
 // abre a semana atual na Jornada por padrão
 abertas.add(Math.min(6, semanaJornada().semana));
 render(false);
+conectar();
 </script>
 </body>
 </html>
