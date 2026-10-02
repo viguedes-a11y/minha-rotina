@@ -802,7 +802,7 @@ function optsAgrupadas(lista, sel){
 function dadosPadrao(){
   return {
     versao:1,
-    receitasVersao:7,
+    receitasVersao:7, /* v8 aplicada em normalizar */
     pessoas:[
       {id:'marido', nome:'Baia', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
       {id:'filha',  nome:'Mel',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:100},
@@ -819,7 +819,7 @@ function dadosPadrao(){
       lanches:{ativo:true, itens:[]}, cafe:{ativo:true, itens:[]}, petiscos:{ativo:true, itens:[]},
       checks:{}, compradas:{}, extras:[], naHora:{}
     },
-    config:{bocas:4, airfryer:1, forno:1, inicio:'08:00', margem:5, diaPre:'Quinta-feira', diaPrep:'Sexta-feira'}
+    config:{bocas:4, airfryer:1, forno:1, inicio:'08:00', margem:5, preparadoCA:true, diaPre:'Quinta-feira', diaPrep:'Sexta-feira'}
   };
 }
 
@@ -856,6 +856,7 @@ function normalizar(){
   }
   const migrou=migrarReceitas();
   let conv=false; D.receitas.forEach(r=>{ if(preParaEtapas(r)) conv=true; });
+  if(migrarCebolaAlho()) conv=true;
   return migrou || mudou || conv;
 }
 /* v2: receitas da página “Marmitas” do Notion. Só acrescenta o que falta e
@@ -1097,6 +1098,49 @@ function quantoTxt(r,n){
 /* Agenda as etapas nos equipamentos (fogão com N bocas, airfryer, forno, bancada) */
 const naVespera = e => e.dia==='vespera';
 /* o antigo “pré-preparo” vira etapas da receita marcadas na véspera */
+/* PREPARADO DE CEBOLA E ALHO (processador, na véspera)
+   receitas em que a cebola ou o alho NÃO vão para o processador (fatiados, inteiros) */
+const FORA_DO_PREPARADO = {
+  iscas_patinho:['cebola'], abobrinha:['cebola'], frango_batatas:['cebola'], hamburguer_caseiro:['cebola'],
+  carne_louca:['cebola'], linguica_acebolada:['cebola'], frango_creme_brocolis:['cebola'], espetinho_carne:['cebola'],
+  hamburguinho_pastel:['cebola'], bruschetta:['alho'], tomates_confitados:['alho'],
+};
+function preparadoCA(need){
+  let ceb=0, alho=0; const usos=[];
+  for(const id in need){
+    const r=rec(id), fora=FORA_DO_PREPARADO[id]||[];
+    let usa=false;
+    escala(r,need[id].qtd).forEach(i=>{
+      const n=i.nome.trim().toLowerCase();
+      if(n==='cebola' && i.un==='un' && !fora.includes('cebola')){ ceb+=i.qtd; usa=true; }
+      if(n==='alho' && i.un==='dente' && !fora.includes('alho')){ alho+=i.qtd; usa=true; }
+    });
+    if(usa) usos.push(r.nome);
+  }
+  return {ceb:Math.ceil(ceb-0.001), alho:Math.ceil(alho-0.001), usos};
+}
+/* v8: tira das receitas padrão as etapas de picar cebola e alho (vão para o preparado) */
+function migrarCebolaAlho(){
+  if((D.receitasVersao||1) >= 8) return false;
+  const TROCA = {
+    'Picar cebola, alho e tomate e guardar em pote fechado':'Picar o tomate e guardar em pote fechado',
+    'Picar cebola, alho e tomate':'Picar o tomate',
+    'Picar cebola e alho':null, 'Picar a cebola e o alho':null, 'Picar bem o alho':null,
+    'Picar os pimentões, a cebola e o tomate':'Picar os pimentões e o tomate',
+    'Picar cebola, alho e cheiro-verde, misturar com a carne, ovo e farinha e modelar as almôndegas (guardar na geladeira)':
+      'Picar o cheiro-verde, misturar com a carne, o preparado de cebola e alho, ovo e farinha e modelar as almôndegas (guardar na geladeira)',
+  };
+  const ids=new Set(receitasPadrao().map(r=>r.id));
+  D.receitas.forEach(r=>{
+    if(!ids.has(r.id)) return;
+    r.etapas=(r.etapas||[]).flatMap(e=>{
+      if(!(e.txt in TROCA)) return [e];
+      return TROCA[e.txt]===null ? [] : [Object.assign({},e,{txt:TROCA[e.txt]})];
+    });
+  });
+  D.receitasVersao=8;
+  return true;
+}
 function preParaEtapas(r){
   if(!(r.pre && r.pre.length)) return false;
   r.etapas=[...r.pre.map(t=>({eq:'bancada',min:10,txt:t,dia:'vespera'})), ...(r.etapas||[])];
@@ -1446,6 +1490,9 @@ function pgVespera(c){
   const temCongelado = ids.some(id=>['proteina','jantar','lanche'].includes(rec(id).tipo));
   h+=`<div class="sec-s">${nTarefas?`${nTarefas} tarefa${nTarefas>1?'s':''} · cerca de ${dur(total)}`:'Nada marcado para a véspera.'}</div>
     <div class="card white">
+      ${(()=>{ if(!D.config.preparadoCA) return ''; const pc=preparadoCA(need); if(!pc.ceb && !pc.alho) return '';
+        return chkHtml('pre|cebola-alho',`Preparado de cebola e alho no processador: ${pc.ceb?`<span class="q">${pc.ceb} cebola${pc.ceb>1?'s':''}</span>`:''}${pc.ceb&&pc.alho?' + ':''}${pc.alho?`<span class="q">${pc.alho} dente${pc.alho>1?'s':''} de alho</span> (~${Math.ceil(pc.alho/10)} cabeça${Math.ceil(pc.alho/10)>1?'s':''})`:''}
+          <div class="sub">guardar em pote fechado na geladeira · para ${pc.usos.map(esc).join(', ')}</div>`); })()}
       ${chkHtml('pre|potes',`Separar e higienizar <span class="q">${c.total} potes</span>`)}
       ${temCongelado?chkHtml('pre|desc','Passar as proteínas congeladas do freezer para a geladeira'):''}
     </div>`;
@@ -1710,7 +1757,8 @@ function pgAjustes(){
     <div><label class="lbl">Dia do pré-preparo</label><input class="inp" value="${esc(C.diaPre)}" onchange="setC('diaPre',this.value)"></div>
     <div><label class="lbl">Dia do preparo</label><input class="inp" value="${esc(C.diaPrep)}" onchange="setC('diaPrep',this.value)"></div>
   </div>
-  <div class="muted" style="margin-top:8px">A margem compensa perdas e variação no rendimento (sobra um pouco a mais).</div></div>
+  <div class="muted" style="margin-top:8px">A margem compensa perdas e variação no rendimento (sobra um pouco a mais).</div>
+  <label class="switch" style="margin-top:12px"><input type="checkbox" ${C.preparadoCA?'checked':''} onchange="setC('preparadoCA',this.checked)">Preparado de cebola e alho no processador na véspera</label></div>
 
   <div class="sec-t" style="margin-top:22px">Backup</div>
   <div class="card">
