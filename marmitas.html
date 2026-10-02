@@ -124,6 +124,8 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 .fchip{padding:6px 12px;border-radius:16px;border:1.5px solid var(--creme-e);background:white;font-size:12px;cursor:pointer;color:var(--texto-s);}
 .fchip.active{background:var(--verde);border-color:var(--verde);color:var(--dourado);}
 .grp-h{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-s);margin:14px 2px 6px;}
+.hora-btn{font-size:11px;padding:4px 9px;border-radius:12px;border:1px solid var(--creme-e);background:white;color:var(--verde-c);cursor:pointer;white-space:nowrap;}
+.hora-btn.on{background:rgba(201,168,76,.18);border-color:var(--dourado);color:#7a5f1c;}
 .rcard{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--creme-e);border-radius:12px;padding:11px 12px;margin-bottom:8px;cursor:pointer;}
 .rcard .nm{font-size:14px;font-weight:500;}
 .rcard .meta{font-size:11px;color:var(--texto-s);margin-top:2px;}
@@ -815,7 +817,7 @@ function dadosPadrao(){
       },
       jantar:{ativo:true, pessoas:6, junto:true, itens:[{rid:'lasanha', g:150}]},
       lanches:{ativo:true, itens:[]}, cafe:{ativo:true, itens:[]}, petiscos:{ativo:true, itens:[]},
-      checks:{}, compradas:{}, extras:[]
+      checks:{}, compradas:{}, extras:[], naHora:{}
     },
     config:{bocas:4, airfryer:1, forno:1, inicio:'08:00', margem:5, diaPre:'Quinta-feira', diaPrep:'Sexta-feira'}
   };
@@ -1272,7 +1274,8 @@ function pgSemana(c){
   const need=tudo(c);
   const ids=Object.keys(need);
   if(ids.length){
-    h+=`<div class="card white"><div class="card-t" style="margin-bottom:8px">Quanto preparar</div>`;
+    h+=`<div class="card white"><div class="card-t" style="margin-bottom:2px">Quanto preparar</div>
+      <div class="muted" style="margin-bottom:6px">Toque em <b>📅 no dia das marmitas</b> para trocar para <b>⏱ fazer na hora</b>: a receita sai do cronograma e fica numa lista à parte, mas continua nas compras.</div>`;
     agrupar(ids.map(rec)).forEach(gr=>{
       const comum = gr.itens.length>1 && !['carbo','legume','outros','cafe','petisco'].includes(gr.g);
       h+=`<div class="grp-h">${esc(gr.label)}${comum?' · <span style="color:var(--verde-c)">base em comum</span>':''}</div>`;
@@ -1280,7 +1283,7 @@ function pgSemana(c){
         const n=need[r.id];
         h+=`<div class="row" style="padding:6px 0;border-bottom:1px solid var(--creme-e)"><span class="dot ${r.tipo}"></span>
           <span style="flex:1;font-size:14px">${esc(r.nome)}<div class="muted">${n.quem.map(q=>q.porcoes?`${esc(q.nome)}: ${q.n} porç${q.n>1?'ões':'ão'}`:q.un?`${q.nome}: ${q.n} ${q.un}`:`${esc(q.nome)}: ${q.n}×${q.g}g`).join(' · ')}</div></span>
-          <b style="color:var(--verde);white-space:nowrap">${quantoTxt(r,n)}</b></div>`;
+          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><b style="color:var(--verde);white-space:nowrap">${quantoTxt(r,n)}</b>${horaBtn(r.id)}</span></div>`;
       });
     });
     h+=`<div class="muted" style="margin-top:8px">Quantidades de ingredientes incluem ${D.config.margem}% de margem (ajustável em Ajustes).</div>
@@ -1303,6 +1306,9 @@ function rmCombo(pid,cid){
   const [rm]=cs.splice(i,1); cs[Math.max(0,i-1)].qtd+= (+rm.qtd||0);
   save(); render();
 }
+const naHora = id => !!(D.semana.naHora||{})[id];
+function togNaHora(id){ D.semana.naHora=D.semana.naHora||{}; if(D.semana.naHora[id]) delete D.semana.naHora[id]; else D.semana.naHora[id]=1; save(); render(); }
+function horaBtn(id){ const on=naHora(id); return `<button class="hora-btn ${on?'on':''}" onclick="event.stopPropagation();togNaHora('${id}')" title="Trocar entre preparar no dia das marmitas e fazer na hora">${on?'⏱ fazer na hora':'📅 no dia das marmitas'}</button>`; }
 function setX(ch,k,v){ D.semana[ch][k]=v; save(); render(); }
 function setXItem(ch,i,k,v){ const it=D.semana[ch].itens[i]; it[k]=v; if(k==='rid'){ const r=rec(v); if(r) it.qtd=r.rende; } save(); render(); }
 function addXItem(ch){ D.semana[ch].itens.push({rid:'',qtd:0}); save(); render(); }
@@ -1439,6 +1445,7 @@ function pgVespera(c){
     const ings=escala(r,n.qtd).filter(i=>!ehAgua(i.nome));
     h+=`<div class="card white">
       <div class="card-h" style="margin-bottom:4px"><span class="dot ${r.tipo}"></span><div class="card-t">${esc(r.nome)}</div><span class="muted ml-auto">${quantoTxt(r,n)}</span></div>
+      ${naHora(r.id)?`<div class="muted" style="margin-bottom:4px">⏱ vai ser feita na hora; faça só o que adiantar.</div>`:''}
       <div class="ing-list">${ings.map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div>
       ${obsHtml(r)}
       ${r.pre.map((p,i)=>chkHtml('pre|'+r.id+'|'+i,esc(p))).join('')}
@@ -1486,22 +1493,41 @@ function timelineHtml(ag,pref){
 function pgPreparo(c){
   const J=D.semana.jantar;
   const juntos=J.ativo && J.junto;
-  const needDia = juntos ? tudo(c) : juntar(c.mar,c.lan);
+  const needTodo = juntos ? tudo(c) : juntar(c.mar,c.lan);
+  const needDia={}, needHora={};
+  for(const id in needTodo) (naHora(id)?needHora:needDia)[id]=needTodo[id];
   const ag=agendar(needDia,true,c.total);
   let h=`<div class="sec-t">${esc(D.config.diaPrep)} · preparo</div>
     <div class="sec-s">Cronograma montado para ${D.config.bocas} bocas, ${D.config.airfryer} airfryer e ${D.config.forno} forno, começando pelo que demora mais.</div>
     <div class="row no-print" style="margin-bottom:12px"><span class="muted">Começo às</span>
       <input class="inp sm" type="time" value="${esc(D.config.inicio)}" onchange="D.config.inicio=this.value;save();render()" style="width:110px">
       ${ag.passos.length?`<span class="muted ml-auto">término ~<b style="color:var(--verde)">${hora(ag.fim)}</b> (${dur(ag.fim)})</span>`:''}</div>`;
-  if(!ag.passos.length) return h+`<div class="empty">Escolha receitas na aba Semana.</div>`;
+  if(!ag.passos.length && !Object.keys(needHora).length) return h+`<div class="empty">Escolha receitas na aba Semana.</div>`;
   ag.avisos.forEach(a=>h+=`<div class="warn">${esc(a)}</div>`);
-  h+=ganttHtml(ag)+timelineHtml(ag,'dia|');
+  if(ag.passos.length) h+=ganttHtml(ag)+timelineHtml(ag,'dia|');
+  else h+=`<div class="empty">Todas as receitas estão marcadas para fazer na hora.</div>`;
+
+  // Feitas na hora: fora do cronograma
+  const idsHora=Object.keys(needHora);
+  if(idsHora.length){
+    h+=`<div class="sec-t" style="margin-top:20px">⏱ Para fazer na hora</div>
+      <div class="sec-s">Fora do cronograma. Os ingredientes já estão na lista de compras.</div>`;
+    idsHora.forEach(id=>{
+      const r=rec(id), n=needHora[id];
+      const tempo=(r.etapas||[]).reduce((a,e)=>a+(+e.min||0),0);
+      h+=`<div class="card white"><div class="card-h" style="margin-bottom:4px"><span class="dot ${r.tipo}"></span><div class="card-t" style="font-size:19px">${esc(r.nome)}</div>
+          <span class="muted ml-auto">${quantoTxt(r,n)} · ~${dur(tempo)}</span></div>
+        <div class="muted" style="margin-bottom:4px">${n.quem.map(q=>q.porcoes?`${esc(q.nome)}: ${q.n} porç${q.n>1?'ões':'ão'}`:q.un?`${esc(q.nome)}: ${q.n} ${q.un}`:`${esc(q.nome)}: ${q.n}×${q.g}g`).join(' · ')}</div>
+        ${(r.etapas||[]).map((e,i)=>chkHtml('hora|'+id+'|'+i,`${EQUIP[e.eq]?EQUIP[e.eq].icon:''} <b>${dur(+e.min||0)}</b> ${esc(e.txt)}`)).join('')}
+        <div style="margin-top:8px">${horaBtn(id)}</div></div>`;
+    });
+  }
 
   // Quantidades por receita (para conferir durante o preparo)
   h+=`<div class="sec-t" style="margin-top:20px">Ingredientes de cada receita</div>`;
-  Object.keys(needDia).forEach(id=>{
-    const r=rec(id), n=needDia[id];
-    h+=`<details class="card white"><summary class="row" style="cursor:pointer"><span class="dot ${r.tipo}"></span><b style="flex:1">${esc(r.nome)}</b><span class="muted">${quantoTxt(r,n)}</span></summary>
+  Object.keys(needTodo).forEach(id=>{
+    const r=rec(id), n=needTodo[id];
+    h+=`<details class="card white"><summary class="row" style="cursor:pointer"><span class="dot ${r.tipo}"></span><b style="flex:1">${esc(r.nome)}${naHora(id)?' <span class="muted">⏱ na hora</span>':''}</b><span class="muted">${quantoTxt(r,n)}</span></summary>
       <div class="ing-list" style="margin-top:8px">${escala(r,n.qtd).map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div>${obsHtml(r)}</details>`;
   });
 
@@ -1511,7 +1537,7 @@ function pgPreparo(c){
     <div class="card white"><table class="mt"><tr><th>Quem</th><th>Conteúdo</th><th style="text-align:right">Qtd</th></tr>`;
   c.montagem.forEach(m=>{
     h+=`<tr><td>${esc(m.p.emoji||'')} ${esc(m.p.nome)}</td>
-      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.porcao?(x.un==='un'?'1 un':'1 porção'):x.g+'g'} ${esc(x.r.nome)}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
+      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.porcao?(x.un==='un'?'1 un':'1 porção'):x.g+'g'} ${esc(x.r.nome)}${naHora(x.r.id)?' <span class="muted">⏱ na hora</span>':''}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
       <td class="n">${m.c.qtd}×</td></tr>`;
   });
   h+=`</table></div>
