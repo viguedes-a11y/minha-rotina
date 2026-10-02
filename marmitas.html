@@ -183,6 +183,7 @@ const EXTRAS = [
 ];
 const EXTRA = t => EXTRAS.find(x=>x.tipo===t);
 const POR_UNIDADE = t => t==='jantar' || !!EXTRA(t);
+const UNID = r => r.tipo==='jantar' ? 'porções' : EXTRA(r.tipo) ? EXTRA(r.tipo).un : 'g';
 const NOME_TIPO = t => EXTRA(t) ? EXTRA(t).plural : TIPOS[t];
 const EQUIP = {
   fogao:{nome:'Fogão', icon:'🔥'},
@@ -1036,9 +1037,10 @@ function calcular(){
       COMP.forEach(k=>{
         const r=c[k] && rec(c[k]);
         if(!(p[k]>0) || !r) return;
-        if(r.tipo==='jantar'){ // prato completo: 1 porção por marmita
-          add(mar,r.id,c.qtd,{nome:p.nome,n:c.qtd,porcoes:true});
-          partes.push({k:'jantar',r,porcao:true});
+        if(POR_UNIDADE(r.tipo)){ // prato completo, lanche etc.: 1 por marmita
+          const un=UNID(r);
+          add(mar,r.id,c.qtd,un==='porções'?{nome:p.nome,n:c.qtd,porcoes:true}:{nome:p.nome,n:c.qtd,un});
+          partes.push({k:r.tipo,r,porcao:true,un});
         } else {
           add(mar,r.id,p[k]*c.qtd,{nome:p.nome,n:c.qtd,g:p[k]});
           partes.push({k,r,g:p[k]});
@@ -1050,13 +1052,13 @@ function calcular(){
   const J=D.semana.jantar;
   if(J.ativo) J.itens.forEach(it=>{
     const r=rec(it.rid); if(!r) return;
-    if(r.tipo==='jantar') add(jan,r.id,J.pessoas,{nome:'Jantar',n:J.pessoas,porcoes:true});
+    if(POR_UNIDADE(r.tipo)) add(jan,r.id,J.pessoas,UNID(r)==='porções'?{nome:'Jantar',n:J.pessoas,porcoes:true}:{nome:'Jantar',n:J.pessoas,un:UNID(r)});
     else add(jan,r.id,(it.g||150)*J.pessoas,{nome:'Jantar',n:J.pessoas,g:it.g||150});
   });
   const lan={};
   EXTRAS.forEach(x=>{
     const L=D.semana[x.chave];
-    if(L && L.ativo) L.itens.forEach(it=>{ const r=rec(it.rid); if(!r||!(it.qtd>0)) return; add(lan,r.id,it.qtd,{nome:x.plural,n:it.qtd,un:x.un}); });
+    if(L && L.ativo) L.itens.forEach(it=>{ const r=rec(it.rid); if(!r||!(it.qtd>0)) return; add(lan,r.id,it.qtd,{nome:x.plural,n:it.qtd,un:UNID(r)}); });
   });
   return {mar,jan,lan,montagem,total};
 }
@@ -1144,10 +1146,24 @@ function render(){
   el.innerHTML=fn(c);
 }
 
+/* qualquer receita pode ir em qualquer lugar: primeiro as do próprio tipo,
+   depois “outras receitas”, separadas por tipo */
+const ORDEM_TIPOS=['proteina','jantar','carbo','legume','lanche','cafe','petisco'];
+function opcoesTodas(principais, sel, vazio){
+  let h=`<option value="">${vazio||'— escolher —'}</option>`+optsAgrupadas(D.receitas.filter(r=>principais.includes(r.tipo)), sel);
+  const resto=D.receitas.filter(r=>!principais.includes(r.tipo));
+  const prox = principais.includes('legume') ? ['carbo'] : principais.includes('carbo') ? ['legume'] : [];
+  [...prox, ...ORDEM_TIPOS.filter(t=>!prox.includes(t))].filter(t=>!principais.includes(t)).forEach(t=>{
+    agrupar(resto.filter(r=>r.tipo===t)).forEach(gr=>{
+      const nomeT=t==='jantar'?'Prato completo':NOME_TIPO(t);
+      h+=`<optgroup label="Outras · ${esc(nomeT)} · ${esc(gr.label.replace(/^[^\p{L}]+/u,''))}">${gr.itens.map(r=>`<option value="${r.id}" ${r.id===sel?'selected':''}>${esc(r.nome)}</option>`).join('')}</optgroup>`;
+    });
+  });
+  return h;
+}
 function opcoesReceita(tipo, sel, vazio){
   // na proteína entram também os pratos completos, no grupo da mesma base
-  const lista=D.receitas.filter(r=>r.tipo===tipo || (tipo==='proteina' && r.tipo==='jantar'));
-  return `<option value="">${vazio||'— escolher —'}</option>`+optsAgrupadas(lista, sel);
+  return opcoesTodas(tipo==='proteina'?['proteina','jantar']:[tipo], sel, vazio);
 }
 
 /* ============================================================
@@ -1180,7 +1196,8 @@ function pgSemana(c){
         h+=`<div class="sel-row"><span class="dot ${k}"></span><span class="k">${TIPOS[k]}</span>
           <select class="inp" onchange="setCombo('${p.id}','${cb.id}','${k}',this.value)">${opcoesReceita(k,cb[k])}</select></div>`;
         const rk=cb[k]&&rec(cb[k]);
-        if(rk && rk.tipo==='jantar') h+=`<div class="muted" style="margin:4px 0 0 70px">Prato completo: 1 porção por marmita (a receita rende ${rk.rende}).</div>`;
+        if(rk && POR_UNIDADE(rk.tipo)) h+=`<div class="muted" style="margin:4px 0 0 70px">${UNID(rk)==='un'?'1 unidade':'1 porção'} por marmita (a receita rende ${rk.rende} ${UNID(rk)}).</div>`;
+        else if(rk && rk.tipo!==k) h+=`<div class="muted" style="margin:4px 0 0 70px">${p[k]} g por marmita.</div>`;
       });
       h+=`</div>`;
     });
@@ -1204,12 +1221,11 @@ function pgSemana(c){
       </div>`;
     J.itens.forEach((it,i)=>{
       const r=rec(it.rid);
-      const porGramas = r && r.tipo!=='jantar';
+      const porGramas = r && !POR_UNIDADE(r.tipo);
       h+=`<div class="combo"><div class="row">
         <select class="inp" onchange="setJItem(${i},'rid',this.value)">
           <option value="">— escolher prato —</option>
-          ${optsAgrupadas(D.receitas.filter(x=>x.tipo==='jantar'||x.tipo==='proteina'), it.rid)}
-          ${['carbo','legume'].map(t=>agrupar(D.receitas.filter(x=>x.tipo===t)).map(gr=>`<optgroup label="${TIPOS[t]} · ${esc(gr.b)}">${gr.itens.map(x=>`<option value="${x.id}" ${x.id===it.rid?'selected':''}>${esc(x.nome)}</option>`).join('')}</optgroup>`).join('')).join('')}
+          ${opcoesTodas(['jantar','proteina'], it.rid, '— escolher prato —').replace(/^<option value="">[^<]*<\/option>/,'')}
         </select>
         <button class="x" onclick="rmJItem(${i})">×</button></div>
         ${porGramas?`<div class="row" style="margin-top:8px"><span class="muted">Porção por pessoa</span><input class="inp sm" type="number" inputmode="numeric" value="${it.g||150}" onchange="setJItem(${i},'g',+this.value)"><span class="muted">g</span></div>`:''}
@@ -1231,9 +1247,9 @@ function pgSemana(c){
       L.itens.forEach((it,i)=>{
         const r=rec(it.rid);
         h+=`<div class="combo"><div class="row">
-          <select class="inp" onchange="setXItem('${x.chave}',${i},'rid',this.value)"><option value="">— escolher —</option>${optsAgrupadas(D.receitas.filter(q=>q.tipo===x.tipo), it.rid)}</select>
+          <select class="inp" onchange="setXItem('${x.chave}',${i},'rid',this.value)">${opcoesTodas([x.tipo], it.rid)}</select>
           <button class="x" onclick="rmXItem('${x.chave}',${i})">×</button></div>
-          ${r?`<div class="row" style="margin-top:8px"><span class="muted">Quantidade</span><input class="inp sm" type="number" inputmode="numeric" value="${it.qtd||''}" onchange="setXItem('${x.chave}',${i},'qtd',+this.value)"><span class="muted">${x.un} · a receita rende ${r.rende}</span></div>`:''}
+          ${r?`<div class="row" style="margin-top:8px"><span class="muted">Quantidade</span><input class="inp sm" type="number" inputmode="numeric" value="${it.qtd||''}" onchange="setXItem('${x.chave}',${i},'qtd',+this.value)"><span class="muted">${UNID(r)==='g'?'g prontos':UNID(r)} · a receita rende ${UNID(r)==='g'?fmtG(r.rende):r.rende}</span></div>`:''}
         </div>`;
       });
       h+=`<button class="btn ghost sm" onclick="addXItem('${x.chave}')">${x.add}</button>`;
@@ -1484,7 +1500,7 @@ function pgPreparo(c){
     <div class="card white"><table class="mt"><tr><th>Quem</th><th>Conteúdo</th><th style="text-align:right">Qtd</th></tr>`;
   c.montagem.forEach(m=>{
     h+=`<tr><td>${esc(m.p.emoji||'')} ${esc(m.p.nome)}</td>
-      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.porcao?'1 porção':x.g+'g'} ${esc(x.r.nome)}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
+      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.porcao?(x.un==='un'?'1 un':'1 porção'):x.g+'g'} ${esc(x.r.nome)}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
       <td class="n">${m.c.qtd}×</td></tr>`;
   });
   h+=`</table></div>
