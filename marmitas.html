@@ -209,7 +209,7 @@ function R(id,nome,tipo,rende,ing,pre,etapas,lote){
     ingredientes:ing.map(([qtd,un,nome])=>({qtd,un,nome,secao:''})),
     pre,etapas:etapas.map(([eq,min,txt])=>({eq,min,txt}))};
 }
-function receitasPadrao(){ return receitasBase().map(r=>r.id==='arroz_branco'?ARROZ_BRANCO_VI():r.id==='legumes_assados'?LEGUMES_FORNO_VI():r).concat(receitasVi(),receitasLanches(),receitasCafe(),receitasPetiscos(),receitasNovas5()); }
+function receitasPadrao(){ return receitasBase().map(r=>r.id==='arroz_branco'?ARROZ_BRANCO_VI():r.id==='legumes_assados'?LEGUMES_FORNO_VI():r).concat(receitasVi(),receitasLanches(),receitasCafe(),receitasPetiscos(),receitasNovas5(),receitasNovas7()); }
 function receitasBase(){ return [
   // PROTEÍNAS
   R('frango_cubos','Frango em cubos grelhado','proteina',700,
@@ -674,6 +674,15 @@ function receitasCafe(){ return [
     ['Misturar chia, leite e mel em potinhos e deixar na geladeira de um dia para o outro'],
     [['bancada',5,'Cobrir com morango picado']]),
 ];}
+function receitasNovas7(){ return [
+  V('espetinho_carne','Espetinho de carne','proteina',700,
+    [[1000,'g','alcatra em cubos'],[1,'un','cebola'],[1,'un','pimentão vermelho'],[3,'dente','alho'],[10,'g','sal'],[15,'ml','azeite'],[20,'ml','molho inglês'],[1,'pacote','palitos de churrasco']],
+    ['Cortar a carne em cubos médios e temperar com alho, sal, azeite e molho inglês (marinar na geladeira)',
+     'Cortar cebola e pimentão em pedaços',
+     'Montar os espetinhos alternando carne, cebola e pimentão (palito de madeira: deixar de molho em água antes)'],
+    [['airfryer',15,'Airfryer a 200 °C, virando na metade (por leva)']],350,
+    'Também dá no forno a 220 °C por 20–25 min, virando na metade. Fica ótimo com farofa e vinagrete.'),
+];}
 function receitasNovas5(){ return [
   V('torta_frango_dalbo','Torta de frango (Cozinha Dal Bó)','lanche',8,
     [[800,'g','peito de frango com osso'],[2,'colher (sopa)','vinagre'],[2,'un','cebola'],[2,'un','caldo de galinha (tablete)'],[1,'dente','alho'],[1,'colher (sopa)','páprica doce'],[1,'lata','milho verde'],[200,'g','requeijão cremoso'],
@@ -715,7 +724,7 @@ const GRUPOS = [
 ];
 const CLASSE = {};
 [['carne','Carne moída','carne_moida almondegas hamburguer_caseiro lasanha escondidinho panqueca_carne conchiglione macarrao_bolonhesa nhoque_bolonhesa berinjela_gratinada'],
- ['carne','Cubos e tiras','iscas_patinho picadinho carne_molho_queijo iscas_alho strogonoff_carne yakisoba bife'],
+ ['carne','Cubos e tiras','iscas_patinho picadinho carne_molho_queijo iscas_alho strogonoff_carne yakisoba bife espetinho_carne'],
  ['carne','Desfiada e peças','carne_louca carne_desfiada cupim_pressao carne_assada costela_assada'],
  ['frango','Frango desfiado','frango_desfiado fricasse empadao_frango panqueca_frango_verde torta_frango_dalbo'],
  ['frango','Cubos e filés','frango_cubos frango_af file_frango frango_creme_brocolis strogonoff'],
@@ -791,7 +800,7 @@ function optsAgrupadas(lista, sel){
 function dadosPadrao(){
   return {
     versao:1,
-    receitasVersao:6,
+    receitasVersao:7,
     pessoas:[
       {id:'marido', nome:'Baia', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
       {id:'filha',  nome:'Mel',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:100},
@@ -849,7 +858,9 @@ function normalizar(){
    só troca arroz branco / legumes assados se ainda estiverem como vieram. */
 function migrarReceitas(){
   const v=D.receitasVersao||1;
-  if(v >= 6) return false;
+  if(v >= 7) return false;
+  receitasNovas7().forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
+  if(v === 6){ D.receitasVersao=7; return true; }
   if(v === 5){
     // a torta da Dal Bó passa a ser lanche (8 fatias)
     const t=D.receitas.find(r=>r.id==='torta_frango_dalbo');
@@ -859,12 +870,12 @@ function migrarReceitas(){
       for(const pid in D.semana.combos) D.semana.combos[pid].forEach(c=>{ if(c.proteina===t.id) c.proteina=''; });
       D.semana.jantar.itens=D.semana.jantar.itens.filter(i=>i.rid!==t.id);
     }
-    D.receitasVersao=6;
+    D.receitasVersao=7;
     return true;
   }
   const novas=[...(v<3?receitasLanches():[]), ...(v<4?[...receitasCafe(), ...receitasPetiscos()]:[]), ...receitasNovas5()];
   novas.forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
-  D.receitasVersao=6;
+  D.receitasVersao=7;
   if(v >= 2) return true;
   const base=receitasBase();
   [['arroz_branco',ARROZ_BRANCO_VI],['legumes_assados',LEGUMES_FORNO_VI]].forEach(([id,nova])=>{
