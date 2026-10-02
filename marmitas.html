@@ -674,7 +674,7 @@ function receitasCafe(){ return [
     [['bancada',5,'Cobrir com morango picado']]),
 ];}
 function receitasNovas5(){ return [
-  V('torta_frango_dalbo','Torta de frango (Cozinha Dal Bó)','jantar',8,
+  V('torta_frango_dalbo','Torta de frango (Cozinha Dal Bó)','lanche',8,
     [[800,'g','peito de frango com osso'],[2,'colher (sopa)','vinagre'],[2,'un','cebola'],[2,'un','caldo de galinha (tablete)'],[1,'dente','alho'],[1,'colher (sopa)','páprica doce'],[1,'lata','milho verde'],[200,'g','requeijão cremoso'],
      [200,'g','manteiga sem sal'],[3,'un','ovo'],[2,'colher (sopa)','leite integral'],[3,'xícara','farinha de trigo'],[1,'g','sal']],
     ['Massa: misturar a manteiga levemente amolecida, 2 gemas, o leite, a farinha e a pitada de sal até desgrudar das mãos; embrulhar em filme e guardar na geladeira',
@@ -684,7 +684,7 @@ function receitasNovas5(){ return [
      ['fogao',15,'Refogar cebola e alho, juntar páprica, o outro tablete, o frango e o milho; desligar e misturar o requeijão'],
      ['bancada',15,'Forrar fundo e laterais da forma com 2/3 da massa, rechear, cobrir com o restante e pincelar com o ovo batido'],
      ['forno',40,'Assar a 180 °C até dourar']],0,
-    'Receita: https://cozinhadalbo.com.br/2014/06/torta-de-frango/ — o modo de preparo aqui é um resumo; confira tempos e detalhes no site.'),
+    'Rende 8 fatias. Receita: https://cozinhadalbo.com.br/2014/06/torta-de-frango/ — o modo de preparo aqui é um resumo; confira tempos e detalhes no site.'),
 ];}
 function receitasPetiscos(){ return [
   V('bruschetta','Bruschetta','petisco',6,
@@ -790,7 +790,7 @@ function optsAgrupadas(lista, sel){
 function dadosPadrao(){
   return {
     versao:1,
-    receitasVersao:5,
+    receitasVersao:6,
     pessoas:[
       {id:'marido', nome:'Baia', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
       {id:'filha',  nome:'Mel',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:100},
@@ -848,10 +848,22 @@ function normalizar(){
    só troca arroz branco / legumes assados se ainda estiverem como vieram. */
 function migrarReceitas(){
   const v=D.receitasVersao||1;
-  if(v >= 5) return false;
+  if(v >= 6) return false;
+  if(v === 5){
+    // a torta da Dal Bó passa a ser lanche (8 fatias)
+    const t=D.receitas.find(r=>r.id==='torta_frango_dalbo');
+    if(t && t.tipo==='jantar'){
+      t.tipo='lanche';
+      if(!/fatias/.test(t.obs||'')) t.obs='Rende 8 fatias. '+(t.obs||'');
+      for(const pid in D.semana.combos) D.semana.combos[pid].forEach(c=>{ if(c.proteina===t.id) c.proteina=''; });
+      D.semana.jantar.itens=D.semana.jantar.itens.filter(i=>i.rid!==t.id);
+    }
+    D.receitasVersao=6;
+    return true;
+  }
   const novas=[...(v<3?receitasLanches():[]), ...(v<4?[...receitasCafe(), ...receitasPetiscos()]:[]), ...receitasNovas5()];
   novas.forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
-  D.receitasVersao=5;
+  D.receitasVersao=6;
   if(v >= 2) return true;
   const base=receitasBase();
   [['arroz_branco',ARROZ_BRANCO_VI],['legumes_assados',LEGUMES_FORNO_VI]].forEach(([id,nova])=>{
