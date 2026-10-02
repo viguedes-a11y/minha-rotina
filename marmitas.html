@@ -13,7 +13,7 @@
   --creme:#f5f0e8; --creme-e:#e0d8c8; --branco:#fdfaf5;
   --texto:#1a2420; --texto-s:#6a7a70;
   --rosa:#d4756a; --azul:#5a8ab0;
-  --c-proteina:#d4756a; --c-carbo:#c9a84c; --c-legume:#4a7c5f; --c-jantar:#5a8ab0;
+  --c-proteina:#d4756a; --c-carbo:#c9a84c; --c-legume:#4a7c5f; --c-jantar:#5a8ab0; --c-lanche:#9a7aa0; --c-cafe:#a9845a; --c-petisco:#c0705a;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'DM Sans',sans-serif;background:var(--branco);color:var(--texto);min-height:100vh;overflow-x:hidden;}
@@ -27,6 +27,7 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;col
 .hdr-date{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dourado);margin-bottom:4px;opacity:.8;}
 .hdr-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--creme);}
 .hdr-title em{font-style:italic;color:var(--dourado-c);}
+.hdr-sync{font-size:11px;color:var(--dourado-c);margin-top:6px;min-height:14px;}
 .hdr-sum{font-size:12px;color:rgba(245,240,232,.65);margin-top:6px;}
 
 /* CONTENT / TABS */
@@ -54,7 +55,7 @@ button,input,select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;col
 .inp,select.inp,textarea.inp{width:100%;padding:9px 11px;border:1.5px solid var(--creme-e);border-radius:10px;background:white;outline:none;min-width:0;}
 .inp:focus{border-color:var(--verde-c);}
 .inp.sm{width:72px;text-align:center;padding:7px 6px;}
-.inp.xs{width:58px;text-align:center;padding:6px 4px;}
+.inp.xs{width:64px;flex:0 0 64px;text-align:center;padding:6px 4px;}
 textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 .lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-s);margin:10px 0 5px;display:block;}
 .row{display:flex;gap:8px;align-items:center;}
@@ -82,7 +83,7 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 .stepper span{min-width:34px;text-align:center;font-weight:600;font-size:14px;}
 .sel-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
 .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.dot.proteina{background:var(--c-proteina);} .dot.carbo{background:var(--c-carbo);} .dot.legume{background:var(--c-legume);} .dot.jantar{background:var(--c-jantar);}
+.dot.proteina{background:var(--c-proteina);} .dot.carbo{background:var(--c-carbo);} .dot.legume{background:var(--c-legume);} .dot.jantar{background:var(--c-jantar);} .dot.lanche{background:var(--c-lanche);} .dot.cafe{background:var(--c-cafe);} .dot.petisco{background:var(--c-petisco);}
 .sel-row .k{font-size:11px;color:var(--texto-s);width:62px;flex-shrink:0;}
 .sum-line{font-size:12px;margin-top:4px;}
 
@@ -106,7 +107,7 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 .g-name{width:74px;font-size:11px;color:var(--texto-s);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .g-track{position:relative;flex:1;height:22px;background:var(--creme);border-radius:6px;}
 .g-bar{position:absolute;top:0;bottom:0;border-radius:6px;color:white;font-size:10px;padding:0 5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:22px;border:1px solid rgba(255,255,255,.6);}
-.g-bar.proteina{background:var(--c-proteina);} .g-bar.carbo{background:var(--c-carbo);} .g-bar.legume{background:var(--c-legume);} .g-bar.jantar{background:var(--c-jantar);} .g-bar.montagem{background:var(--verde);}
+.g-bar.proteina{background:var(--c-proteina);} .g-bar.carbo{background:var(--c-carbo);} .g-bar.legume{background:var(--c-legume);} .g-bar.jantar{background:var(--c-jantar);} .g-bar.lanche{background:var(--c-lanche);} .g-bar.cafe{background:var(--c-cafe);} .g-bar.petisco{background:var(--c-petisco);} .g-bar.montagem{background:var(--verde);}
 .g-axis{display:flex;margin-left:74px;position:relative;height:16px;margin-top:4px;}
 .g-tick{position:absolute;font-size:10px;color:var(--texto-s);transform:translateX(-50%);}
 .tl-time{font-size:12px;font-weight:600;color:var(--verde);white-space:nowrap;min-width:92px;}
@@ -122,6 +123,9 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
 .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
 .fchip{padding:6px 12px;border-radius:16px;border:1.5px solid var(--creme-e);background:white;font-size:12px;cursor:pointer;color:var(--texto-s);}
 .fchip.active{background:var(--verde);border-color:var(--verde);color:var(--dourado);}
+.grp-h{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-s);margin:14px 2px 6px;}
+.hora-btn{font-size:11px;padding:4px 9px;border-radius:12px;border:1px solid var(--creme-e);background:white;color:var(--verde-c);cursor:pointer;white-space:nowrap;}
+.hora-btn.on{background:rgba(201,168,76,.18);border-color:var(--dourado);color:#7a5f1c;}
 .rcard{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--creme-e);border-radius:12px;padding:11px 12px;margin-bottom:8px;cursor:pointer;}
 .rcard .nm{font-size:14px;font-weight:500;}
 .rcard .meta{font-size:11px;color:var(--texto-s);margin-top:2px;}
@@ -158,6 +162,7 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
   <div class="hdr-date">planejamento semanal</div>
   <div class="hdr-title">Marmitas <em>da Semana</em></div>
   <div class="hdr-sum" id="hdrSum"></div>
+  <div class="hdr-sync" id="syncInfo"></div>
 </div>
 
 <div class="content">
@@ -171,7 +176,17 @@ textarea.inp{min-height:80px;resize:vertical;line-height:1.5;}
    ============================================================ */
 const KEY = 'marmitas_v1';
 const COMP = ['proteina','carbo','legume'];
-const TIPOS = {proteina:'Proteína', carbo:'Carboidrato', legume:'Legumes', jantar:'Jantar'};
+const TIPOS = {proteina:'Proteína', jantar:'Proteína · prato completo', carbo:'Carboidrato', legume:'Legumes', lanche:'Lanche', cafe:'Café da manhã', petisco:'Petisco'};
+/* seções extras da semana: receitas que rendem unidades/porções */
+const EXTRAS = [
+  {tipo:'lanche',  chave:'lanches',  titulo:'Lanches da semana', plural:'Lanches',       emoji:'🥪', un:'un',      fundo:'rgba(154,122,160,.09)', add:'+ lanche'},
+  {tipo:'cafe',    chave:'cafe',     titulo:'Café da manhã',     plural:'Café da manhã', emoji:'☕', un:'porções', fundo:'rgba(169,132,90,.10)',  add:'+ item do café'},
+  {tipo:'petisco', chave:'petiscos', titulo:'Petiscos',          plural:'Petiscos',      emoji:'🧀', un:'porções', fundo:'rgba(192,112,90,.09)',  add:'+ petisco'},
+];
+const EXTRA = t => EXTRAS.find(x=>x.tipo===t);
+const POR_UNIDADE = t => t==='jantar' || !!EXTRA(t);
+const UNID = r => r.tipo==='jantar' ? 'porções' : EXTRA(r.tipo) ? EXTRA(r.tipo).un : 'g';
+const NOME_TIPO = t => EXTRA(t) ? EXTRA(t).plural : TIPOS[t];
 const EQUIP = {
   fogao:{nome:'Fogão', icon:'🔥'},
   airfryer:{nome:'Airfryer', icon:'💨'},
@@ -179,7 +194,7 @@ const EQUIP = {
   bancada:{nome:'Bancada', icon:'🔪'}
 };
 const UNIDADES = ['g','ml','un','dente','maço','colher (sopa)','colher (chá)','xícara','lata','caixa','pacote','a gosto'];
-const SECOES = ['Açougue e peixaria','Hortifrúti','Frios, laticínios e ovos','Mercearia','Outros'];
+const SECOES = ['Açougue e peixaria','Hortifrúti','Frios, laticínios e ovos','Padaria','Mercearia','Outros'];
 const PAGES = [
   ['semana','Semana'],['compras','Compras'],['vespera','Véspera'],
   ['preparo','Dia do preparo'],['receitas','Receitas'],['ajustes','Ajustes']
@@ -196,7 +211,8 @@ function R(id,nome,tipo,rende,ing,pre,etapas,lote){
     ingredientes:ing.map(([qtd,un,nome])=>({qtd,un,nome,secao:''})),
     pre,etapas:etapas.map(([eq,min,txt])=>({eq,min,txt}))};
 }
-function receitasPadrao(){ return [
+function receitasPadrao(){ return receitasBase().map(r=>r.id==='arroz_branco'?ARROZ_BRANCO_VI():r.id==='legumes_assados'?LEGUMES_FORNO_VI():r).concat(receitasVi(),receitasLanches(),receitasCafe(),receitasPetiscos(),receitasNovas5(),receitasNovas7()); }
+function receitasBase(){ return [
   // PROTEÍNAS
   R('frango_cubos','Frango em cubos grelhado','proteina',700,
     [[1000,'g','peito de frango'],[3,'dente','alho'],[1,'un','limão'],[10,'g','sal'],[20,'ml','azeite'],[5,'g','páprica defumada']],
@@ -303,13 +319,494 @@ function receitasPadrao(){ return [
     [['bancada',10,'Cortar batatas e cebolas e montar tudo na assadeira'],['forno',60,'Assar a 200 °C coberto por 30 min e descoberto até dourar']]),
 ];}
 
+
+/* ============================================================
+   RECEITAS DO NOTION DA VI (página “Marmitas”)
+   ============================================================ */
+function V(id,nome,tipo,rende,ing,pre,etapas,lote,obs){ const r=R(id,nome,tipo,rende,ing,pre,etapas,lote); r.obs=obs||''; return r; }
+const ARROZ_BRANCO_VI = ()=>V('arroz_branco','Arroz branco','carbo',1500,
+  [[500,'g','arroz branco'],[1000,'ml','água'],[1,'un','cebola'],[2,'dente','alho'],[15,'ml','azeite'],[8,'g','sal'],[1,'un','folha de louro']],
+  ['Picar a cebola e o alho'],
+  [['fogao',25,'Refogar levemente cebola e alho no azeite; juntar o arroz e fritar um pouco (sela o grão e não fica papado). Sal, 1 folha de louro e a água já fervendo. Para congelar: cozido, mas não muito mole']],0,
+  'O azeite sela o arroz e ele não fica papado. Para congelar, o ponto certo é cozido mas não muito mole.');
+const LEGUMES_FORNO_VI = ()=>V('legumes_assados','Legumes ao forno','legume',900,
+  [[300,'g','berinjela'],[400,'g','abobrinha'],[1,'un','cebola roxa'],[2,'un','tomate'],[300,'g','cenoura'],[30,'ml','azeite'],[6,'g','sal'],[2,'g','orégano']],
+  ['Lavar e cortar todos os legumes em pedaços do mesmo tamanho'],
+  [['forno',35,'Assar a 220 °C bem espalhados (2 assadeiras)']]);
+function receitasVi(){ return [
+  // ---------- CARNE ----------
+  V('almondegas','Almôndegas ao sugo','proteina',1400,
+    [[1000,'g','carne moída'],[1,'un','ovo'],[50,'g','farinha de rosca'],[1,'un','cebola'],[3,'dente','alho'],[1,'maço','cheiro-verde'],[10,'g','sal'],[680,'g','molho de tomate']],
+    ['Picar cebola, alho e cheiro-verde, misturar com a carne, ovo e farinha e modelar as almôndegas (guardar na geladeira)'],
+    [['forno',25,'Assar as almôndegas a 200 °C até dourar'],['fogao',15,'Aquecer o molho e cozinhar as almôndegas nele']],0,'Rendimento contando o molho.'),
+  V('hamburguer_caseiro','Hambúrguer caseiro com cebola caramelizada','proteina',800,
+    [[1000,'g','carne moída'],[10,'g','sal'],[2,'g','pimenta-do-reino'],[3,'un','cebola'],[20,'g','manteiga'],[10,'g','açúcar mascavo']],
+    ['Moldar hambúrgueres de ~120 g e separar com papel-manteiga','Fatiar as cebolas em meia-lua'],
+    [['fogao',30,'Caramelizar a cebola em fogo baixo com manteiga e açúcar'],['fogao',20,'Grelhar os hambúrgueres na chapa, em levas']]),
+  V('picadinho','Picadinho de carne com batata e cenoura','proteina',1600,
+    [[1000,'g','patinho em cubos'],[400,'g','batata'],[300,'g','cenoura'],[1,'un','cebola'],[3,'dente','alho'],[2,'un','tomate'],[10,'g','sal'],[15,'ml','azeite'],[1,'maço','cheiro-verde']],
+    ['Cortar a carne em cubos e temperar','Descascar e cortar batata e cenoura (guardar em água na geladeira)','Picar cebola, alho e tomate'],
+    [['fogao',15,'Dourar a carne em levas e refogar cebola, alho e tomate'],['fogao',35,'Pressão com água por 20 min; juntar batata e cenoura e cozinhar mais 8 min']],0,'Rendimento contando batata, cenoura e caldo.'),
+  V('carne_molho_queijo','Carne em cubos ao molho de queijo','proteina',1300,
+    [[1000,'g','alcatra em cubos'],[200,'g','requeijão'],[100,'g','muçarela'],[200,'ml','leite'],[1,'un','cebola'],[3,'dente','alho'],[10,'g','sal'],[15,'ml','azeite']],
+    ['Cortar a carne em cubos e temperar com sal e alho'],
+    [['fogao',20,'Dourar a carne em levas, em fogo alto'],['fogao',10,'Refogar a cebola, juntar leite, requeijão e muçarela até virar creme e misturar a carne']],0,
+    'Servir com batata rústica. Vídeo: https://vt.tiktok.com/ZSqytEnXW/'),
+  V('carne_louca','Carne louca','proteina',900,
+    [[1000,'g','lagarto'],[2,'un','cebola'],[1,'un','pimentão verde'],[1,'un','pimentão vermelho'],[3,'un','tomate'],[4,'dente','alho'],[30,'ml','vinagre'],[10,'g','sal'],[15,'ml','azeite'],[1,'maço','cheiro-verde']],
+    ['Temperar a carne','Fatiar cebolas e pimentões e picar os tomates'],
+    [['fogao',50,'Cozinhar o lagarto inteiro na pressão com água e sal (40 min após pegar pressão)'],['bancada',10,'Desfiar a carne'],['fogao',15,'Refogar com cebola, pimentões, tomate e vinagre']]),
+  V('carne_desfiada','Carne desfiada','proteina',800,
+    [[1000,'g','acém'],[1,'un','cebola'],[3,'dente','alho'],[2,'un','tomate'],[10,'g','sal'],[2,'un','folha de louro'],[15,'ml','azeite']],
+    ['Cortar a carne em pedaços grandes','Picar cebola, alho e tomate'],
+    [['fogao',50,'Cozinhar na pressão com água, sal e louro (40 min após pegar pressão)'],['bancada',10,'Desfiar'],['fogao',10,'Refogar com cebola, alho e tomate']],0,
+    'Combina com farofa de banana e arroz com lentilha.'),
+  V('cupim_pressao','Cupim (ou maminha) na pressão','proteina',900,
+    [[1500,'g','cupim'],[4,'dente','alho'],[1,'un','cebola'],[15,'g','sal'],[30,'ml','molho inglês']],
+    ['Temperar a carne e deixar marinando na geladeira de um dia para o outro'],
+    [['fogao',70,'Selar e cozinhar na pressão com a cebola por cerca de 1 h'],['bancada',10,'Fatiar ou desfiar']]),
+  V('iscas_alho','Iscas de carne ao molho de alho','proteina',700,
+    [[1000,'g','alcatra em iscas'],[8,'dente','alho'],[30,'g','manteiga'],[10,'g','sal'],[15,'ml','azeite'],[1,'maço','cheiro-verde']],
+    ['Cortar a carne em tiras finas (ou pedir no açougue)','Picar bem o alho'],
+    [['fogao',20,'Selar as iscas em fogo alto, em levas; finalizar com manteiga, alho e cheiro-verde']],0,'Receita do vídeo do TikTok.'),
+  V('carne_assada','Carne assada (lagarto)','proteina',750,
+    [[1000,'g','lagarto'],[4,'dente','alho'],[1,'un','cebola'],[10,'g','sal'],[30,'ml','molho inglês'],[20,'ml','azeite']],
+    ['Temperar e deixar marinando de um dia para o outro'],
+    [['fogao',10,'Selar a peça inteira'],['forno',60,'Assar coberta com papel-alumínio a 200 °C; descobrir nos últimos 15 min']]),
+  V('costela_assada','Costela assada','proteina',700,
+    [[1500,'g','costela bovina'],[4,'dente','alho'],[1,'un','cebola'],[15,'g','sal']],
+    ['Temperar e deixar marinando de um dia para o outro'],
+    [['fogao',60,'Cozinhar na pressão por 50 min'],['forno',20,'Dourar no forno a 220 °C']],0,'Rendimento já descontando o osso.'),
+  V('linguica_acebolada','Linguiça acebolada','proteina',800,
+    [[1000,'g','linguiça toscana'],[2,'un','cebola']],
+    ['Fatiar as cebolas'],
+    [['airfryer',18,'Assar a linguiça a 200 °C (furar antes)'],['fogao',10,'Fatiar a linguiça e acebolar na frigideira']],500),
+  V('bife','Bife grelhado','proteina',700,
+    [[1000,'g','contrafilé em bifes'],[10,'g','sal'],[2,'dente','alho'],[15,'ml','azeite']],
+    ['Temperar os bifes'],
+    [['fogao',20,'Grelhar em chapa bem quente, em levas']],0,'No cardápio: bife com arroz e batata rústica.'),
+  V('coracao_linguica','Coração de frango com linguiça','proteina',800,
+    [[600,'g','coração de frango'],[500,'g','linguiça toscana'],[1,'un','cebola'],[3,'dente','alho'],[10,'g','sal']],
+    ['Limpar os corações e temperar com alho e sal','Cortar a linguiça em rodelas'],
+    [['airfryer',22,'Airfryer a 200 °C, sacudindo na metade']],450),
+  V('berinjela_gratinada','Berinjela gratinada com carne moída','jantar',6,
+    [[3,'un','berinjela'],[600,'g','carne moída'],[680,'g','molho de tomate'],[300,'g','muçarela'],[50,'g','parmesão ralado'],[1,'un','cebola'],[2,'dente','alho'],[8,'g','sal']],
+    [],
+    [['bancada',10,'Fatiar a berinjela no comprido'],['fogao',20,'Refogar a carne com cebola, alho e molho'],['bancada',10,'Montar camadas de berinjela, carne e muçarela'],['forno',35,'Assar a 200 °C e gratinar com parmesão']]),
+  V('panqueca_carne','Panqueca de carne moída','jantar',6,
+    [[2,'un','ovo'],[500,'ml','leite'],[240,'g','farinha de trigo'],[30,'ml','óleo'],[4,'g','sal'],[600,'g','carne moída'],[1,'un','cebola'],[2,'dente','alho'],[2,'un','tomate'],[700,'g','molho de tomate'],[200,'g','muçarela']],
+    ['Fazer o recheio de carne (pode ser na véspera)'],
+    [['bancada',5,'Bater a massa no liquidificador'],['fogao',25,'Fazer os discos na frigideira antiaderente'],['bancada',10,'Rechear, enrolar e cobrir com molho e muçarela'],['forno',20,'Gratinar a 200 °C (ou congelar)']]),
+  V('conchiglione','Conchiglione de carne','jantar',6,
+    [[500,'g','conchiglione'],[600,'g','carne moída'],[700,'g','molho de tomate'],[300,'g','muçarela'],[200,'g','requeijão'],[1,'un','cebola'],[2,'dente','alho'],[8,'g','sal'],[50,'g','parmesão ralado']],
+    ['Fazer o recheio de carne (pode ser na véspera)'],
+    [['fogao',15,'Cozinhar a massa al dente'],['bancada',15,'Rechear as conchas e arrumar no refratário com molho'],['forno',25,'Cobrir com muçarela e gratinar a 200 °C']]),
+  V('macarrao_bolonhesa','Macarrão à bolonhesa','jantar',6,
+    [[500,'g','espaguete'],[600,'g','carne moída'],[700,'g','molho de tomate'],[1,'un','cebola'],[3,'dente','alho'],[8,'g','sal'],[50,'g','parmesão ralado']],
+    ['Picar cebola e alho'],
+    [['fogao',25,'Molho à bolonhesa'],['fogao',15,'Cozinhar o macarrão al dente e misturar']]),
+  V('nhoque_bolonhesa','Nhoque à bolonhesa','jantar',6,
+    [[1000,'g','batata'],[250,'g','farinha de trigo'],[1,'un','ovo'],[6,'g','sal'],[600,'g','carne moída'],[700,'g','molho de tomate'],[1,'un','cebola'],[3,'dente','alho'],[50,'g','parmesão ralado']],
+    ['Fazer o nhoque na véspera e congelar em bandeja (opcional, adianta muito)'],
+    [['fogao',25,'Cozinhar as batatas com casca'],['bancada',25,'Espremer, fazer a massa com farinha e ovo, enrolar e cortar'],['fogao',25,'Molho à bolonhesa'],['fogao',10,'Cozinhar o nhoque em água fervente até subir']]),
+  V('strogonoff_carne','Strogonoff de carne','jantar',6,
+    [[900,'g','alcatra em tiras'],[400,'g','creme de leite'],[200,'g','champignon'],[1,'un','cebola'],[2,'dente','alho'],[200,'g','molho de tomate'],[30,'g','mostarda'],[30,'g','ketchup'],[8,'g','sal'],[150,'g','batata palha']],
+    ['Cortar a carne em tiras e temperar'],
+    [['fogao',30,'Selar a carne em levas, juntar cebola, alho, molhos e champignon; finalizar com creme de leite em fogo baixo']]),
+  V('yakisoba','Yakisoba','jantar',6,
+    [[500,'g','macarrão para yakisoba'],[400,'g','alcatra em tiras'],[400,'g','peito de frango'],[300,'g','brócolis'],[200,'g','cenoura'],[300,'g','repolho'],[1,'un','cebola'],[150,'ml','shoyu'],[20,'g','amido de milho'],[30,'g','açúcar'],[15,'ml','óleo']],
+    ['Cortar as carnes em tiras','Cortar os legumes (brócolis em floretes, cenoura em palitos, repolho em tiras)'],
+    [['fogao',15,'Cozinhar o macarrão'],['fogao',25,'Saltear as carnes e os legumes; juntar o molho de shoyu, açúcar e amido e misturar o macarrão']]),
+  V('feijoada_light','Feijoada light','jantar',6,
+    [[500,'g','feijão preto'],[400,'g','acém'],[300,'g','linguiça toscana'],[1,'un','cebola'],[4,'dente','alho'],[2,'un','folha de louro'],[10,'g','sal'],[1,'maço','couve']],
+    ['Deixar o feijão de molho por 12 h','Cortar as carnes em cubos','Lavar e fatiar a couve'],
+    [['fogao',50,'Cozinhar feijão e carnes na pressão com louro'],['fogao',15,'Refogar cebola e alho, juntar ao feijão e engrossar'],['fogao',10,'Refogar a couve']]),
+  V('arroz_linguica_coalho','Arroz com linguiça fininha e queijo coalho','jantar',6,
+    [[500,'g','arroz branco'],[400,'g','linguiça calabresa fininha'],[250,'g','queijo coalho'],[1,'un','cebola'],[2,'dente','alho'],[1,'maço','cheiro-verde'],[8,'g','sal'],[1000,'ml','água']],
+    ['Cortar linguiça em rodelas e queijo coalho em cubos'],
+    [['fogao',15,'Dourar a linguiça com cebola e alho'],['fogao',25,'Juntar o arroz e a água fervente e cozinhar'],['airfryer',10,'Dourar o queijo coalho e misturar no final']]),
+  // ---------- PEIXE ----------
+  V('moqueca_tilapia','Moqueca de tilápia','proteina',1700,
+    [[1600,'g','filé de tilápia'],[3,'dente','alho'],[10,'g','sal'],[2,'g','pimenta-do-reino'],[5,'g','páprica defumada'],[1,'un','limão'],[1,'un','pimentão vermelho'],[1,'un','pimentão verde'],[1,'un','pimentão amarelo'],[1,'un','tomate'],[1,'un','cebola'],[200,'ml','leite de coco light'],[1,'maço','cheiro-verde'],[20,'ml','azeite']],
+    ['Picar os pimentões, a cebola e o tomate'],
+    [['bancada',20,'Cortar o filé em 4 partes e temperar com sal, alho, pimenta, páprica e suco de 1 limão (marinar 20 min)'],
+     ['fogao',25,'Panela aquecida com azeite: dourar a cebola com páprica, juntar pimentões e tomate e cozinhar em fogo baixo até formar um caldinho (um pouco de água ajuda)'],
+     ['fogao',15,'Grelhar os pedaços de tilápia na frigideira'],
+     ['fogao',10,'Juntar o leite de coco aos legumes, cozinhar um pouco, colocar o peixe e cozinhar mais um pouco']],0,'Rendimento contando o molho.'),
+  V('tilapia_empanada','Tilápia empanada com molho tártaro','proteina',800,
+    [[1000,'g','filé de tilápia'],[5,'g','lemon pepper'],[6,'g','sal'],[3,'un','ovo'],[60,'g','farinha de trigo'],[100,'g','farinha panko'],[15,'ml','azeite'],[150,'g','maionese'],[100,'g','iogurte natural'],[30,'g','picles'],[1,'un','limão'],[1,'maço','cheiro-verde']],
+    ['Temperar os filés com lemon pepper (ou sal e pimenta) dos dois lados e esperar 10 min',
+     'Empanar: farinha de trigo → ovo batido com sal → panko',
+     'Porcionar e congelar, separando os filés com saquinhos'],
+    [['airfryer',25,'Do freezer para a airfryer, borrifando azeite: 180 °C por 15–20 min e mais 5 min a 200 °C; virar na metade e borrifar o outro lado'],
+     ['bancada',5,'Molho tártaro: maionese, iogurte, picles picado, limão e cheiro-verde']],400,'Pode ir do freezer direto para a airfryer.'),
+  V('tilapia_catupiry','Tilápia no catupiry','proteina',1100,
+    [[1000,'g','filé de tilápia'],[200,'g','catupiry'],[50,'g','parmesão ralado'],[1,'un','limão'],[2,'dente','alho'],[8,'g','sal']],
+    ['Passar os filés do congelador para a geladeira'],
+    [['bancada',10,'Temperar com limão, alho e sal e arrumar no refratário'],['forno',25,'Cobrir com catupiry e parmesão e assar a 200 °C']]),
+  V('isca_peixe','Isca de peixe empanada','proteina',800,
+    [[1000,'g','filé de tilápia'],[8,'g','sal'],[1,'un','limão'],[3,'un','ovo'],[60,'g','farinha de trigo'],[120,'g','farinha panko'],[15,'ml','azeite']],
+    ['Cortar em tiras, temperar com sal e limão e empanar (trigo → ovo → panko); pode congelar'],
+    [['airfryer',18,'Airfryer a 200 °C, borrifando azeite e virando na metade']],400),
+  V('risoto_camarao','Risoto de camarão','jantar',6,
+    [[500,'g','arroz arbóreo'],[500,'g','camarão limpo'],[1,'un','cebola'],[3,'dente','alho'],[150,'ml','vinho branco'],[1500,'ml','água'],[1,'un','caldo de legumes (tablete)'],[50,'g','manteiga'],[60,'g','parmesão ralado'],[15,'ml','azeite'],[8,'g','sal']],
+    ['Limpar e temperar o camarão','Picar cebola e alho'],
+    [['fogao',10,'Saltear o camarão e reservar'],['fogao',30,'Refogar cebola e alho, tostar o arroz, vinho e caldo quente aos poucos; finalizar com manteiga, parmesão e o camarão']]),
+  V('ceviche','Ceviche','jantar',6,
+    [[800,'g','filé de peixe branco fresco'],[6,'un','limão'],[1,'un','cebola roxa'],[1,'un','pimenta dedo-de-moça'],[1,'maço','coentro'],[8,'g','sal']],
+    [],
+    [['bancada',20,'Cortar o peixe em cubos, fatiar a cebola roxa fininha e picar pimenta e coentro'],['bancada',15,'Marinar no limão com sal por 15 min e servir gelado']],0,'Feito na hora; não vai para marmita.'),
+  V('poke','Poke','jantar',6,
+    [[600,'g','salmão fresco'],[400,'g','arroz japonês'],[2,'un','pepino'],[2,'un','manga'],[1,'un','abacate'],[100,'ml','shoyu'],[15,'g','gergelim'],[30,'ml','vinagre de arroz'],[20,'g','açúcar']],
+    [],
+    [['fogao',25,'Cozinhar o arroz e temperar com vinagre e açúcar'],['bancada',25,'Cortar salmão, pepino, manga e abacate e montar as tigelas']],0,'Feito na hora; não vai para marmita.'),
+  V('sushi_preguicoso','Sushi de preguiçoso','jantar',6,
+    [[1000,'g','arroz japonês'],[500,'g','salmão'],[1,'lata','atum'],[1,'un','cream cheese (pote)'],[1,'maço','couve'],[2,'un','pepino'],[1,'maço','cebolinha'],[1,'pacote','alga nori'],[50,'ml','shoyu'],[30,'ml','molho tarê'],[220,'ml','vinagre de maçã'],[75,'g','açúcar'],[15,'g','sal'],[20,'g','gergelim']],
+    ['Conferir se ainda tem alga, shoyu, tarê, vinagre e gergelim'],
+    [['bancada',25,'Lavar o arroz 3 vezes e deixar descansar 20 min'],
+     ['fogao',20,'Fogo alto até ferver e mais 15 min em fogo baixo; desligar e descansar 20 min na panela'],
+     ['bancada',10,'Molho do arroz (6 col. sopa de vinagre de maçã, 1 col. sopa de açúcar, 1 col. chá de sal): soltar os grãos e misturar'],
+     ['bancada',30,'Pepino: fatiar, 1 col. chá de sal por pepino na peneira por 20 min; espremer e misturar com o molho (4 col. de açúcar + 130 ml de vinagre aquecidos); 30 min na geladeira'],
+     ['fogao',10,'Grelhar metade do salmão'],
+     ['forno',15,'Couve no forno até ficar crocante'],
+     ['bancada',20,'Outra metade do salmão em cubinhos com cream cheese, cebolinha e gergelim; montar na forma com plástico: arroz, salmão ou atum, arroz; cortar com faca molhada; alga em quadrados']]),
+  // ---------- FRANGO ----------
+  V('file_frango','Filé de frango grelhado','proteina',700,
+    [[1000,'g','filé de peito de frango'],[3,'dente','alho'],[1,'un','limão'],[10,'g','sal'],[15,'ml','azeite'],[3,'g','orégano']],
+    ['Temperar os filés e deixar na geladeira'],
+    [['fogao',25,'Grelhar na frigideira bem quente, em levas']]),
+  V('frango_creme_brocolis','Frango com creme de brócolis e cebola crispy','proteina',1500,
+    [[1000,'g','peito de frango'],[300,'g','brócolis'],[200,'g','creme de leite'],[200,'g','requeijão'],[200,'ml','leite'],[1,'un','cebola'],[30,'g','farinha de trigo'],[2,'dente','alho'],[10,'g','sal'],[15,'ml','azeite']],
+    ['Cortar o frango em cubos e temperar','Separar os floretes de brócolis','Fatiar a cebola bem fininha'],
+    [['fogao',20,'Grelhar o frango'],['fogao',15,'Creme: cozinhar o brócolis no leite com alho, bater com requeijão e creme de leite e juntar ao frango'],['airfryer',15,'Cebola fininha passada na farinha, a 180 °C até ficar crocante']],0,
+    'Receita do vídeo do TikTok. Rendimento contando o creme.'),
+  V('frango_empanado','Frango empanado','proteina',800,
+    [[1000,'g','filé de peito de frango'],[3,'un','ovo'],[60,'g','farinha de trigo'],[150,'g','farinha panko'],[10,'g','sal'],[3,'dente','alho'],[5,'g','lemon pepper'],[15,'ml','azeite']],
+    ['Temperar e empanar (trigo → ovo → panko); pode congelar separado'],
+    [['airfryer',20,'Airfryer a 200 °C, borrifando azeite e virando na metade']],400),
+  V('hamburguer_frango','Hambúrguer de frango empanado','proteina',800,
+    [[1000,'g','peito de frango moído'],[1,'un','cebola'],[2,'dente','alho'],[1,'maço','cheiro-verde'],[8,'g','sal'],[2,'un','ovo'],[60,'g','farinha de trigo'],[120,'g','farinha panko']],
+    ['Misturar o frango com cebola, alho e cheiro-verde ralados; moldar, empanar e congelar separados'],
+    [['airfryer',20,'Airfryer a 200 °C, virando na metade']],400),
+  V('frango_assado','Frango assado (coxa e sobrecoxa)','proteina',800,
+    [[1500,'g','coxa e sobrecoxa'],[4,'dente','alho'],[1,'un','limão'],[12,'g','sal'],[5,'g','páprica doce'],[20,'ml','azeite']],
+    ['Temperar e deixar marinando de um dia para o outro'],
+    [['forno',60,'Assar a 200 °C coberto por 30 min e descoberto até dourar']],0,'Rendimento já descontando o osso.'),
+  V('parmegiana_frango','Filé de frango à parmegiana','jantar',6,
+    [[1000,'g','filé de peito de frango'],[3,'un','ovo'],[80,'g','farinha de trigo'],[150,'g','farinha panko'],[700,'g','molho de tomate'],[400,'g','muçarela'],[50,'g','parmesão ralado'],[10,'g','sal'],[3,'dente','alho']],
+    ['Temperar e empanar os filés; pode congelar empanado e no dia só colocar o molho'],
+    [['airfryer',40,'Assar os filés empanados a 200 °C, em levas'],['forno',20,'Cobrir com molho e muçarela e gratinar']],0,'Jantar das crianças com arroz branco.'),
+  V('fricasse','Fricassê de frango','jantar',6,
+    [[800,'g','peito de frango'],[400,'g','creme de leite'],[200,'g','requeijão'],[1,'lata','milho verde'],[200,'g','muçarela'],[150,'g','batata palha'],[1,'un','cebola'],[2,'dente','alho'],[8,'g','sal']],
+    [],
+    [['fogao',25,'Cozinhar o frango na pressão'],['bancada',10,'Desfiar'],['fogao',10,'Refogar com cebola e alho e juntar milho, creme de leite e requeijão'],['forno',20,'Cobrir com muçarela e gratinar; batata palha na hora de servir']]),
+  V('empadao_frango','Empadão de frango','jantar',6,
+    [[400,'g','farinha de trigo'],[200,'g','manteiga'],[2,'un','ovo'],[6,'g','sal'],[700,'g','peito de frango'],[1,'lata','milho verde'],[200,'g','requeijão'],[1,'un','cebola'],[2,'un','tomate'],[2,'dente','alho']],
+    ['Fazer a massa e deixar na geladeira (pode ser na véspera)'],
+    [['fogao',25,'Cozinhar o frango na pressão'],['bancada',10,'Desfiar'],['fogao',10,'Refogar o recheio com milho e requeijão'],['bancada',20,'Abrir a massa, rechear, cobrir e pincelar gema'],['forno',40,'Assar a 180 °C até dourar']]),
+  V('panqueca_frango_verde','Panqueca de frango verde','jantar',6,
+    [[600,'g','peito de frango'],[4,'un','ovo'],[3,'un','folha de couve-manteiga'],[600,'ml','leite integral'],[1,'colher (chá)','sal'],[270,'g','farinha de aveia'],[3,'colher (sopa)','creme de ricota'],[700,'g','molho de tomate'],[70,'g','parmesão ralado'],[10,'ml','azeite']],
+    ['Cozinhar e desfiar o frango (ou usar frango desfiado pronto)','Preparar o molho de tomate'],
+    [['bancada',10,'Misturar o creme de ricota com o frango desfiado'],
+     ['bancada',5,'Liquidificador: 4 ovos, couve sem talo, leite e sal; juntar a farinha de aveia (ou de arroz) e bater 2 min; acertar com leite ou farinha'],
+     ['fogao',25,'Frigideira antiaderente untada com azeite: fazer os discos'],
+     ['bancada',10,'Rechear, enrolar, arrumar no refratário e cobrir com molho e parmesão (ou muçarela)'],
+     ['forno',20,'Forno pré-aquecido a 180 °C por 15–20 min (ou congelar)']],0,'Receita da Patrícia Stênico.'),
+  // ---------- ACOMPANHAMENTOS ----------
+  V('arroz_7graos','Arroz 7 grãos','carbo',1300,
+    [[500,'g','arroz 7 grãos'],[1250,'ml','água'],[2,'dente','alho'],[15,'ml','azeite'],[8,'g','sal']],
+    ['Deixar de molho (opcional, acelera o cozimento)'],
+    [['fogao',40,'Refogar o alho, juntar o arroz e a água fervente com sal; cozinhar tampado em fogo baixo']]),
+  V('arroz_brocolis','Arroz com brócolis','carbo',1700,
+    [[500,'g','arroz branco'],[1000,'ml','água'],[300,'g','brócolis'],[3,'dente','alho'],[15,'ml','azeite'],[8,'g','sal']],
+    ['Picar o brócolis em floretes pequenos'],
+    [['fogao',25,'Cozinhar o arroz'],['fogao',8,'Refogar o brócolis com alho e misturar ao arroz']],0,'Para a versão integral, troque o arroz e aumente o tempo.'),
+  V('arroz_lentilha','Arroz com lentilha','carbo',1600,
+    [[400,'g','arroz branco'],[150,'g','lentilha'],[1,'un','cebola'],[2,'dente','alho'],[15,'ml','azeite'],[8,'g','sal'],[1100,'ml','água']],
+    ['Deixar a lentilha de molho por 2 h (opcional)'],
+    [['fogao',30,'Refogar cebola e alho, juntar arroz, lentilha e água fervente; cozinhar tampado']]),
+  V('batata_rustica','Batata rústica','carbo',800,
+    [[1000,'g','batata'],[20,'ml','azeite'],[3,'dente','alho'],[6,'g','sal'],[2,'g','alecrim'],[2,'g','páprica doce']],
+    ['Lavar bem e cortar em gomos com casca (guardar em água na geladeira)'],
+    [['airfryer',25,'Secar, temperar e assar a 200 °C, sacudindo na metade']],400),
+  V('pure_batata_doce','Purê de batata-doce','carbo',1000,
+    [[1100,'g','batata-doce'],[30,'g','manteiga'],[100,'ml','leite'],[5,'g','sal']],
+    ['Descascar e cortar (guardar em água na geladeira)'],
+    [['fogao',25,'Cozinhar até ficar macia'],['bancada',10,'Amassar com manteiga e leite']]),
+  V('farofa','Farofa','carbo',500,
+    [[250,'g','farinha de mandioca'],[50,'g','manteiga'],[1,'un','cebola'],[2,'dente','alho'],[4,'g','sal']],
+    ['Picar cebola e alho'],
+    [['fogao',12,'Dourar cebola e alho na manteiga e tostar a farinha']]),
+  V('farofa_banana','Farofa de banana','carbo',600,
+    [[3,'un','banana-prata'],[250,'g','farinha de mandioca'],[50,'g','manteiga'],[1,'un','cebola'],[4,'g','sal']],
+    [],
+    [['fogao',12,'Dourar a cebola e a banana em rodelas na manteiga e juntar a farinha']]),
+  V('creme_milho','Creme de milho','carbo',900,
+    [[2,'lata','milho verde'],[400,'ml','leite'],[200,'g','creme de leite'],[20,'g','manteiga'],[15,'g','amido de milho'],[1,'un','cebola'],[4,'g','sal']],
+    [],
+    [['bancada',5,'Bater metade do milho com o leite e o amido'],['fogao',15,'Refogar a cebola na manteiga, juntar tudo e cozinhar até engrossar; finalizar com creme de leite']]),
+  V('brocolis_gratinado','Brócolis gratinado','legume',1000,
+    [[800,'g','brócolis'],[200,'g','requeijão'],[100,'g','muçarela'],[30,'g','parmesão ralado'],[5,'g','sal']],
+    ['Lavar e separar em floretes'],
+    [['fogao',8,'Cozinhar no vapor'],['forno',15,'Cobrir com requeijão e queijos e gratinar']]),
+  V('brocolis_assado','Brócolis assado','legume',800,
+    [[1000,'g','brócolis'],[20,'ml','azeite'],[3,'dente','alho'],[5,'g','sal']],
+    ['Lavar e separar em floretes'],
+    [['forno',20,'Assar a 220 °C com azeite, alho e sal']]),
+  V('couve_refogada','Couve refogada','legume',350,
+    [[2,'maço','couve'],[3,'dente','alho'],[15,'ml','azeite'],[4,'g','sal']],
+    ['Lavar e fatiar a couve bem fininha'],
+    [['fogao',8,'Refogar rapidamente com alho']]),
+  V('abobora_alecrim','Abóbora assada com alecrim','legume',800,
+    [[1000,'g','abóbora cabotiá'],[20,'ml','azeite'],[5,'g','sal'],[2,'g','alecrim']],
+    ['Descascar e cortar em cubos'],
+    [['forno',35,'Assar a 200 °C até dourar']]),
+  V('vinagrete','Vinagrete','legume',800,
+    [[4,'un','tomate'],[1,'un','cebola'],[1,'un','pimentão verde'],[1,'maço','cheiro-verde'],[30,'ml','vinagre'],[30,'ml','azeite'],[4,'g','sal']],
+    [],
+    [['bancada',15,'Picar tudo em cubinhos e temperar']],0,'Não congela: vai em pote separado na geladeira.'),
+];}
+
+
+/* ============================================================
+   LANCHES (rende = unidades; lote = unidades por leva na airfryer)
+   ============================================================ */
+function receitasLanches(){ return [
+  V('bolinha_mandioca_carne','Bolinha de mandioca com carne moída','lanche',10,
+    [[1000,'g','mandioca descascada'],[1,'colher (chá)','sal'],[1,'colher (sopa)','manteiga'],[1,'maço','cheiro-verde'],[100,'g','parmesão ralado'],[400,'g','carne moída'],[1,'un','cebola'],[2,'dente','alho'],[2,'un','ovo'],[100,'g','farinha panko']],
+    ['Cozinhar e amassar a mandioca (pode ser na véspera)','Fazer a carne moída bem sequinha, como recheio de pastel'],
+    [['bancada',10,'Massa: mandioca amassada, sal, manteiga derretida, cheiro-verde e 50 g de parmesão'],
+     ['bancada',25,'100 g de massa + 30 g de carne por bolinho; fechar bem, passar no ovo e depois na panko com parmesão'],
+     ['airfryer',20,'180 °C por 20 min ou até dourar']],10,
+    'Congelado: do freezer direto para a airfryer, 30 min a 180 °C (virar na metade). Receita da Patrícia Stênico: https://www.instagram.com/reel/DcuJWMGuUOk/'),
+  V('bolinha_frango_batata','Bolinha de frango e batata com queijo','lanche',28,
+    [[1000,'g','batata'],[1300,'g','peito de frango'],[200,'g','muçarela'],[3,'un','ovo'],[200,'g','farinha panko'],[10,'g','sal'],[1,'un','cebola'],[2,'dente','alho']],
+    ['Cozinhar e desfiar o frango (pode ser na véspera)'],
+    [['fogao',25,'Cozinhar as batatas e amassar'],['bancada',30,'Misturar batata e frango, fazer as bolinhas com queijo no meio e empanar na panko'],['airfryer',20,'200 °C até dourar']],10,
+    '1 kg de batata amassada para 1 kg de frango desfiado.'),
+  V('bolinha_abobora_carne','Bolinha de abóbora com carne moída','lanche',20,
+    [[1000,'g','abóbora cabotiá'],[150,'g','polvilho doce'],[50,'g','parmesão ralado'],[5,'g','sal'],[300,'g','carne moída'],[1,'un','cebola'],[2,'dente','alho'],[2,'un','ovo'],[100,'g','farinha panko']],
+    ['Fazer a carne moída bem sequinha (pode ser na véspera)'],
+    [['fogao',20,'Cozinhar a abóbora no vapor e amassar bem seca'],['bancada',10,'Misturar com polvilho, parmesão e sal'],['bancada',25,'Modelar com a carne no meio e empanar'],['airfryer',20,'200 °C até dourar']],10),
+  V('coxinha_frango','Coxinha de frango','lanche',25,
+    [[500,'g','peito de frango'],[100,'g','requeijão'],[1,'un','cebola'],[2,'dente','alho'],[500,'ml','água'],[1,'un','caldo de galinha (tablete)'],[500,'g','farinha de trigo'],[30,'g','manteiga'],[2,'un','ovo'],[150,'g','farinha de rosca']],
+    ['Cozinhar, desfiar e temperar o frango com requeijão (pode ser na véspera)'],
+    [['fogao',15,'Massa: ferver água com caldo e manteiga, juntar a farinha e mexer até desgrudar'],['bancada',40,'Modelar, rechear, passar no ovo e na farinha de rosca'],['airfryer',20,'200 °C até dourar']],12,
+    'Dá para congelar crua e assar direto do freezer.'),
+  V('hamburguinho_pastel','Hamburguinho na massa de pastel','lanche',12,
+    [[600,'g','carne moída'],[1,'pacote','massa de pastel (rolo)'],[150,'g','muçarela'],[100,'g','requeijão'],[2,'un','cebola'],[1,'un','ovo'],[10,'g','gergelim'],[8,'g','sal']],
+    ['Caramelizar a cebola (pode ser na véspera)'],
+    [['fogao',20,'Modelar mini hambúrgueres e grelhar'],['bancada',25,'Envolver na massa de pastel com muçarela, requeijão e cebola caramelizada; pincelar gema e salpicar gergelim'],['forno',25,'Assar a 200 °C (ou congelar)']]),
+  V('torta_frango_tapioca','Torta de frango e tapioca','lanche',8,
+    [[4,'un','ovo'],[150,'g','tapioca (goma)'],[80,'g','requeijão'],[1,'colher (sopa)','fermento em pó'],[4,'g','sal'],[400,'g','peito de frango'],[1,'un','cebola'],[2,'dente','alho'],[30,'g','extrato de tomate'],[2,'g','orégano'],[1,'lata','milho verde'],[1,'un','cenoura'],[1,'maço','cebolinha'],[100,'g','muçarela']],
+    ['Cozinhar e desfiar o frango; temperar com cebola, alho, sal, orégano e extrato de tomate'],
+    [['bancada',10,'Misturar ovos, tapioca, requeijão, sal, pimenta e fermento; juntar frango, milho, cenoura ralada e cebolinha'],['forno',35,'Assar a 180 °C até dourar']],0,
+    'Rende 8 fatias. Vídeo: https://vt.tiktok.com/ZSq5WST27/'),
+  V('rap10_frango','Rap10 de frango desfiado','lanche',6,
+    [[1,'pacote','Rap10'],[400,'g','peito de frango'],[1,'un','cebola'],[2,'dente','alho'],[2,'un','tomate'],[100,'g','requeijão'],[1,'un','alface']],
+    ['Cozinhar e desfiar o frango'],
+    [['fogao',10,'Refogar o frango com cebola, alho e tomate'],['bancada',10,'Rechear com requeijão e salada e enrolar']],0,'Serve com salada.'),
+  V('rap10_carne','Rap10 de carne moída','lanche',6,
+    [[1,'pacote','Rap10'],[400,'g','carne moída'],[1,'un','cebola'],[2,'dente','alho'],[2,'un','tomate'],[100,'g','muçarela'],[1,'un','alface']],
+    [],
+    [['fogao',20,'Refogar a carne com cebola, alho e tomate'],['bancada',10,'Rechear com muçarela e salada e enrolar']]),
+  V('pao_frango','Pão artesano com frango desfiado','lanche',6,
+    [[6,'un','pão artesano'],[400,'g','peito de frango'],[100,'g','requeijão'],[1,'un','cebola'],[2,'dente','alho'],[1,'un','tomate'],[1,'un','alface']],
+    ['Cozinhar e desfiar o frango'],
+    [['fogao',10,'Refogar o frango com cebola e alho e misturar o requeijão'],['bancada',10,'Montar os sanduíches']]),
+  V('isca_peixe_lanche','Isca de peixe','lanche',30,
+    [[600,'g','filé de tilápia'],[6,'g','sal'],[1,'un','limão'],[2,'un','ovo'],[40,'g','farinha de trigo'],[80,'g','farinha panko'],[10,'ml','azeite']],
+    ['Cortar em tiras, temperar e empanar (trigo → ovo → panko); pode congelar'],
+    [['airfryer',18,'200 °C, borrifando azeite e virando na metade']],15),
+  V('maionese_verde','Maionese verde','lanche',6,
+    [[3,'un','ovo'],[170,'g','iogurte natural desnatado'],[1,'colher (sopa)','requeijão'],[3,'g','sal'],[3,'g','lemon pepper'],[1,'maço','cheiro-verde']],
+    [],
+    [['fogao',12,'Cozinhar os ovos'],['bancada',5,'Bater tudo no liquidificador']],0,'Rende 6 porções.'),
+];}
+
+/* ============================================================
+   CAFÉ DA MANHÃ e PETISCOS (rende = porções)
+   ============================================================ */
+function receitasCafe(){ return [
+  V('cafe_coado','Café coado','cafe',10,
+    [[60,'g','café em pó'],[1000,'ml','água']],[],
+    [['fogao',10,'Ferver a água e passar o café']],0,'Rende 10 xícaras.'),
+  V('iogurte_morango','Iogurte de morango','cafe',6,
+    [[1000,'g','iogurte natural'],[300,'g','morango'],[30,'g','mel']],
+    ['Lavar e cortar os morangos'],
+    [['bancada',5,'Bater tudo no liquidificador e guardar em garrafinhas']]),
+  V('suco_limao','Suco de limão','cafe',6,
+    [[4,'un','limão'],[1500,'ml','água'],[60,'g','açúcar']],[],
+    [['bancada',5,'Bater os limões com casca rapidamente com água e açúcar e coar']],0,'Bater pouco para não amargar.'),
+  V('cha_gelado','Chá gelado','cafe',8,
+    [[4,'un','sachê de chá'],[2000,'ml','água'],[1,'un','limão'],[40,'g','mel']],[],
+    [['fogao',10,'Fazer o chá, adoçar com mel e juntar o limão; deixar esfriar e levar à geladeira']]),
+  V('salada_frutas','Salada de frutas','cafe',8,
+    [[2,'un','maçã'],[1,'un','manga'],[1,'un','mamão'],[1,'un','abacaxi'],[3,'un','laranja']],[],
+    [['bancada',20,'Descascar e cortar as frutas; regar com o suco das laranjas']],0,'Maçã, manga, mamão, abacaxi e laranja.'),
+  V('uva','Uva','cafe',6,
+    [[500,'g','uva']],['Lavar, higienizar e separar em potinhos'],[]),
+  V('banana','Banana','cafe',6,
+    [[6,'un','banana-prata']],[],[]),
+  V('omelete','Omelete','cafe',4,
+    [[8,'un','ovo'],[100,'g','muçarela'],[150,'g','tomate-cereja'],[100,'g','presunto'],[3,'g','sal']],
+    ['Picar o recheio e guardar em pote'],
+    [['fogao',15,'Bater os ovos, juntar o recheio e cozinhar em fogo baixo, em levas']],0,'Recheio: muçarela, tomatinho, presunto etc.'),
+  V('tapioca','Tapioca','cafe',4,
+    [[400,'g','goma de tapioca'],[150,'g','muçarela'],[100,'g','presunto']],[],
+    [['fogao',15,'Espalhar a goma na frigideira, rechear e dobrar']]),
+  V('crepioca','Crepioca','cafe',4,
+    [[4,'un','ovo'],[60,'g','goma de tapioca'],[100,'g','muçarela'],[2,'g','sal']],[],
+    [['fogao',15,'Bater ovo com tapioca e sal e fazer na frigideira, rechear com queijo']]),
+  V('pao_ovo_cremoso','Pão com ovo mexido cremoso','cafe',4,
+    [[4,'un','pão francês'],[6,'un','ovo'],[20,'g','manteiga'],[50,'g','requeijão'],[2,'g','sal']],[],
+    [['fogao',8,'Mexer os ovos em fogo baixo com manteiga; finalizar com requeijão']]),
+  V('pao_cream_cheese','Pão com cream cheese e muçarela','cafe',4,
+    [[4,'un','pão francês'],[100,'g','cream cheese'],[120,'g','muçarela']],[],
+    [['airfryer',5,'Montar e aquecer até o queijo derreter']]),
+  V('cafe_pao_frango','Pão com frango desfiado','cafe',4,
+    [[4,'un','pão francês'],[250,'g','peito de frango'],[50,'g','requeijão'],[1,'un','cebola'],[1,'dente','alho']],
+    ['Cozinhar e desfiar o frango'],
+    [['fogao',10,'Refogar o frango com cebola e alho e misturar o requeijão'],['bancada',5,'Montar os pães']]),
+  V('pao_atum','Pão com atum','cafe',4,
+    [[4,'un','pão francês'],[1,'lata','atum'],[50,'g','requeijão'],[1,'un','tomate'],[1,'maço','cheiro-verde']],[],
+    [['bancada',10,'Misturar atum, requeijão, tomate e cheiro-verde e rechear os pães']]),
+  V('pudim_chia','Pudim de chia','cafe',4,
+    [[60,'g','chia'],[400,'ml','leite'],[30,'g','mel'],[150,'g','morango']],
+    ['Misturar chia, leite e mel em potinhos e deixar na geladeira de um dia para o outro'],
+    [['bancada',5,'Cobrir com morango picado']]),
+];}
+function receitasNovas7(){ return [
+  V('espetinho_carne','Espetinho de carne','proteina',700,
+    [[1000,'g','alcatra em cubos'],[1,'un','cebola'],[1,'un','pimentão vermelho'],[3,'dente','alho'],[10,'g','sal'],[15,'ml','azeite'],[20,'ml','molho inglês'],[1,'pacote','palitos de churrasco']],
+    ['Cortar a carne em cubos médios e temperar com alho, sal, azeite e molho inglês (marinar na geladeira)',
+     'Cortar cebola e pimentão em pedaços',
+     'Montar os espetinhos alternando carne, cebola e pimentão (palito de madeira: deixar de molho em água antes)'],
+    [['airfryer',15,'Airfryer a 200 °C, virando na metade (por leva)']],350,
+    'Também dá no forno a 220 °C por 20–25 min, virando na metade. Fica ótimo com farofa e vinagrete.'),
+];}
+function receitasNovas5(){ return [
+  V('torta_frango_dalbo','Torta de frango (Cozinha Dal Bó)','lanche',8,
+    [[800,'g','peito de frango com osso'],[2,'colher (sopa)','vinagre'],[2,'un','cebola'],[2,'un','caldo de galinha (tablete)'],[1,'dente','alho'],[1,'colher (sopa)','páprica doce'],[1,'lata','milho verde'],[200,'g','requeijão cremoso'],
+     [200,'g','manteiga sem sal'],[3,'un','ovo'],[2,'colher (sopa)','leite integral'],[3,'xícara','farinha de trigo'],[1,'g','sal']],
+    ['Massa: misturar a manteiga levemente amolecida, 2 gemas, o leite, a farinha e a pitada de sal até desgrudar das mãos; embrulhar em filme e guardar na geladeira',
+     'Cozinhar e desfiar o frango (pode ser feito na véspera)'],
+    [['fogao',30,'Cozinhar o peito na pressão com água, o vinagre e 1 tablete de caldo (cerca de 20 min após pegar pressão)'],
+     ['bancada',10,'Desfiar o frango'],
+     ['fogao',15,'Refogar cebola e alho, juntar páprica, o outro tablete, o frango e o milho; desligar e misturar o requeijão'],
+     ['bancada',15,'Forrar fundo e laterais da forma com 2/3 da massa, rechear, cobrir com o restante e pincelar com o ovo batido'],
+     ['forno',40,'Assar a 180 °C até dourar']],0,
+    'Rende 8 fatias. Receita: https://cozinhadalbo.com.br/2014/06/torta-de-frango/ — o modo de preparo aqui é um resumo; confira tempos e detalhes no site.'),
+];}
+function receitasPetiscos(){ return [
+  V('bruschetta','Bruschetta','petisco',6,
+    [[1,'un','pão italiano'],[3,'un','tomate'],[2,'dente','alho'],[30,'ml','azeite'],[1,'maço','manjericão'],[4,'g','sal']],[],
+    [['bancada',10,'Picar tomate e manjericão e temperar com azeite e sal'],['forno',10,'Fatiar o pão, esfregar alho, regar com azeite e tostar']]),
+  V('tomates_confitados','Tomates confitados','petisco',6,
+    [[500,'g','tomate-cereja'],[100,'ml','azeite'],[4,'dente','alho'],[2,'g','tomilho'],[4,'g','sal'],[10,'g','açúcar']],[],
+    [['forno',60,'Assar a 150 °C cobertos de azeite com alho e tomilho até murcharem']],0,'Guarde na geladeira em pote coberto de azeite. Combina com burrata e bruschetta.'),
+  V('burrata','Burrata com tomates','petisco',6,
+    [[2,'un','burrata'],[250,'g','tomate-cereja'],[1,'maço','manjericão'],[30,'ml','azeite'],[1,'un','pão italiano'],[2,'g','sal']],[],
+    [['bancada',10,'Montar a burrata no centro com tomates, manjericão, azeite e sal; servir com o pão']],0,'Fica ótima com os tomates confitados.'),
+];}
+
+/* ============================================================
+   GRUPOS: proteína principal e base (para agrupar as escolhas)
+   ============================================================ */
+const GRUPOS = [
+  ['carne','🥩 Carne',['Carne moída','Cubos e tiras','Desfiada e peças']],
+  ['frango','🍗 Frango',['Frango desfiado','Cubos e filés','Empanado','Assado']],
+  ['peixe','🐟 Peixe e frutos do mar',['Empanado','Grelhado e assado','Frutos do mar','Cru e frio']],
+  ['linguica','🌭 Linguiça e outros',['Linguiça e miúdos']],
+  ['carbo','',['Arroz','Batatas e raízes','Massas','Grãos e farofas']],
+  ['legume','',['Legumes']],
+  ['cafe','',['Bebidas','Frutas','Principal','Outros']],
+  ['petisco','',['Petiscos']],
+  ['outros','Outros',['Outros']],
+];
+const CLASSE = {};
+[['carne','Carne moída','carne_moida almondegas hamburguer_caseiro lasanha escondidinho panqueca_carne conchiglione macarrao_bolonhesa nhoque_bolonhesa berinjela_gratinada'],
+ ['carne','Cubos e tiras','iscas_patinho picadinho carne_molho_queijo iscas_alho strogonoff_carne yakisoba bife espetinho_carne'],
+ ['carne','Desfiada e peças','carne_louca carne_desfiada cupim_pressao carne_assada costela_assada'],
+ ['frango','Frango desfiado','frango_desfiado fricasse empadao_frango panqueca_frango_verde torta_frango_dalbo'],
+ ['frango','Cubos e filés','frango_cubos frango_af file_frango frango_creme_brocolis strogonoff'],
+ ['frango','Empanado','frango_empanado hamburguer_frango parmegiana_frango'],
+ ['frango','Assado','sobrecoxa_forno frango_assado frango_batatas'],
+ ['peixe','Empanado','tilapia_empanada isca_peixe'],
+ ['peixe','Grelhado e assado','tilapia_af tilapia_catupiry moqueca_tilapia'],
+ ['peixe','Frutos do mar','risoto_camarao'],
+ ['peixe','Cru e frio','ceviche poke sushi_preguicoso'],
+ ['linguica','Linguiça e miúdos','linguica_acebolada coracao_linguica feijoada_light arroz_linguica_coalho'],
+ ['carbo','Arroz','arroz_branco arroz_integral arroz_7graos arroz_brocolis arroz_lentilha'],
+ ['carbo','Batatas e raízes','batata_doce_forno batata_doce_af mandioca pure_batata pure_batata_doce batata_rustica'],
+ ['carbo','Massas','macarrao_integral'],
+ ['carbo','Grãos e farofas','feijao farofa farofa_banana creme_milho'],
+ ['carne','Carne moída','bolinha_mandioca_carne bolinha_abobora_carne hamburguinho_pastel rap10_carne'],
+ ['frango','Frango desfiado','bolinha_frango_batata coxinha_frango torta_frango_tapioca rap10_frango pao_frango'],
+ ['peixe','Empanado','isca_peixe_lanche'],
+ ['outros','Outros','maionese_verde'],
+ ['cafe','Bebidas','cafe_coado iogurte_morango suco_limao cha_gelado'],
+ ['cafe','Frutas','salada_frutas uva banana'],
+ ['cafe','Principal','omelete tapioca crepioca pao_ovo_cremoso pao_cream_cheese cafe_pao_frango pao_atum'],
+ ['cafe','Outros','pudim_chia'],
+ ['petisco','Petiscos','bruschetta tomates_confitados burrata'],
+].forEach(([g,b,ids])=>ids.split(' ').forEach(id=>CLASSE[id]=[g,b]));
+
+function classe(r){
+  const prot=['proteina','jantar','lanche'].includes(r.tipo);
+  if(prot && r.grupo) return [r.grupo, r.base||'Outros'];
+  if(!prot && r.base) return [r.tipo, r.base];
+  const cl=CLASSE[r.id];
+  if(cl && (['carbo','legume','cafe','petisco'].includes(cl[0]) !== prot)) return cl;
+  if(r.tipo==='cafe') return ['cafe','Outros'];
+  if(r.tipo==='petisco') return ['petisco','Petiscos'];
+  if(r.tipo==='carbo') return ['carbo', r.base||'Grãos e farofas'];
+  if(r.tipo==='legume') return ['legume','Legumes'];
+  // receitas novas: adivinha pela proteína dos ingredientes
+  const ing=r.ingredientes.map(i=>i.nome.toLowerCase()).join(' ');
+  const txt=(r.nome+' '+(r.etapas||[]).map(e=>e.txt).join(' ')).toLowerCase();
+  let g='outros';
+  if(/frango|sobrecoxa|coxa/.test(ing)) g='frango';
+  else if(/til[áa]pia|peixe|salm[ãa]o|camar|atum|bacalhau/.test(ing)) g='peixe';
+  else if(/carne|patinho|alcatra|ac[ée]m|lagarto|cupim|costela|maminha|contrafil|m[úu]sculo|cox[ãa]o/.test(ing)) g='carne';
+  else if(/lingui|cora[çc][ãa]o|porco|lombo/.test(ing)) g='linguica';
+  let b=r.base||'';
+  if(!b){
+    if(g==='carne') b=/mo[íi]d/.test(ing)?'Carne moída':/desfi|pressão/.test(txt)?'Desfiada e peças':'Cubos e tiras';
+    else if(g==='frango') b=/desfi/.test(txt)?'Frango desfiado':/empan|panko/.test(txt+ing)?'Empanado':/assa/.test(txt)?'Assado':'Cubos e filés';
+    else if(g==='peixe') b=/empan|panko/.test(txt+ing)?'Empanado':'Grelhado e assado';
+    else if(g==='linguica') b='Linguiça e miúdos';
+    else b='Outros';
+  }
+  return [g,b];
+}
+function rotuloGrupo(g,b){
+  const G=GRUPOS.find(x=>x[0]===g);
+  return G && G[1] ? G[1]+' · '+b : b;
+}
+/* ordena e agrupa: grupo → base → nome */
+function agrupar(lista){
+  const ordemG=g=>{ const i=GRUPOS.findIndex(x=>x[0]===g); return i<0?99:i; };
+  const ordemB=(g,b)=>{ const G=GRUPOS.find(x=>x[0]===g); const i=G?G[2].indexOf(b):-1; return i<0?99:i; };
+  const map=new Map();
+  lista.forEach(r=>{ const [g,b]=classe(r); const k=g+'|'+b; if(!map.has(k)) map.set(k,{g,b,itens:[]}); map.get(k).itens.push(r); });
+  return [...map.values()]
+    .sort((x,y)=>ordemG(x.g)-ordemG(y.g) || ordemB(x.g,x.b)-ordemB(y.g,y.b) || x.b.localeCompare(y.b))
+    .map(x=>({label:rotuloGrupo(x.g,x.b), g:x.g, b:x.b, itens:x.itens.sort((a,c)=>a.nome.localeCompare(c.nome))}));
+}
+function optsAgrupadas(lista, sel){
+  const misto=lista.some(r=>r.tipo==='jantar') && lista.some(r=>r.tipo==='proteina');
+  return agrupar(lista).map(gr=>`<optgroup label="${esc(gr.label)}">${gr.itens.map(r=>`<option value="${r.id}" ${r.id===sel?'selected':''}>${esc(r.nome)}${misto&&r.tipo==='jantar'?' (prato completo)':''}</option>`).join('')}</optgroup>`).join('');
+}
+
 function dadosPadrao(){
   return {
     versao:1,
+    receitasVersao:7, /* v8 aplicada em normalizar */
     pessoas:[
-      {id:'marido', nome:'Marido', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
-      {id:'filha',  nome:'Filha',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:0},
-      {id:'eu',     nome:'Eu',     emoji:'👩', qtd:5,  proteina:150, carbo:150, legume:0},
+      {id:'marido', nome:'Baia', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
+      {id:'filha',  nome:'Mel',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:100},
+      {id:'eu',     nome:'Vi',     emoji:'👩', qtd:5,  proteina:150, carbo:150, legume:100},
     ],
     receitas:receitasPadrao(),
     semana:{
@@ -319,16 +816,17 @@ function dadosPadrao(){
         eu:[{id:uid(), proteina:'frango_cubos', carbo:'arroz_integral', legume:'', qtd:5}],
       },
       jantar:{ativo:true, pessoas:6, junto:true, itens:[{rid:'lasanha', g:150}]},
-      checks:{}, compradas:{}, extras:[]
+      lanches:{ativo:true, itens:[]}, cafe:{ativo:true, itens:[]}, petiscos:{ativo:true, itens:[]},
+      checks:{}, compradas:{}, extras:[], naHora:{}
     },
-    config:{bocas:4, airfryer:1, forno:1, inicio:'08:00', margem:5, diaPre:'Quinta-feira', diaPrep:'Sexta-feira'}
+    config:{bocas:4, airfryer:1, forno:1, inicio:'08:00', margem:5, preparadoCA:true, diaPre:'Quinta-feira', diaPrep:'Sexta-feira'}
   };
 }
 
 /* ============================================================
    ESTADO
    ============================================================ */
-let D, page='semana', filtroTipo='todos', ED=null;
+let D, page='semana', filtroTipo='todos', ED=null, busca='';
 
 function uid(){ return Math.random().toString(36).slice(2,9); }
 function load(){
@@ -336,14 +834,144 @@ function load(){
     const s = JSON.parse(localStorage.getItem(KEY));
     D = (s && s.receitas && s.pessoas) ? s : dadosPadrao();
   }catch(e){ D = dadosPadrao(); }
+  if(normalizar()) salvarLocal();
+  try{ const pg = localStorage.getItem(KEY+'_page'); if(pg && PAGES.some(x=>x[0]===pg)) page = pg; }catch(e){}
+}
+function normalizar(){
   const p = dadosPadrao();
+  if(!Array.isArray(D.receitas)) D.receitas = p.receitas;
+  if(!Array.isArray(D.pessoas)) D.pessoas = p.pessoas;
   D.config = Object.assign(p.config, D.config||{});
   D.semana = Object.assign(p.semana, D.semana||{});
   D.semana.jantar = Object.assign(p.semana.jantar, D.semana.jantar||{});
-  try{ const pg = localStorage.getItem(KEY+'_page'); if(pg && PAGES.some(x=>x[0]===pg)) page = pg; }catch(e){}
+  EXTRAS.forEach(x=>{ D.semana[x.chave] = Object.assign(p.semana[x.chave], D.semana[x.chave]||{}); });
+  let mudou=false;
+  [['marido','Marido','Baia'],['filha','Filha','Mel'],['eu','Eu','Vi']].forEach(([id,de,para])=>{
+    const x=D.pessoas.find(q=>q.id===id); if(x && x.nome===de){ x.nome=para; mudou=true; }
+  });
+  // pedido da Vi: legumes também nas marmitas dela e da Mel (uma vez só)
+  if(!D.config.legumesViMel){
+    ['filha','eu'].forEach(id=>{ const x=D.pessoas.find(q=>q.id===id); if(x && !(x.legume>0)) x.legume=100; });
+    D.config.legumesViMel=1; mudou=true;
+  }
+  const migrou=migrarReceitas();
+  let conv=false; D.receitas.forEach(r=>{ if(preParaEtapas(r)) conv=true; });
+  if(migrarCebolaAlho()) conv=true;
+  return migrou || mudou || conv;
 }
-function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){ toast('Não consegui salvar no navegador'); }
+/* v2: receitas da página “Marmitas” do Notion. Só acrescenta o que falta e
+   só troca arroz branco / legumes assados se ainda estiverem como vieram. */
+function migrarReceitas(){
+  const v=D.receitasVersao||1;
+  if(v >= 7) return false;
+  receitasNovas7().forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
+  if(v === 6){ D.receitasVersao=7; return true; }
+  if(v === 5){
+    // a torta da Dal Bó passa a ser lanche (8 fatias)
+    const t=D.receitas.find(r=>r.id==='torta_frango_dalbo');
+    if(t && t.tipo==='jantar'){
+      t.tipo='lanche';
+      if(!/fatias/.test(t.obs||'')) t.obs='Rende 8 fatias. '+(t.obs||'');
+      for(const pid in D.semana.combos) D.semana.combos[pid].forEach(c=>{ if(c.proteina===t.id) c.proteina=''; });
+      D.semana.jantar.itens=D.semana.jantar.itens.filter(i=>i.rid!==t.id);
+    }
+    D.receitasVersao=7;
+    return true;
+  }
+  const novas=[...(v<3?receitasLanches():[]), ...(v<4?[...receitasCafe(), ...receitasPetiscos()]:[]), ...receitasNovas5()];
+  novas.forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
+  D.receitasVersao=7;
+  if(v >= 2) return true;
+  const base=receitasBase();
+  [['arroz_branco',ARROZ_BRANCO_VI],['legumes_assados',LEGUMES_FORNO_VI]].forEach(([id,nova])=>{
+    const i=D.receitas.findIndex(r=>r.id===id), orig=base.find(r=>r.id===id);
+    if(i>=0 && estavel(D.receitas[i])===estavel(orig)) D.receitas[i]=nova();
+  });
+  receitasVi().forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
+  return true;
+}
+function salvarLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){} }
+function save(){ salvarLocal(); agendarEnvio(); }
+
+/* ============================================================
+   SINCRONIZAÇÃO — quando aberto no Claude, os dados ficam na conta
+   e aparecem iguais no celular e no computador
+   ============================================================ */
+const DOCS = {
+  receitas: ()=>({lista:D.receitas, versao:D.receitasVersao||1}),
+  ajustes:  ()=>({pessoas:D.pessoas, config:D.config}),
+  semana:   ()=>({semana:D.semana})
+};
+let nuvem=null;
+const ultimo={}, timers={}, cadeia={}, semeado={};
+function estavel(o){
+  if(Array.isArray(o)) return '['+o.map(estavel).join(',')+']';
+  if(o && typeof o==='object') return '{'+Object.keys(o).filter(k=>o[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+estavel(o[k])).join(',')+'}';
+  return JSON.stringify(o===undefined?null:o);
+}
+function setSync(st){
+  const el=document.getElementById('syncInfo'); if(!el) return;
+  el.textContent = {conectando:'☁️ conectando…', ok:'☁️ sincronizado entre seus aparelhos', salvando:'☁️ salvando…',
+    local:'📱 salvo só neste aparelho', erro:'⚠️ não consegui sincronizar agora; suas mudanças continuam neste aparelho'}[st]||'';
+}
+function agendarEnvio(){
+  if(!nuvem) return;
+  for(const n in DOCS){
+    if(estavel(DOCS[n]())===ultimo[n]) continue;
+    clearTimeout(timers[n]);
+    timers[n]=setTimeout(()=>{ timers[n]=null; enviar(n); },700);
+  }
+}
+function enviar(n){
+  cadeia[n]=(cadeia[n]||Promise.resolve()).then(async()=>{
+    const corpo=DOCS[n](), j=estavel(corpo);
+    if(j===ultimo[n]) return;
+    setSync('salvando');
+    const gravar=()=>nuvem.doc('marmitas/'+n).set(JSON.parse(JSON.stringify(corpo)));
+    try{ await gravar(); }
+    catch(e){
+      if(e && e.code==='unavailable'){
+        await new Promise(r=>setTimeout(r,800+Math.random()*800));
+        try{ await gravar(); }catch(e2){ setSync('erro'); return; }
+      } else { setSync('erro'); if(e && e.code==='quota_exceeded') toast('Espaço de armazenamento cheio'); return; }
+    }
+    ultimo[n]=j; setSync('ok');
+  });
+}
+function aplicar(n,data){
+  if(n==='receitas' && Array.isArray(data.lista)){ D.receitas=data.lista; D.receitasVersao=data.versao||1; }
+  if(n==='ajustes'){ if(Array.isArray(data.pessoas)) D.pessoas=data.pessoas; if(data.config) D.config=data.config; }
+  if(n==='semana' && data.semana) D.semana=data.semana;
+  return normalizar();
+}
+async function conectar(){
+  if(!(window.claude && typeof window.claude.use==='function')) return;
+  setSync('conectando');
+  let db=null;
+  try{ db=await window.claude.use('db'); }catch(e){}
+  if(!db){ setSync('local'); return; }
+  nuvem=db;
+  for(const n in DOCS){
+    db.doc('marmitas/'+n).onSnapshot(snap=>{
+      if(snap.metadata.hasPendingWrites) return;
+      if(!snap.exists){
+        // primeira vez: leva para a conta o que já existe neste aparelho
+        if(semeado[n]) return;
+        if(!snap.metadata.fromCache){ semeado[n]=true; enviar(n); return; }
+        // resposta ainda do cache: confirma direto no servidor antes de enviar
+        db.doc('marmitas/'+n).get().then(s2=>{ if(!s2.exists && !semeado[n]){ semeado[n]=true; enviar(n); } }).catch(()=>{});
+        return;
+      }
+      const data=JSON.parse(JSON.stringify(snap.data()));
+      const j=estavel(data);
+      if(!snap.metadata.fromCache) setSync('ok');
+      if(j===ultimo[n] || timers[n]) return;
+      ultimo[n]=j;
+      if(j===estavel(DOCS[n]())) return;
+      if(aplicar(n,data)) save(); else salvarLocal();
+      render();
+    }, ()=>setSync('erro'));
+  }
 }
 function rec(id){ return D.receitas.find(r=>r.id===id); }
 function pessoa(id){ return D.pessoas.find(p=>p.id===id); }
@@ -399,12 +1027,15 @@ function dur(min){ min=Math.round(min); return min>=60 ? Math.floor(min/60)+'h'+
 function secaoDe(ing){
   if(ing.secao) return ing.secao;
   const n = ing.nome.toLowerCase();
-  if(/palha|molho|massa|macarr|arroz|feij|champignon|ketchup|mostarda/.test(n)) return 'Mercearia';
+  if(/palha|molho|massa|macarr|arroz|feij|champignon|ketchup|mostarda|atum|coco|pimenta-do-reino/.test(n)) return 'Mercearia';
   if(/frango|carne|patinho|sobrecoxa|coxa|til[áa]pia|peixe|salm[ãa]o|alcatra|m[úu]sculo|lombo|porco|lingui|fil[ée]|mo[íi]da|peito|cox[ãa]o|ac[ée]m|maminha|fraldinha|atum|camar/.test(n)) return 'Açougue e peixaria';
-  if(/queijo|mu[çcs]+arela|presunto|creme de leite|leite|manteiga|requeij|parmes|iogurte|\bovos?\b|ricota/.test(n)) return 'Frios, laticínios e ovos';
-  if(/cebola|alho|tomate|lim[ãa]o|batata|mandioca|aipim|br[óo]colis|abobrinha|cenoura|berinjela|vagem|chuchu|cheiro|salsinha|cebolinha|couve|espinafre|piment[ãa]o|ab[óo]bora|inhame|mandioquinha|beterraba|alface|repolho|quiabo|couve-flor|gengibre|coentro/.test(n)) return 'Hortifrúti';
+  if(/p[ãa]o (franc|italiano|artesano|de forma)|^p[ãa]o$|rap10/.test(n)) return 'Padaria';
+  if(/burrata|queijo|mu[çcs]+arela|presunto|creme de leite|leite|manteiga|requeij|parmes|iogurte|\bovos?\b|ricota|cream cheese|catupiry|maionese/.test(n)) return 'Frios, laticínios e ovos';
+  if(/cebola|alho|tomate|lim[ãa]o|batata|mandioca|aipim|br[óo]colis|abobrinha|cenoura|berinjela|vagem|chuchu|cheiro|salsinha|cebolinha|couve|espinafre|piment[ãa]o|ab[óo]bora|inhame|mandioquinha|beterraba|alface|repolho|quiabo|couve-flor|gengibre|coentro|pepino|manga|abacate|banana|pimenta dedo|morango|ma[çc][ãa]|mam[ãa]o|abacaxi|laranja|\buva|manjeric|tomilho/.test(n)) return 'Hortifrúti';
   return 'Mercearia';
 }
+function linkify(t){ return esc(t).replace(/https?:\/\/[^\s<]+/g,u=>`<a href="${u}" target="_blank" rel="noopener" style="color:var(--verde-c)">${u}</a>`); }
+function obsHtml(r){ return r.obs?`<div class="muted" style="margin:6px 0;line-height:1.5">📝 ${linkify(r.obs)}</div>`:''; }
 function ehAgua(nome){ return /^água\b/i.test(nome.trim()); }
 
 /* ============================================================
@@ -420,9 +1051,15 @@ function calcular(){
       total += c.qtd;
       const partes=[];
       COMP.forEach(k=>{
-        if(p[k]>0 && c[k] && rec(c[k])){
-          add(mar,c[k],p[k]*c.qtd,{nome:p.nome,n:c.qtd,g:p[k]});
-          partes.push({k,r:rec(c[k]),g:p[k]});
+        const r=c[k] && rec(c[k]);
+        if(!(p[k]>0) || !r) return;
+        if(POR_UNIDADE(r.tipo)){ // prato completo, lanche etc.: 1 por marmita
+          const un=UNID(r);
+          add(mar,r.id,c.qtd,un==='porções'?{nome:p.nome,n:c.qtd,porcoes:true}:{nome:p.nome,n:c.qtd,un});
+          partes.push({k:r.tipo,r,porcao:true,un});
+        } else {
+          add(mar,r.id,p[k]*c.qtd,{nome:p.nome,n:c.qtd,g:p[k]});
+          partes.push({k,r,g:p[k]});
         }
       });
       montagem.push({p,c,partes});
@@ -431,27 +1068,90 @@ function calcular(){
   const J=D.semana.jantar;
   if(J.ativo) J.itens.forEach(it=>{
     const r=rec(it.rid); if(!r) return;
-    if(r.tipo==='jantar') add(jan,r.id,J.pessoas,{nome:'Jantar',n:J.pessoas,porcoes:true});
+    if(POR_UNIDADE(r.tipo)) add(jan,r.id,J.pessoas,UNID(r)==='porções'?{nome:'Jantar',n:J.pessoas,porcoes:true}:{nome:'Jantar',n:J.pessoas,un:UNID(r)});
     else add(jan,r.id,(it.g||150)*J.pessoas,{nome:'Jantar',n:J.pessoas,g:it.g||150});
   });
-  return {mar,jan,montagem,total};
+  const lan={};
+  EXTRAS.forEach(x=>{
+    const L=D.semana[x.chave];
+    if(L && L.ativo) L.itens.forEach(it=>{ const r=rec(it.rid); if(!r||!(it.qtd>0)) return; add(lan,r.id,it.qtd,{nome:x.plural,n:it.qtd,un:UNID(r)}); });
+  });
+  return {mar,jan,lan,montagem,total};
 }
 function fator(r,qtd){
   if(!(r.rende>0)) return 0;
-  return r.tipo==='jantar' ? qtd/r.rende : qtd*(1+(D.config.margem||0)/100)/r.rende;
+  return POR_UNIDADE(r.tipo) ? qtd/r.rende : qtd*(1+(D.config.margem||0)/100)/r.rende;
 }
 function escala(r,qtd){ const f=fator(r,qtd); return r.ingredientes.map(i=>Object.assign({},i,{qtd:i.qtd*f})); }
-function juntar(a,b){
+function tudo(c){ return juntar(c.mar,c.jan,c.lan); }
+function juntar(...ms){
   const o={};
-  [a,b].forEach(m=>{ for(const k in m){ o[k]=o[k]||{qtd:0,quem:[]}; o[k].qtd+=m[k].qtd; o[k].quem.push(...m[k].quem); } });
+  ms.forEach(m=>{ for(const k in m){ o[k]=o[k]||{qtd:0,quem:[]}; o[k].qtd+=m[k].qtd; o[k].quem.push(...m[k].quem); } });
   return o;
 }
 function quantoTxt(r,n){
   if(r.tipo==='jantar') return num(n.qtd)+' porç'+(n.qtd>1?'ões':'ão');
+  if(EXTRA(r.tipo)) return num(n.qtd)+' '+EXTRA(r.tipo).un;
   return fmtG(n.qtd)+' pronto';
 }
 
 /* Agenda as etapas nos equipamentos (fogão com N bocas, airfryer, forno, bancada) */
+const naVespera = e => e.dia==='vespera';
+/* o antigo “pré-preparo” vira etapas da receita marcadas na véspera */
+/* PREPARADO DE CEBOLA E ALHO (processador, na véspera)
+   receitas em que a cebola ou o alho NÃO vão para o processador (fatiados, inteiros) */
+const FORA_DO_PREPARADO = {
+  iscas_patinho:['cebola'], abobrinha:['cebola'], frango_batatas:['cebola'], hamburguer_caseiro:['cebola'],
+  carne_louca:['cebola'], linguica_acebolada:['cebola'], frango_creme_brocolis:['cebola'], espetinho_carne:['cebola'],
+  hamburguinho_pastel:['cebola'], bruschetta:['alho'], tomates_confitados:['alho'],
+};
+function preparadoCA(need){
+  let ceb=0, alho=0; const usos=[];
+  for(const id in need){
+    const r=rec(id), fora=FORA_DO_PREPARADO[id]||[];
+    let usa=false;
+    escala(r,need[id].qtd).forEach(i=>{
+      const n=i.nome.trim().toLowerCase();
+      if(n==='cebola' && i.un==='un' && !fora.includes('cebola')){ ceb+=i.qtd; usa=true; }
+      if(n==='alho' && i.un==='dente' && !fora.includes('alho')){ alho+=i.qtd; usa=true; }
+    });
+    if(usa) usos.push(r.nome);
+  }
+  return {ceb:Math.ceil(ceb-0.001), alho:Math.ceil(alho-0.001), usos};
+}
+/* v8: tira das receitas padrão as etapas de picar cebola e alho (vão para o preparado) */
+function migrarCebolaAlho(){
+  if((D.receitasVersao||1) >= 8) return false;
+  const TROCA = {
+    'Picar cebola, alho e tomate e guardar em pote fechado':'Picar o tomate e guardar em pote fechado',
+    'Picar cebola, alho e tomate':'Picar o tomate',
+    'Picar cebola e alho':null, 'Picar a cebola e o alho':null, 'Picar bem o alho':null,
+    'Picar os pimentões, a cebola e o tomate':'Picar os pimentões e o tomate',
+    'Picar cebola, alho e cheiro-verde, misturar com a carne, ovo e farinha e modelar as almôndegas (guardar na geladeira)':
+      'Picar o cheiro-verde, misturar com a carne, o preparado de cebola e alho, ovo e farinha e modelar as almôndegas (guardar na geladeira)',
+  };
+  const ids=new Set(receitasPadrao().map(r=>r.id));
+  D.receitas.forEach(r=>{
+    if(!ids.has(r.id)) return;
+    r.etapas=(r.etapas||[]).flatMap(e=>{
+      if(!(e.txt in TROCA)) return [e];
+      return TROCA[e.txt]===null ? [] : [Object.assign({},e,{txt:TROCA[e.txt]})];
+    });
+  });
+  D.receitasVersao=8;
+  return true;
+}
+function preParaEtapas(r){
+  if(!(r.pre && r.pre.length)) return false;
+  r.etapas=[...r.pre.map(t=>({eq:'bancada',min:10,txt:t,dia:'vespera'})), ...(r.etapas||[])];
+  r.pre=[];
+  return true;
+}
+function levas(r,qtd,e){
+  if(e.eq!=='airfryer' || !(r.lote>0) || r.tipo==='jantar') return 1;
+  const q = EXTRA(r.tipo) ? qtd : qtd*(1+(D.config.margem||0)/100);
+  return Math.max(1,Math.ceil(q/r.lote));
+}
 function agendar(need, comMontagem, nMarmitas){
   const C=D.config;
   const unidades={
@@ -466,12 +1166,12 @@ function agendar(need, comMontagem, nMarmitas){
   const avisos=[];
   const cadeias=Object.keys(need).map(rid=>{
     const r=rec(rid), n=need[rid];
-    const gProntos = r.tipo==='jantar' ? 0 : n.qtd*(1+(C.margem||0)/100);
+    const gProntos = r.tipo==='jantar' ? 0 : EXTRA(r.tipo) ? n.qtd : n.qtd*(1+(C.margem||0)/100);
     const passos=(r.etapas||[]).map((e,i)=>{
       let lotes=1;
       if(e.eq==='airfryer' && r.lote>0 && gProntos>0) lotes=Math.max(1,Math.ceil(gProntos/r.lote));
-      return {r,i,eq:e.eq,txt:e.txt,lotes,dur:(+e.min||0)*lotes};
-    }).filter(s=>s.dur>0);
+      return {r,i,eq:e.eq,txt:e.txt,lotes,dur:(+e.min||0)*lotes,vesp:naVespera(e)};
+    }).filter(s=>s.dur>0 && !s.vesp);
     return {r,passos,total:passos.reduce((a,s)=>a+s.dur,0)};
   }).sort((a,b)=>b.total-a.total);
 
@@ -492,7 +1192,7 @@ function agendar(need, comMontagem, nMarmitas){
   let fim=out.reduce((a,s)=>Math.max(a,s.end),0);
   if(comMontagem && nMarmitas>0){
     const d=Math.max(15,Math.ceil(nMarmitas*1.5));
-    const fimMarm=out.filter(s=>s.r.tipo!=='jantar').reduce((a,s)=>Math.max(a,s.end),0);
+    const fimMarm=out.filter(s=>!POR_UNIDADE(s.r.tipo)).reduce((a,s)=>Math.max(a,s.end),0);
     const ini=encaixe(ocup.bancada[0],fimMarm,d);
     out.push({montagem:true,eq:'bancada',lane:'Bancada',start:ini,end:ini+d,dur:d,key:'montagem',
       txt:`Deixar amornar (no máx. 2 h fora da geladeira), porcionar ${nMarmitas} marmitas na balança, tampar, etiquetar e levar para geladeira/freezer`});
@@ -511,15 +1211,31 @@ function render(){
   document.getElementById('tabs').innerHTML = PAGES.map(([id,nm])=>`<button class="tab ${page===id?'active':''}" onclick="go('${id}')">${nm}</button>`).join('');
   const c=calcular();
   const J=D.semana.jantar;
-  document.getElementById('hdrSum').textContent = `${c.total} marmitas` + (J.ativo?` · jantar para ${J.pessoas}`:'');
+  const nLan=Object.keys(c.lan).filter(id=>rec(id).tipo==='lanche').reduce((a,id)=>a+c.lan[id].qtd,0);
+  document.getElementById('hdrSum').textContent = `${c.total} marmitas` + (J.ativo?` · jantar para ${J.pessoas}`:'') + (nLan?` · ${nLan} lanches`:'');
   const el=document.getElementById('page');
   const fn={semana:pgSemana,compras:pgCompras,vespera:pgVespera,preparo:pgPreparo,receitas:pgReceitas,ajustes:pgAjustes}[page];
   el.innerHTML=fn(c);
 }
 
+/* qualquer receita pode ir em qualquer lugar: primeiro as do próprio tipo,
+   depois “outras receitas”, separadas por tipo */
+const ORDEM_TIPOS=['proteina','jantar','carbo','legume','lanche','cafe','petisco'];
+function opcoesTodas(principais, sel, vazio){
+  let h=`<option value="">${vazio||'— escolher —'}</option>`+optsAgrupadas(D.receitas.filter(r=>principais.includes(r.tipo)), sel);
+  const resto=D.receitas.filter(r=>!principais.includes(r.tipo));
+  const prox = principais.includes('legume') ? ['carbo'] : principais.includes('carbo') ? ['legume'] : [];
+  [...prox, ...ORDEM_TIPOS.filter(t=>!prox.includes(t))].filter(t=>!principais.includes(t)).forEach(t=>{
+    agrupar(resto.filter(r=>r.tipo===t)).forEach(gr=>{
+      const nomeT=t==='jantar'?'Prato completo':NOME_TIPO(t);
+      h+=`<optgroup label="Outras · ${esc(nomeT)} · ${esc(gr.label.replace(/^[^\p{L}]+/u,''))}">${gr.itens.map(r=>`<option value="${r.id}" ${r.id===sel?'selected':''}>${esc(r.nome)}</option>`).join('')}</optgroup>`;
+    });
+  });
+  return h;
+}
 function opcoesReceita(tipo, sel, vazio){
-  const lista=D.receitas.filter(r=>r.tipo===tipo).sort((a,b)=>a.nome.localeCompare(b.nome));
-  return `<option value="">${vazio||'— escolher —'}</option>`+lista.map(r=>`<option value="${r.id}" ${r.id===sel?'selected':''}>${esc(r.nome)}</option>`).join('');
+  // na proteína entram também os pratos completos, no grupo da mesma base
+  return opcoesTodas(tipo==='proteina'?['proteina','jantar']:[tipo], sel, vazio);
 }
 
 /* ============================================================
@@ -551,6 +1267,9 @@ function pgSemana(c){
       COMP.filter(k=>p[k]>0).forEach(k=>{
         h+=`<div class="sel-row"><span class="dot ${k}"></span><span class="k">${TIPOS[k]}</span>
           <select class="inp" onchange="setCombo('${p.id}','${cb.id}','${k}',this.value)">${opcoesReceita(k,cb[k])}</select></div>`;
+        const rk=cb[k]&&rec(cb[k]);
+        if(rk && POR_UNIDADE(rk.tipo)) h+=`<div class="muted" style="margin:4px 0 0 70px">${UNID(rk)==='un'?'1 unidade':'1 porção'} por marmita (a receita rende ${rk.rende} ${UNID(rk)}).</div>`;
+        else if(rk && rk.tipo!==k) h+=`<div class="muted" style="margin:4px 0 0 70px">${p[k]} g por marmita.</div>`;
       });
       h+=`</div>`;
     });
@@ -574,11 +1293,11 @@ function pgSemana(c){
       </div>`;
     J.itens.forEach((it,i)=>{
       const r=rec(it.rid);
-      const porGramas = r && r.tipo!=='jantar';
+      const porGramas = r && !POR_UNIDADE(r.tipo);
       h+=`<div class="combo"><div class="row">
         <select class="inp" onchange="setJItem(${i},'rid',this.value)">
           <option value="">— escolher prato —</option>
-          ${['jantar','proteina','carbo','legume'].map(t=>`<optgroup label="${TIPOS[t]}">${D.receitas.filter(x=>x.tipo===t).sort((a,b)=>a.nome.localeCompare(b.nome)).map(x=>`<option value="${x.id}" ${x.id===it.rid?'selected':''}>${esc(x.nome)}</option>`).join('')}</optgroup>`).join('')}
+          ${opcoesTodas(['jantar','proteina'], it.rid, '— escolher prato —').replace(/^<option value="">[^<]*<\/option>/,'')}
         </select>
         <button class="x" onclick="rmJItem(${i})">×</button></div>
         ${porGramas?`<div class="row" style="margin-top:8px"><span class="muted">Porção por pessoa</span><input class="inp sm" type="number" inputmode="numeric" value="${it.g||150}" onchange="setJItem(${i},'g',+this.value)"><span class="muted">g</span></div>`:''}
@@ -588,17 +1307,42 @@ function pgSemana(c){
   }
   h+=`</div>`;
 
+  // LANCHES, CAFÉ DA MANHÃ, PETISCOS
+  EXTRAS.forEach(x=>{
+    const L=D.semana[x.chave];
+    h+=`<div class="card" style="background:${x.fundo}">
+      <div class="card-h"><div class="avatar">${x.emoji}</div>
+        <div><div class="card-t">${x.titulo}</div><div class="card-s">escolha quant${x.un==='un'?'as unidades':'as porções'} fazer de cada</div></div>
+        <label class="switch ml-auto"><input type="checkbox" ${L.ativo?'checked':''} onchange="setX('${x.chave}','ativo',this.checked)">incluir</label>
+      </div>`;
+    if(L.ativo){
+      L.itens.forEach((it,i)=>{
+        const r=rec(it.rid);
+        h+=`<div class="combo"><div class="row">
+          <select class="inp" onchange="setXItem('${x.chave}',${i},'rid',this.value)">${opcoesTodas([x.tipo], it.rid)}</select>
+          <button class="x" onclick="rmXItem('${x.chave}',${i})">×</button></div>
+          ${r?`<div class="row" style="margin-top:8px"><span class="muted">Quantidade</span><input class="inp sm" type="number" inputmode="numeric" value="${it.qtd||''}" onchange="setXItem('${x.chave}',${i},'qtd',+this.value)"><span class="muted">${UNID(r)==='g'?'g prontos':UNID(r)} · a receita rende ${UNID(r)==='g'?fmtG(r.rende):r.rende}</span></div>`:''}
+        </div>`;
+      });
+      h+=`<button class="btn ghost sm" onclick="addXItem('${x.chave}')">${x.add}</button>`;
+    }
+    h+=`</div>`;
+  });
+
   // RESUMO
-  const need=juntar(c.mar,c.jan);
+  const need=tudo(c);
   const ids=Object.keys(need);
   if(ids.length){
-    h+=`<div class="card white"><div class="card-t" style="margin-bottom:8px">Quanto preparar</div>`;
-    ['proteina','carbo','legume','jantar'].forEach(t=>{
-      ids.filter(id=>rec(id).tipo===t).forEach(id=>{
-        const r=rec(id), n=need[id];
-        h+=`<div class="row" style="padding:6px 0;border-bottom:1px solid var(--creme-e)"><span class="dot ${t}"></span>
-          <span style="flex:1;font-size:14px">${esc(r.nome)}<div class="muted">${n.quem.map(q=>q.porcoes?`${q.nome}: ${q.n} porções`:`${esc(q.nome)}: ${q.n}×${q.g}g`).join(' · ')}</div></span>
-          <b style="color:var(--verde);white-space:nowrap">${quantoTxt(r,n)}</b></div>`;
+    h+=`<div class="card white"><div class="card-t" style="margin-bottom:2px">Quanto preparar</div>
+      <div class="muted" style="margin-bottom:6px">Toque em <b>📅 no dia das marmitas</b> para trocar para <b>⏱ fazer na hora</b>: a receita sai do cronograma e fica numa lista à parte, mas continua nas compras.</div>`;
+    agrupar(ids.map(rec)).forEach(gr=>{
+      const comum = gr.itens.length>1 && !['carbo','legume','outros','cafe','petisco'].includes(gr.g);
+      h+=`<div class="grp-h">${esc(gr.label)}${comum?' · <span style="color:var(--verde-c)">base em comum</span>':''}</div>`;
+      gr.itens.forEach(r=>{
+        const n=need[r.id];
+        h+=`<div class="row" style="padding:6px 0;border-bottom:1px solid var(--creme-e)"><span class="dot ${r.tipo}"></span>
+          <span style="flex:1;font-size:14px">${esc(r.nome)}<div class="muted">${n.quem.map(q=>q.porcoes?`${esc(q.nome)}: ${q.n} porç${q.n>1?'ões':'ão'}`:q.un?`${q.nome}: ${q.n} ${q.un}`:`${esc(q.nome)}: ${q.n}×${q.g}g`).join(' · ')}</div></span>
+          <span style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><b style="color:var(--verde);white-space:nowrap">${quantoTxt(r,n)}</b>${horaBtn(r.id)}</span></div>`;
       });
     });
     h+=`<div class="muted" style="margin-top:8px">Quantidades de ingredientes incluem ${D.config.margem}% de margem (ajustável em Ajustes).</div>
@@ -621,6 +1365,13 @@ function rmCombo(pid,cid){
   const [rm]=cs.splice(i,1); cs[Math.max(0,i-1)].qtd+= (+rm.qtd||0);
   save(); render();
 }
+const naHora = id => !!(D.semana.naHora||{})[id];
+function togNaHora(id){ D.semana.naHora=D.semana.naHora||{}; if(D.semana.naHora[id]) delete D.semana.naHora[id]; else D.semana.naHora[id]=1; save(); render(); }
+function horaBtn(id){ const on=naHora(id); return `<button class="hora-btn ${on?'on':''}" onclick="event.stopPropagation();togNaHora('${id}')" title="Trocar entre preparar no dia das marmitas e fazer na hora">${on?'⏱ fazer na hora':'📅 no dia das marmitas'}</button>`; }
+function setX(ch,k,v){ D.semana[ch][k]=v; save(); render(); }
+function setXItem(ch,i,k,v){ const it=D.semana[ch].itens[i]; it[k]=v; if(k==='rid'){ const r=rec(v); if(r) it.qtd=r.rende; } save(); render(); }
+function addXItem(ch){ D.semana[ch].itens.push({rid:'',qtd:0}); save(); render(); }
+function rmXItem(ch,i){ D.semana[ch].itens.splice(i,1); save(); render(); }
 function setJ(k,v){ D.semana.jantar[k]=v; save(); render(); }
 function setJItem(i,k,v){ D.semana.jantar.itens[i][k]=v; save(); render(); }
 function addJItem(){ D.semana.jantar.itens.push({rid:'',g:150}); save(); render(); }
@@ -636,7 +1387,7 @@ function novaSemana(){
    PÁGINA: COMPRAS
    ============================================================ */
 function listaCompras(c){
-  const need=juntar(c.mar,c.jan), itens={};
+  const need=tudo(c), itens={};
   Object.keys(need).forEach(rid=>{
     const r=rec(rid);
     escala(r,need[rid].qtd).forEach(i=>{
@@ -710,35 +1461,43 @@ function chkHtml(key,conteudo){
 function togChk(k){ const c=D.semana.checks; if(c[k]) delete c[k]; else c[k]=1; save(); render(); }
 
 function pgVespera(c){
-  const need=juntar(c.mar,c.jan);
+  const need=tudo(c);
   const ids=Object.keys(need);
-  const J=D.semana.jantar;
-  let h=`<div class="sec-t">${esc(D.config.diaPre)} · pré-preparo</div>
-    <div class="sec-s">Tudo o que dá para adiantar no dia anterior, para o dia do preparo render.</div>`;
+  let h=`<div class="sec-t">${esc(D.config.diaPre)} · véspera</div>`;
   if(!ids.length) return h+`<div class="empty">Escolha receitas na aba Semana.</div>`;
 
-  const temCongelado = ids.some(id=>{ const t=rec(id).tipo; return t==='proteina' || t==='jantar'; });
-  const potes = c.total;
-  h+=`<div class="card white"><div class="card-t" style="margin-bottom:4px">Geral</div>
-    ${chkHtml('pre|potes',`Separar e higienizar <span class="q">${potes} potes</span> de marmita${J.ativo&&!J.junto?'':''}`)}
-    ${temCongelado?chkHtml('pre|desc','Passar as proteínas congeladas do freezer para a geladeira'):''}
-    ${chkHtml('pre|etiq','Preparar etiquetas (nome + data de preparo)')}
-    ${chkHtml('pre|bal','Conferir balança de cozinha, assadeiras e cesto da airfryer limpos')}
-  </div>`;
-
-  const ordem=['proteina','carbo','legume','jantar'];
-  const sem=[];
+  // só as etapas marcadas “na véspera”
+  const ordem=['proteina','jantar','carbo','legume','lanche','cafe','petisco'];
+  const cards=[]; let total=0, nTarefas=0;
   ordem.forEach(t=>ids.filter(id=>rec(id).tipo===t).forEach(id=>{
     const r=rec(id), n=need[id];
-    if(!(r.pre||[]).length){ sem.push(r.nome); return; }
+    const vesp=(r.etapas||[]).map((e,i)=>({e,i})).filter(x=>naVespera(x.e));
+    if(!vesp.length) return;
+    const linhas=vesp.map(({e,i})=>{
+      const lv=levas(r,n.qtd,e), tm=(+e.min||0)*lv;
+      total+=tm; nTarefas++;
+      return chkHtml('vesp|'+r.id+'|'+i,`${esc(e.txt)}<div class="sub">${EQUIP[e.eq]?EQUIP[e.eq].icon:''} ${dur(tm)}${lv>1?` · ${lv} levas`:''}</div>`);
+    }).join('');
     const ings=escala(r,n.qtd).filter(i=>!ehAgua(i.nome));
-    h+=`<div class="card white">
-      <div class="card-h" style="margin-bottom:4px"><span class="dot ${r.tipo}"></span><div class="card-t">${esc(r.nome)}</div><span class="muted ml-auto">${quantoTxt(r,n)}</span></div>
-      <div class="ing-list">${ings.map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div>
-      ${r.pre.map((p,i)=>chkHtml('pre|'+r.id+'|'+i,esc(p))).join('')}
-    </div>`;
+    cards.push(`<div class="card white">
+      <div class="card-h" style="margin-bottom:2px"><span class="dot ${r.tipo}"></span><div class="card-t" style="font-size:19px">${esc(r.nome)}</div><span class="muted ml-auto">${quantoTxt(r,n)}</span></div>
+      ${naHora(r.id)?`<div class="muted">⏱ receita feita na hora</div>`:''}
+      ${linhas}
+      <details style="margin-top:6px"><summary class="muted" style="cursor:pointer">ver ingredientes</summary><div class="ing-list">${ings.map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div>${obsHtml(r)}</details>
+    </div>`);
   }));
-  if(sem.length) h+=`<div class="muted" style="padding:0 4px">Sem pré-preparo: ${sem.map(esc).join(', ')}.</div>`;
+
+  const temCongelado = ids.some(id=>['proteina','jantar','lanche'].includes(rec(id).tipo));
+  h+=`<div class="sec-s">${nTarefas?`${nTarefas} tarefa${nTarefas>1?'s':''} · cerca de ${dur(total)}`:'Nada marcado para a véspera.'}</div>
+    <div class="card white">
+      ${(()=>{ if(!D.config.preparadoCA) return ''; const pc=preparadoCA(need); if(!pc.ceb && !pc.alho) return '';
+        return chkHtml('pre|cebola-alho',`Preparado de cebola e alho no processador: ${pc.ceb?`<span class="q">${pc.ceb} cebola${pc.ceb>1?'s':''}</span>`:''}${pc.ceb&&pc.alho?' + ':''}${pc.alho?`<span class="q">${pc.alho} dente${pc.alho>1?'s':''} de alho</span> (~${Math.ceil(pc.alho/10)} cabeça${Math.ceil(pc.alho/10)>1?'s':''})`:''}
+          <div class="sub">guardar em pote fechado na geladeira · para ${pc.usos.map(esc).join(', ')}</div>`); })()}
+      ${chkHtml('pre|potes',`Separar e higienizar <span class="q">${c.total} potes</span>`)}
+      ${temCongelado?chkHtml('pre|desc','Passar as proteínas congeladas do freezer para a geladeira'):''}
+    </div>`;
+  if(!cards.length) h+=`<div class="empty">Para adiantar algo, abra a receita em <b>Receitas</b> e, em <b>Etapas do preparo</b>, toque em <b>🌙 na véspera</b>.</div>`;
+  h+=cards.join('');
   return h;
 }
 
@@ -780,23 +1539,42 @@ function timelineHtml(ag,pref){
 function pgPreparo(c){
   const J=D.semana.jantar;
   const juntos=J.ativo && J.junto;
-  const needDia = juntos ? juntar(c.mar,c.jan) : c.mar;
+  const needTodo = juntos ? tudo(c) : juntar(c.mar,c.lan);
+  const needDia={}, needHora={};
+  for(const id in needTodo) (naHora(id)?needHora:needDia)[id]=needTodo[id];
   const ag=agendar(needDia,true,c.total);
   let h=`<div class="sec-t">${esc(D.config.diaPrep)} · preparo</div>
     <div class="sec-s">Cronograma montado para ${D.config.bocas} bocas, ${D.config.airfryer} airfryer e ${D.config.forno} forno, começando pelo que demora mais.</div>
     <div class="row no-print" style="margin-bottom:12px"><span class="muted">Começo às</span>
       <input class="inp sm" type="time" value="${esc(D.config.inicio)}" onchange="D.config.inicio=this.value;save();render()" style="width:110px">
       ${ag.passos.length?`<span class="muted ml-auto">término ~<b style="color:var(--verde)">${hora(ag.fim)}</b> (${dur(ag.fim)})</span>`:''}</div>`;
-  if(!ag.passos.length) return h+`<div class="empty">Escolha receitas na aba Semana.</div>`;
+  if(!ag.passos.length && !Object.keys(needHora).length) return h+`<div class="empty">Escolha receitas na aba Semana.</div>`;
   ag.avisos.forEach(a=>h+=`<div class="warn">${esc(a)}</div>`);
-  h+=ganttHtml(ag)+timelineHtml(ag,'dia|');
+  if(ag.passos.length) h+=ganttHtml(ag)+timelineHtml(ag,'dia|');
+  else h+=`<div class="empty">Todas as receitas estão marcadas para fazer na hora.</div>`;
+
+  // Feitas na hora: fora do cronograma
+  const idsHora=Object.keys(needHora);
+  if(idsHora.length){
+    h+=`<div class="sec-t" style="margin-top:20px">⏱ Para fazer na hora</div>
+      <div class="sec-s">Fora do cronograma. Os ingredientes já estão na lista de compras.</div>`;
+    idsHora.forEach(id=>{
+      const r=rec(id), n=needHora[id];
+      const tempo=(r.etapas||[]).reduce((a,e)=>a+(+e.min||0),0);
+      h+=`<div class="card white"><div class="card-h" style="margin-bottom:4px"><span class="dot ${r.tipo}"></span><div class="card-t" style="font-size:19px">${esc(r.nome)}</div>
+          <span class="muted ml-auto">${quantoTxt(r,n)} · ~${dur(tempo)}</span></div>
+        <div class="muted" style="margin-bottom:4px">${n.quem.map(q=>q.porcoes?`${esc(q.nome)}: ${q.n} porç${q.n>1?'ões':'ão'}`:q.un?`${esc(q.nome)}: ${q.n} ${q.un}`:`${esc(q.nome)}: ${q.n}×${q.g}g`).join(' · ')}</div>
+        ${(r.etapas||[]).map((e,i)=>chkHtml('hora|'+id+'|'+i,`${EQUIP[e.eq]?EQUIP[e.eq].icon:''} <b>${dur(+e.min||0)}</b> ${esc(e.txt)}${naVespera(e)?' <span class="muted">(na véspera)</span>':''}`)).join('')}
+        <div style="margin-top:8px">${horaBtn(id)}</div></div>`;
+    });
+  }
 
   // Quantidades por receita (para conferir durante o preparo)
   h+=`<div class="sec-t" style="margin-top:20px">Ingredientes de cada receita</div>`;
-  Object.keys(needDia).forEach(id=>{
-    const r=rec(id), n=needDia[id];
-    h+=`<details class="card white"><summary class="row" style="cursor:pointer"><span class="dot ${r.tipo}"></span><b style="flex:1">${esc(r.nome)}</b><span class="muted">${quantoTxt(r,n)}</span></summary>
-      <div class="ing-list" style="margin-top:8px">${escala(r,n.qtd).map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div></details>`;
+  Object.keys(needTodo).forEach(id=>{
+    const r=rec(id), n=needTodo[id];
+    h+=`<details class="card white"><summary class="row" style="cursor:pointer"><span class="dot ${r.tipo}"></span><b style="flex:1">${esc(r.nome)}${naHora(id)?' <span class="muted">⏱ na hora</span>':''}</b><span class="muted">${quantoTxt(r,n)}</span></summary>
+      <div class="ing-list" style="margin-top:8px">${escala(r,n.qtd).map(i=>`<div><b>${fmtQ(i.qtd,i.un)}</b> ${esc(i.nome)}</div>`).join('')}</div>${obsHtml(r)}</details>`;
   });
 
   // Montagem
@@ -805,7 +1583,7 @@ function pgPreparo(c){
     <div class="card white"><table class="mt"><tr><th>Quem</th><th>Conteúdo</th><th style="text-align:right">Qtd</th></tr>`;
   c.montagem.forEach(m=>{
     h+=`<tr><td>${esc(m.p.emoji||'')} ${esc(m.p.nome)}</td>
-      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.g}g ${esc(x.r.nome)}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
+      <td>${m.partes.length?m.partes.map(x=>`<div><span class="dot ${x.k}" style="display:inline-block;margin-right:5px"></span>${x.porcao?(x.un==='un'?'1 un':'1 porção'):x.g+'g'} ${esc(x.r.nome)}${naHora(x.r.id)?' <span class="muted">⏱ na hora</span>':''}</div>`).join(''):'<span class="muted">nenhuma receita escolhida</span>'}</td>
       <td class="n">${m.c.qtd}×</td></tr>`;
   });
   h+=`</table></div>
@@ -830,28 +1608,45 @@ function pgPreparo(c){
 function pgReceitas(){
   if(ED) return editorHtml();
   let h=`<div class="sec-t">Receitas</div>
-    <div class="sec-s">Cadastre suas receitas. Para proteína, carboidrato e legumes informe <b>quanto rende pronto (em g)</b> — o app escala os ingredientes para as gramas que você precisa. Para jantar, informe <b>quantas porções</b>.</div>
-    <div class="filters">${['todos','proteina','carbo','legume','jantar'].map(t=>`<button class="fchip ${filtroTipo===t?'active':''}" onclick="filtroTipo='${t}';render()">${t==='todos'?'Todas':TIPOS[t]}</button>`).join('')}</div>
-    <button class="btn" style="width:100%;margin-bottom:12px" onclick="novaReceita()">+ Nova receita</button>`;
-  const lista=D.receitas.filter(r=>filtroTipo==='todos'||r.tipo===filtroTipo).sort((a,b)=>a.tipo.localeCompare(b.tipo)||a.nome.localeCompare(b.nome));
+    <div class="sec-s">Cadastre suas receitas. Para proteína, carboidrato e legumes informe <b>quanto rende pronto (em g)</b> — o app escala os ingredientes para as gramas que você precisa. Para pratos completos (lasanha, panqueca...) escolha <b>Proteína · prato completo</b> e informe <b>quantas porções</b>; para lanches, café e petiscos <b>quantas unidades ou porções</b>.</div>
+    <div class="filters">${['todos','proteina','carbo','legume','lanche','cafe','petisco'].map(t=>`<button class="fchip ${filtroTipo===t?'active':''}" onclick="filtroTipo='${t}';render()">${t==='todos'?'Todas':NOME_TIPO(t)}</button>`).join('')}</div>
+    <div class="row" style="margin-bottom:12px"><input class="inp" id="buscaRec" placeholder="buscar receita..." value="${esc(busca)}" oninput="busca=this.value;filtrarLista()">
+    <button class="btn" onclick="novaReceita()">+ Nova</button></div><div id="listaRec">`;
+  const q=busca.trim().toLowerCase();
+  const lista=D.receitas.filter(r=>(filtroTipo==='todos'||r.tipo===filtroTipo||(filtroTipo==='proteina'&&r.tipo==='jantar')) && (!q || r.nome.toLowerCase().includes(q) || r.ingredientes.some(i=>i.nome.toLowerCase().includes(q))));
   if(!lista.length) h+=`<div class="empty">Nenhuma receita aqui ainda.</div>`;
-  lista.forEach(r=>{
+  const ordT=['proteina','carbo','legume','lanche','cafe','petisco'];
+  ordT.filter(t=>filtroTipo==='todos'||t===filtroTipo).forEach(t=>{
+   const doT=lista.filter(r=>r.tipo===t||(t==='proteina'&&r.tipo==='jantar')); if(!doT.length) return;
+   if(filtroTipo==='todos') h+=`<div class="sec-t" style="font-size:20px;margin-top:14px">${NOME_TIPO(t)}</div>`;
+   agrupar(doT).forEach(gr=>{
+   h+=`<div class="grp-h">${esc(gr.label)}</div>`;
+   gr.itens.forEach(r=>{
     const eqs=[...new Set((r.etapas||[]).map(e=>EQUIP[e.eq]?EQUIP[e.eq].icon:''))].join(' ');
     const tempo=(r.etapas||[]).reduce((a,e)=>a+(+e.min||0),0);
     h+=`<div class="rcard" onclick="editarReceita('${r.id}')"><span class="dot ${r.tipo}"></span>
       <div style="flex:1"><div class="nm">${esc(r.nome)}</div>
-      <div class="meta">${TIPOS[r.tipo]} · rende ${r.tipo==='jantar'?r.rende+' porções':fmtG(r.rende)} · ${dur(tempo)} ${eqs}</div></div><span class="muted">›</span></div>`;
+      <div class="meta">${r.obs?'📝 ':''}${(r.etapas||[]).some(naVespera)?'🌙 ':''}rende ${r.tipo==='jantar'?r.rende+' porções · prato completo':EXTRA(r.tipo)?r.rende+' '+EXTRA(r.tipo).un:fmtG(r.rende)} · ${dur(tempo)} ${eqs}</div></div><span class="muted">›</span></div>`;
+   });
+   });
   });
-  return h;
+  return h+'</div>';
+}
+function filtrarLista(){
+  const tmp=document.createElement('div'); tmp.innerHTML=pgReceitas();
+  const nova=tmp.querySelector('#listaRec'); if(nova) document.getElementById('listaRec').replaceWith(nova);
 }
 function novaReceita(){
-  ED={id:'',nome:'',tipo:filtroTipo==='todos'?'proteina':filtroTipo,rende:1000,lote:0,ingredientes:[{qtd:'',un:'g',nome:'',secao:''}],pre:[],etapas:[{eq:'fogao',min:20,txt:''}]};
+  ED={id:'',nome:'',obs:'',tipo:filtroTipo==='todos'||filtroTipo==='jantar'?'proteina':filtroTipo,rende:1000,lote:0,ingredientes:[{qtd:'',un:'g',nome:'',secao:''}],pre:[],etapas:[{eq:'fogao',min:20,txt:''}]};
   render(); window.scrollTo({top:0});
 }
 function editarReceita(id){ ED=JSON.parse(JSON.stringify(rec(id))); render(); window.scrollTo({top:0}); }
 function editorHtml(){
-  const r=ED, j=r.tipo==='jantar';
+  const r=ED, j=r.tipo==='jantar', l=!!EXTRA(r.tipo), unX=l?EXTRA(r.tipo).un:'';
   const temAF=(r.etapas||[]).some(e=>e.eq==='airfryer');
+  const [cg,cb]=classe(r);
+  const temProt=['proteina','jantar','lanche'].includes(r.tipo);
+  const basesSug=[...new Set(GRUPOS.filter(G=>temProt?G[1]&&G[0]===cg:G[0]===r.tipo).flatMap(G=>G[2]).concat(D.receitas.filter(x=>x.base).map(x=>x.base)))];
   let h=`<div class="row" style="margin-bottom:10px"><button class="btn sec sm" onclick="ED=null;render()">‹ Voltar</button>
     <div class="sec-t" style="margin:0">${r.id?'Editar receita':'Nova receita'}</div></div>
   <div class="card">
@@ -859,34 +1654,42 @@ function editorHtml(){
     <input class="inp" value="${esc(r.nome)}" onchange="ED.nome=this.value" placeholder="ex.: Frango ao curry">
     <div class="grid2">
       <div><label class="lbl">Tipo</label><select class="inp" onchange="ED.tipo=this.value;render()">${Object.keys(TIPOS).map(t=>`<option value="${t}" ${r.tipo===t?'selected':''}>${TIPOS[t]}</option>`).join('')}</select></div>
-      <div><label class="lbl">${j?'Rende (porções)':'Rende pronto (g)'}</label><input class="inp" type="number" inputmode="numeric" value="${r.rende}" onchange="ED.rende=+this.value"></div>
+      <div><label class="lbl">${j||unX==='porções'?'Rende (porções)':l?'Rende (unidades)':'Rende pronto (g)'}</label><input class="inp" type="number" inputmode="numeric" value="${r.rende}" onchange="ED.rende=+this.value"></div>
     </div>
-    <div class="muted" style="margin-top:6px">${j?'Quantas pessoas a receita abaixo serve.':'Peso total da receita depois de pronta, com as quantidades abaixo. Ex.: 1 kg de frango cru rende ~700 g grelhado.'}</div>
-    ${temAF&&!j?`<label class="lbl">Capacidade da airfryer por leva (g prontos)</label><input class="inp sm" style="width:110px" type="number" inputmode="numeric" value="${r.lote||''}" placeholder="ex.: 500" onchange="ED.lote=+this.value">
+    <div class="grid2">
+      ${temProt?`<div><label class="lbl">Proteína</label><select class="inp" onchange="ED.grupo=this.value;ED.base=ED.base||'';render()">${GRUPOS.filter(G=>G[1]&&G[0]!=='carbo').map(G=>`<option value="${G[0]}" ${G[0]===cg?'selected':''}>${G[1]}</option>`).join('')}</select></div>`:''}
+      <div><label class="lbl">${temProt?'Base':'Categoria'}</label><input class="inp" list="basesSug" value="${esc(cb)}" onchange="ED.grupo=ED.grupo||'${cg}';ED.base=this.value.trim()"><datalist id="basesSug">${basesSug.map(b=>`<option value="${esc(b)}">`).join('')}</datalist></div>
+    </div>
+    <div class="muted" style="margin-top:6px">${l?`Quant${unX==='un'?'as unidades':'as porções'} a receita abaixo rende.`:j?'Quantas pessoas a receita abaixo serve.':'Peso total da receita depois de pronta, com as quantidades abaixo. Ex.: 1 kg de frango cru rende ~700 g grelhado.'}</div>
+    ${temAF&&!j?`<label class="lbl">Capacidade da airfryer por leva (${l?unX:'g prontos'})</label><input class="inp sm" style="width:110px" type="number" inputmode="numeric" value="${r.lote||''}" placeholder="ex.: 500" onchange="ED.lote=+this.value">
       <div class="muted" style="margin-top:4px">Usado para calcular quantas levas serão necessárias.</div>`:''}
   </div>
   <div class="card"><div class="card-t" style="margin-bottom:8px">Ingredientes</div>`;
   r.ingredientes.forEach((i,k)=>{
     h+=`<div class="ed-row">
       <input class="inp xs" type="number" inputmode="decimal" step="any" value="${i.qtd}" onchange="ED.ingredientes[${k}].qtd=+this.value" ${i.un==='a gosto'?'disabled':''}>
-      <select class="inp" style="width:96px;flex-shrink:0" onchange="ED.ingredientes[${k}].un=this.value;render()">${UNIDADES.map(u=>`<option ${u===i.un?'selected':''}>${u}</option>`).join('')}</select>
+      <select class="inp" style="width:92px;flex:0 0 92px" onchange="ED.ingredientes[${k}].un=this.value;render()">${UNIDADES.map(u=>`<option ${u===i.un?'selected':''}>${u}</option>`).join('')}</select>
       <input class="inp" value="${esc(i.nome)}" placeholder="ingrediente" onchange="ED.ingredientes[${k}].nome=this.value">
       <button class="x" onclick="ED.ingredientes.splice(${k},1);render()">×</button></div>`;
   });
   h+=`<button class="btn ghost sm" onclick="ED.ingredientes.push({qtd:'',un:'g',nome:'',secao:''});render()">+ ingrediente</button></div>
-  <div class="card"><div class="card-t" style="margin-bottom:4px">Pré-preparo (véspera)</div>
-    <div class="muted" style="margin-bottom:8px">Uma tarefa por linha. Ex.: marinar, descongelar, picar, deixar de molho.</div>
-    <textarea class="inp" onchange="ED.pre=this.value.split('\\n').map(s=>s.trim()).filter(Boolean)">${esc((r.pre||[]).join('\n'))}</textarea></div>
+  <div class="card"><div class="card-t" style="margin-bottom:4px">Observações e links</div>
+    <textarea class="inp" style="min-height:60px" placeholder="dicas, link do vídeo, de onde é a receita..." onchange="ED.obs=this.value">${esc(r.obs||'')}</textarea></div>
   <div class="card"><div class="card-t" style="margin-bottom:4px">Etapas do preparo</div>
-    <div class="muted" style="margin-bottom:8px">Em ordem. O equipamento e o tempo são usados para montar o cronograma do dia.</div>`;
+    <div class="muted" style="margin-bottom:8px">Em ordem. O equipamento e o tempo montam o cronograma. Escolha em cada etapa se ela é feita <b>no dia</b> ou <b>na véspera</b> (marinar, picar, deixar de molho...). A aba Véspera mostra só as etapas marcadas na véspera.</div>`;
   (r.etapas||[]).forEach((e,k)=>{
     h+=`<div class="combo"><div class="ed-row">
       <select class="inp" onchange="ED.etapas[${k}].eq=this.value;render()">${Object.keys(EQUIP).map(q=>`<option value="${q}" ${q===e.eq?'selected':''}>${EQUIP[q].icon} ${EQUIP[q].nome}</option>`).join('')}</select>
       <input class="inp xs" type="number" inputmode="numeric" value="${e.min}" onchange="ED.etapas[${k}].min=+this.value"><span class="muted">min</span>
       <button class="x" onclick="ED.etapas.splice(${k},1);render()">×</button></div>
-      <input class="inp" value="${esc(e.txt)}" placeholder="o que fazer" onchange="ED.etapas[${k}].txt=this.value"></div>`;
+      <input class="inp" value="${esc(e.txt)}" placeholder="o que fazer" onchange="ED.etapas[${k}].txt=this.value">
+      <div class="row" style="margin-top:6px;gap:6px">
+        <button class="hora-btn ${naVespera(e)?'':'on'}" onclick="ED.etapas[${k}].dia='dia';render()">📅 no dia</button>
+        <button class="hora-btn ${naVespera(e)?'on':''}" onclick="ED.etapas[${k}].dia='vespera';render()">🌙 na véspera</button>
+      </div></div>`;
   });
-  h+=`<button class="btn ghost sm" onclick="ED.etapas.push({eq:'fogao',min:15,txt:''});render()">+ etapa</button></div>
+  h+=`<div class="row" style="gap:6px"><button class="btn ghost sm" onclick="ED.etapas.push({eq:'fogao',min:15,txt:'',dia:'dia'});render()">+ etapa no dia</button>
+    <button class="btn ghost sm" onclick="ED.etapas.push({eq:'bancada',min:10,txt:'',dia:'vespera'});render()">+ etapa na véspera</button></div></div>
   <div class="row wrap" style="margin-top:6px">
     <button class="btn" onclick="salvarReceita()">Salvar receita</button>
     ${r.id?`<button class="btn sec" onclick="duplicarReceita()">Duplicar</button><button class="btn danger ml-auto" onclick="apagarReceita()">Apagar</button>`:''}
@@ -900,6 +1703,7 @@ function salvarReceita(){
   if(!r.nome.trim()){ toast('Dê um nome à receita'); return; }
   if(!(r.rende>0)){ toast('Informe quanto a receita rende'); return; }
   r.ingredientes=r.ingredientes.filter(i=>i.nome.trim()).map(i=>Object.assign(i,{nome:i.nome.trim(),qtd:+i.qtd||0}));
+  preParaEtapas(r);
   r.etapas=(r.etapas||[]).filter(e=>(+e.min>0)||e.txt.trim());
   if(!r.id){ r.id=uid(); D.receitas.push(r); }
   else{ const i=D.receitas.findIndex(x=>x.id===r.id); D.receitas[i]=r; }
@@ -953,11 +1757,12 @@ function pgAjustes(){
     <div><label class="lbl">Dia do pré-preparo</label><input class="inp" value="${esc(C.diaPre)}" onchange="setC('diaPre',this.value)"></div>
     <div><label class="lbl">Dia do preparo</label><input class="inp" value="${esc(C.diaPrep)}" onchange="setC('diaPrep',this.value)"></div>
   </div>
-  <div class="muted" style="margin-top:8px">A margem compensa perdas e variação no rendimento (sobra um pouco a mais).</div></div>
+  <div class="muted" style="margin-top:8px">A margem compensa perdas e variação no rendimento (sobra um pouco a mais).</div>
+  <label class="switch" style="margin-top:12px"><input type="checkbox" ${C.preparadoCA?'checked':''} onchange="setC('preparadoCA',this.checked)">Preparado de cebola e alho no processador na véspera</label></div>
 
   <div class="sec-t" style="margin-top:22px">Backup</div>
   <div class="card">
-    <div class="muted" style="margin-bottom:10px">Os dados ficam salvos neste navegador. Copie o backup para guardar ou levar para outro aparelho.</div>
+    <div class="muted" style="margin-bottom:10px">${nuvem?'Seus dados ficam salvos na sua conta e aparecem iguais em todos os aparelhos onde você abrir este link. O backup serve como cópia de segurança.':'Os dados ficam salvos neste navegador. Copie o backup para guardar ou levar para outro aparelho.'}</div>
     <div class="row wrap"><button class="btn" onclick="copiar(JSON.stringify(D),'Backup copiado 📋')">Copiar backup</button>
     <button class="btn sec" onclick="importar()">Restaurar backup</button>
     <button class="btn sec" onclick="restaurarPadrao()">Repor receitas de exemplo</button></div>
@@ -985,10 +1790,10 @@ function importar(){
 function restaurarPadrao(){
   const faltando=receitasPadrao().filter(r=>!rec(r.id));
   if(!faltando.length){ toast('Todas as receitas de exemplo já estão aqui'); return; }
-  D.receitas.push(...faltando); save(); render(); toast(faltando.length+' receitas repostas');
+  faltando.forEach(preParaEtapas); D.receitas.push(...faltando); save(); render(); toast(faltando.length+' receitas repostas');
 }
 
-load(); render();
+load(); render(); conectar();
 </script>
 </body>
 </html>
