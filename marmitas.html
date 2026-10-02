@@ -208,7 +208,7 @@ function R(id,nome,tipo,rende,ing,pre,etapas,lote){
     ingredientes:ing.map(([qtd,un,nome])=>({qtd,un,nome,secao:''})),
     pre,etapas:etapas.map(([eq,min,txt])=>({eq,min,txt}))};
 }
-function receitasPadrao(){ return receitasBase().map(r=>r.id==='arroz_branco'?ARROZ_BRANCO_VI():r.id==='legumes_assados'?LEGUMES_FORNO_VI():r).concat(receitasVi(),receitasLanches(),receitasCafe(),receitasPetiscos()); }
+function receitasPadrao(){ return receitasBase().map(r=>r.id==='arroz_branco'?ARROZ_BRANCO_VI():r.id==='legumes_assados'?LEGUMES_FORNO_VI():r).concat(receitasVi(),receitasLanches(),receitasCafe(),receitasPetiscos(),receitasNovas5()); }
 function receitasBase(){ return [
   // PROTEÍNAS
   R('frango_cubos','Frango em cubos grelhado','proteina',700,
@@ -673,6 +673,19 @@ function receitasCafe(){ return [
     ['Misturar chia, leite e mel em potinhos e deixar na geladeira de um dia para o outro'],
     [['bancada',5,'Cobrir com morango picado']]),
 ];}
+function receitasNovas5(){ return [
+  V('torta_frango_dalbo','Torta de frango (Cozinha Dal Bó)','jantar',8,
+    [[800,'g','peito de frango com osso'],[2,'colher (sopa)','vinagre'],[2,'un','cebola'],[2,'un','caldo de galinha (tablete)'],[1,'dente','alho'],[1,'colher (sopa)','páprica doce'],[1,'lata','milho verde'],[200,'g','requeijão cremoso'],
+     [200,'g','manteiga sem sal'],[3,'un','ovo'],[2,'colher (sopa)','leite integral'],[3,'xícara','farinha de trigo'],[1,'g','sal']],
+    ['Massa: misturar a manteiga levemente amolecida, 2 gemas, o leite, a farinha e a pitada de sal até desgrudar das mãos; embrulhar em filme e guardar na geladeira',
+     'Cozinhar e desfiar o frango (pode ser feito na véspera)'],
+    [['fogao',30,'Cozinhar o peito na pressão com água, o vinagre e 1 tablete de caldo (cerca de 20 min após pegar pressão)'],
+     ['bancada',10,'Desfiar o frango'],
+     ['fogao',15,'Refogar cebola e alho, juntar páprica, o outro tablete, o frango e o milho; desligar e misturar o requeijão'],
+     ['bancada',15,'Forrar fundo e laterais da forma com 2/3 da massa, rechear, cobrir com o restante e pincelar com o ovo batido'],
+     ['forno',40,'Assar a 180 °C até dourar']],0,
+    'Receita: https://cozinhadalbo.com.br/2014/06/torta-de-frango/ — o modo de preparo aqui é um resumo; confira tempos e detalhes no site.'),
+];}
 function receitasPetiscos(){ return [
   V('bruschetta','Bruschetta','petisco',6,
     [[1,'un','pão italiano'],[3,'un','tomate'],[2,'dente','alho'],[30,'ml','azeite'],[1,'maço','manjericão'],[4,'g','sal']],[],
@@ -703,7 +716,7 @@ const CLASSE = {};
 [['carne','Carne moída','carne_moida almondegas hamburguer_caseiro lasanha escondidinho panqueca_carne conchiglione macarrao_bolonhesa nhoque_bolonhesa berinjela_gratinada'],
  ['carne','Cubos e tiras','iscas_patinho picadinho carne_molho_queijo iscas_alho strogonoff_carne yakisoba bife'],
  ['carne','Desfiada e peças','carne_louca carne_desfiada cupim_pressao carne_assada costela_assada'],
- ['frango','Frango desfiado','frango_desfiado fricasse empadao_frango panqueca_frango_verde'],
+ ['frango','Frango desfiado','frango_desfiado fricasse empadao_frango panqueca_frango_verde torta_frango_dalbo'],
  ['frango','Cubos e filés','frango_cubos frango_af file_frango frango_creme_brocolis strogonoff'],
  ['frango','Empanado','frango_empanado hamburguer_frango parmegiana_frango'],
  ['frango','Assado','sobrecoxa_forno frango_assado frango_batatas'],
@@ -777,7 +790,7 @@ function optsAgrupadas(lista, sel){
 function dadosPadrao(){
   return {
     versao:1,
-    receitasVersao:4,
+    receitasVersao:5,
     pessoas:[
       {id:'marido', nome:'Baia', emoji:'👨', qtd:6,  proteina:140, carbo:100, legume:100},
       {id:'filha',  nome:'Mel',  emoji:'👧', qtd:10, proteina:140, carbo:150, legume:0},
@@ -830,10 +843,10 @@ function normalizar(){
    só troca arroz branco / legumes assados se ainda estiverem como vieram. */
 function migrarReceitas(){
   const v=D.receitasVersao||1;
-  if(v >= 4) return false;
-  const novas=[...(v<3?receitasLanches():[]), ...receitasCafe(), ...receitasPetiscos()];
+  if(v >= 5) return false;
+  const novas=[...(v<3?receitasLanches():[]), ...(v<4?[...receitasCafe(), ...receitasPetiscos()]:[]), ...receitasNovas5()];
   novas.forEach(r=>{ if(!D.receitas.some(x=>x.id===r.id)) D.receitas.push(r); });
-  D.receitasVersao=4;
+  D.receitasVersao=5;
   if(v >= 2) return true;
   const base=receitasBase();
   [['arroz_branco',ARROZ_BRANCO_VI],['legumes_assados',LEGUMES_FORNO_VI]].forEach(([id,nova])=>{
