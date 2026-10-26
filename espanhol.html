@@ -77,6 +77,12 @@ textarea.inp{min-height:70px;resize:vertical;line-height:1.5;}
 .nivel i.on{background:var(--verde-c);}
 .ico{width:32px;height:32px;border-radius:50%;border:1px solid var(--creme-e);background:white;cursor:pointer;flex-shrink:0;font-size:14px;line-height:1;color:var(--texto-s);}
 .ico.mic{width:38px;height:38px;font-size:16px;}
+.btn.play.on{background:var(--verde-c);border-color:var(--verde-c);color:white;}
+.frase-acoes{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.res{font-size:14px;margin-top:10px;line-height:1.6;}
+.res .w{padding:1px 3px;border-radius:5px;}
+.res .w.ok{background:rgba(74,124,95,.14);color:var(--verde-m);}
+.res .w.no{background:rgba(212,117,106,.16);color:#9a4a40;}
 .ico.mic.on,.btn.mic.on{background:var(--rosa);border-color:var(--rosa);color:white;animation:pulsa 1.2s infinite;}
 @keyframes pulsa{0%{box-shadow:0 0 0 0 rgba(212,117,106,.5);}70%{box-shadow:0 0 0 10px rgba(212,117,106,0);}100%{box-shadow:0 0 0 0 rgba(212,117,106,0);}}
 .campo{display:flex;gap:8px;align-items:flex-start;}
@@ -138,9 +144,9 @@ const CATS = ['Vocabulário','Expressão','Verbo','Gramática','Frase'];
 // dias até a próxima revisão para cada nível (0 = nova ou errada)
 const INTERVALOS = [1,1,3,7,14,30,60];
 const NIVEL_MAX = INTERVALOS.length-1;
-const PAGES = [['caderno','Caderno'],['revisar','Revisar'],['adicionar','+ Anotar'],['ajustes','Ajustes']];
+const PAGES = [['caderno','Caderno'],['frases','Frases'],['revisar','Revisar'],['adicionar','+ Anotar'],['ajustes','Ajustes']];
 
-function dadosPadrao(){ return {versao:1, itens:[], importadas:[], config:{sentido:'es-pt'}}; }
+function dadosPadrao(){ return {versao:1, itens:[], frases:[], importadas:[], config:{sentido:'es-pt'}}; }
 
 /* ============================================================
    ANOTAÇÕES DITADAS NO CHAT
@@ -160,7 +166,7 @@ const DO_CHAT = [
 /* ============================================================
    ESTADO
    ============================================================ */
-let D, page='caderno', ED=null, busca='', filtroCat='todas', R=null;
+let D, page='caderno', ED=null, EDF=null, busca='', filtroCat='todas', R=null;
 
 function uid(){ return Math.random().toString(36).slice(2,9); }
 function load(){
@@ -169,6 +175,7 @@ function load(){
     D = (s && Array.isArray(s.itens)) ? s : dadosPadrao();
   }catch(e){ D = dadosPadrao(); }
   D.config = Object.assign(dadosPadrao().config, D.config||{});
+  D.frases = D.frases||[];
   D.importadas = D.importadas||[];
   const novas = DO_CHAT.filter(c=>!D.importadas.includes(c.id));
   novas.forEach(c=>{ D.itens.push(Object.assign(novoItem(c.es,c.pt,c.ex,c.nota,c.cat),{id:c.id})); D.importadas.push(c.id); });
@@ -197,7 +204,9 @@ function fmtData(iso){
 }
 function paraHoje(){ const h=hoje(); return D.itens.filter(i=>i.prox<=h); }
 function embaralhar(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function sem(s){ return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+function sem(s){ return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+// sem acento, pontuação e maiúsculas, para comparar o que foi falado
+function limpa(s){ return sem(s).replace(/[¿?¡!.,;:"“”()]/g,' ').replace(/\s+/g,' ').trim(); }
 
 function fecharModal(){ document.getElementById('modal').innerHTML=''; }
 let _modalOk=null;
@@ -224,11 +233,18 @@ function copiar(t,msg){
     else manual();
   }catch(e){ manual(); }
 }
-function falar(t){
+// voz em espanhol da Espanha (es-ES); se o aparelho não tiver, usa outra voz em espanhol
+function vozES(){
+  const vs=speechSynthesis.getVoices(), lg=v=>v.lang.replace('_','-').toLowerCase();
+  return vs.find(v=>lg(v)==='es-es') || vs.find(v=>lg(v).startsWith('es'));
+}
+function temVozEspanha(){ return 'speechSynthesis' in window && speechSynthesis.getVoices().some(v=>v.lang.replace('_','-').toLowerCase()==='es-es'); }
+function falar(t, devagar, btn, emFila){
   if(!('speechSynthesis' in window)){ toast('Este navegador não fala 😕'); return; }
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=.9;
-  const v=speechSynthesis.getVoices().find(v=>/^es/i.test(v.lang)); if(v) u.voice=v;
+  if(!emFila) speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=devagar?.6:.9;
+  const v=vozES(); if(v) u.voice=v;
+  if(btn){ btn.classList.add('on'); u.onend=u.onerror=()=>btn.classList.remove('on'); }
   speechSynthesis.speak(u);
 }
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -263,13 +279,13 @@ function nivelHtml(n){ let h='<span class="nivel" title="nível '+n+' de '+NIVEL
 /* ============================================================
    RENDER — NAVEGAÇÃO
    ============================================================ */
-function go(p){ if(_rec) _rec.abort(); page=p; if(p!=='adicionar') ED=null; if(p!=='revisar') R=null; try{localStorage.setItem(KEY+'_page',p);}catch(e){} render(); window.scrollTo({top:0}); }
+function go(p){ if(_rec) _rec.abort(); if('speechSynthesis' in window) speechSynthesis.cancel(); page=p; if(p!=='adicionar') ED=null; if(p!=='frases') EDF=null; if(p!=='revisar') R=null; try{localStorage.setItem(KEY+'_page',p);}catch(e){} render(); window.scrollTo({top:0}); }
 function render(){
   const due=paraHoje().length;
   document.getElementById('tabs').innerHTML = PAGES.map(([id,nm])=>`<button class="tab ${page===id?'active':''}" onclick="go('${id}')">${id==='adicionar'&&ED?'Editar':nm}${id==='revisar'&&due?`<span class="n">${due}</span>`:''}</button>`).join('');
   const n=D.itens.length;
   document.getElementById('hdrSum').textContent = n ? `${n} anotaç${n>1?'ões':'ão'} · ${due?due+' para revisar hoje':'revisão em dia ✓'}` : 'comece anotando o que aprendeu';
-  const fn={caderno:pgCaderno,revisar:pgRevisar,adicionar:pgAdicionar,ajustes:pgAjustes}[page];
+  const fn={caderno:pgCaderno,frases:pgFrases,revisar:pgRevisar,adicionar:pgAdicionar,ajustes:pgAjustes}[page];
   document.getElementById('page').innerHTML=fn();
   if(page==='adicionar' && !ED) setTimeout(()=>{ const e=document.getElementById('f_es'); if(e && matchMedia('(hover:hover)').matches) e.focus(); },0);
 }
@@ -306,6 +322,81 @@ function listaHtml(){
     ${i.nota?`<div class="nota">${esc(i.nota)}</div>`:''}
     <div class="item-meta">${i.cat?`<span class="chip">${esc(i.cat)}</span>`:''}${nivelHtml(i.nivel)}<span class="muted" style="margin-left:auto">revisar ${fmtData(i.prox)}</span></div>
   </div>`).join('');
+}
+
+/* ============================================================
+   PÁGINA: FRASES PARA TREINAR
+   ============================================================ */
+function pgFrases(){
+  const f = EDF ? D.frases.find(x=>x.id===EDF) : {es:'',pt:''};
+  let h=`<div class="sec-t">Frases para treinar</div>
+  <div class="sec-s">Escreva ou dite as frases que quer treinar. Toque em <b>▶ Ouvir</b> para escutar com o sotaque da Espanha, <b>🐢</b> para ouvir devagar e <b>🎤 Falar</b> para repetir e ver se entendi tudo.</div>
+  <div class="card white">
+    <label class="lbl">Frase em espanhol</label>
+    <div class="campo"><textarea class="inp" id="f_fes" placeholder="ex.: ¿Me puedes ayudar, por favor?" onfocus="ultimo=this" autocapitalize="sentences">${esc(f.es)}</textarea>${micBtn('fes','es-ES')}</div>
+    <label class="lbl">Tradução (opcional)</label>
+    <div class="campo"><input class="inp" id="f_fpt" value="${esc(f.pt)}" placeholder="ex.: Você pode me ajudar, por favor?" onfocus="ultimo=this">${micBtn('fpt','pt-BR')}</div>
+    <div class="acentos">${['á','é','í','ó','ú','ñ','ü','¿','¡'].map(c=>`<button type="button" onmousedown="event.preventDefault()" onclick="inserir('${c}')">${c}</button>`).join('')}</div>
+    <div class="row wrap" style="margin-top:14px">
+      <button class="btn" onclick="salvarFrase()">${EDF?'Salvar':'Adicionar frase'}</button>
+      <button class="btn sec play" onclick="const t=document.getElementById('f_fes').value.trim(); if(t) falar(t,false,this); else toast('Escreva a frase primeiro')">▶ Ouvir</button>
+      ${EDF?`<button class="btn sec" onclick="EDF=null;render()">Cancelar</button><button class="btn danger" style="margin-left:auto" onclick="excluirFrase('${EDF}')">Excluir</button>`:''}
+    </div>
+  </div>`;
+  h+=`<div class="sec-s" id="avisoVoz">${avisoVoz()}</div>`;
+  if(!D.frases.length) return h+`<div class="empty">Nenhuma frase ainda.</div>`;
+  h+=`<div class="row" style="margin:18px 2px 10px"><div class="muted">${D.frases.length} frase${D.frases.length>1?'s':''}</div>
+    <button class="btn sec sm play" style="margin-left:auto" onclick="ouvirTodas(this)">▶ Ouvir todas</button></div>`;
+  h+=D.frases.slice().sort((a,b)=>b.criado.localeCompare(a.criado)).map(f=>`<div class="item">
+    <div class="item-top">
+      <div style="flex:1;min-width:0"><div class="es">${esc(f.es)}</div>${f.pt?`<div class="pt">${esc(f.pt)}</div>`:''}</div>
+      <button class="ico" onclick="editarFrase('${f.id}')" title="Editar">✎</button>
+    </div>
+    <div class="frase-acoes">
+      <button class="btn sm play" onclick="falarFrase('${f.id}',false,this)">▶ Ouvir</button>
+      <button class="btn sec sm play" onclick="falarFrase('${f.id}',true,this)">🐢 Devagar</button>
+      ${SR?`<button class="btn sec sm mic" onclick="treinarFrase('${f.id}',this)">🎤 Falar</button>`:''}
+    </div>
+    <div class="res" id="res_${f.id}"></div>
+  </div>`).join('');
+  return h;
+}
+function avisoVoz(){
+  return 'speechSynthesis' in window && speechSynthesis.getVoices().length && !temVozEspanha()
+    ? '⚠️ Este aparelho não tem voz da Espanha instalada, então vou usar outra voz em espanhol. No iPhone: Ajustes › Acessibilidade › Conteúdo Falado › Vozes › Espanhol › Espanha.' : '';
+}
+function frase(id){ return D.frases.find(f=>f.id===id); }
+function falarFrase(id,devagar,btn){ const f=frase(id); if(f) falar(f.es,devagar,btn); }
+function ouvirTodas(btn){
+  speechSynthesis.cancel();
+  const lista=D.frases.slice().sort((a,b)=>b.criado.localeCompare(a.criado));
+  lista.forEach((f,k)=>falar(f.es,false,k===lista.length-1?btn:null,true));
+  btn.classList.add('on');
+}
+function salvarFrase(){
+  const es=document.getElementById('f_fes').value.trim(), pt=document.getElementById('f_fpt').value.trim();
+  if(!es){ toast('Escreva ou dite a frase em espanhol'); return; }
+  if(EDF){ Object.assign(frase(EDF),{es,pt}); EDF=null; toast('Frase atualizada ✓'); }
+  else{ D.frases.push({id:uid(),es,pt,criado:new Date().toISOString()}); toast('Frase adicionada ✓'); }
+  save(); render();
+}
+function editarFrase(id){ EDF=id; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function excluirFrase(id){
+  pedir('Excluir esta frase?',()=>{ D.frases=D.frases.filter(f=>f.id!==id); EDF=null; save(); render(); toast('Excluída'); },'Excluir');
+}
+// ouve a pessoa repetindo a frase e marca as palavras que reconheceu (verde) ou não (vermelho)
+function treinarFrase(id,btn){
+  const f=frase(id), res=document.getElementById('res_'+id);
+  ouvir('es-ES', btn, (t,final)=>{
+    if(!final){ res.innerHTML=`<span class="muted">🎤 ${esc(t)}</span>`; return; }
+    const ditas=limpa(t).split(' ');
+    const alvo=f.es.split(/\s+/).filter(w=>limpa(w));
+    const ok=alvo.map(w=>{ const k=ditas.indexOf(limpa(w)); if(k>=0) ditas.splice(k,1); return k>=0; });
+    const marcadas=alvo.map((w,k)=>`<span class="w ${ok[k]?'ok':'no'}">${esc(w)}</span>`);
+    const certas=ok.filter(Boolean).length;
+    res.innerHTML = (certas===alvo.length ? '<b style="color:var(--verde-m)">¡Perfecto! 🎉</b><br>' : `<span class="muted">Entendi ${certas} de ${alvo.length} palavras. Em vermelho, o que não reconheci:</span><br>`)
+      + marcadas.join(' ') + `<div class="muted" style="margin-top:4px">Você disse: “${esc(t)}”</div>`;
+  });
 }
 
 /* ============================================================
@@ -392,9 +483,8 @@ function responderFalando(btn, lang){
 }
 // compara a fala com a resposta, ignorando acentos, pontuação e maiúsculas; aceita qualquer opção separada por / , ;
 function confere(fala, resp){
-  const lp=s=>sem(s).replace(/[¿?¡!.,;:"“”()]/g,' ').replace(/\s+/g,' ').trim();
-  const f=lp(fala);
-  return resp.split(/[\/,;]/).map(lp).filter(Boolean).some(o=>o===f);
+  const f=limpa(fala);
+  return resp.split(/[\/,;]/).map(limpa).filter(Boolean).some(o=>o===f);
 }
 function setSentido(s){ D.config.sentido=s; save(); if(R){ R.aberto=false; R.ouvido=null; } render(); }
 
@@ -501,7 +591,11 @@ function importar(){
   },'Restaurar');
 }
 
-if('speechSynthesis' in window) speechSynthesis.getVoices();
+if('speechSynthesis' in window){
+  speechSynthesis.getVoices();
+  // as vozes carregam depois da página; atualiza o aviso de voz da aba Frases
+  speechSynthesis.onvoiceschanged=()=>{ const a=document.getElementById('avisoVoz'); if(a) a.innerHTML=avisoVoz(); };
+}
 load(); render();
 </script>
 </body>
